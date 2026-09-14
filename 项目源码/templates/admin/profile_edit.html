@@ -1,0 +1,522 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑个人资料 · 管理后台{% endblock %}
+
+{% block content %}
+<div class="fade-in space-y-8">
+
+    <!-- 顶部导航 -->
+    <section class="relative rounded-[28px] overflow-hidden glass-strong p-6 md:p-8">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 700px 400px at -10% -20%, rgba(14,165,233,.35), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 110% 10%, rgba(168,85,247,.35), transparent 60%);">
+        </div>
+        <div class="absolute inset-0 opacity-30 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 50% 30%, #000 40%, transparent 80%);">
+        </div>
+
+        <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                    🧑‍💻 <span class="bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">编辑个人资料</span>
+                </h1>
+                <p class="text-sm text-white/60 mt-1.5">
+                    完善你的博主信息，打造专属的个人主页。
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ url_for('profile_home') }}" target="_blank"
+                   class="tag-pill inline-flex items-center gap-1.5 px-4 md:px-5 py-2.5 rounded-xl
+                          glass text-white/85 hover:text-white hover:border-cyber-500/40 text-sm transition">
+                    👀 预览个人主页
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="tag-pill inline-flex items-center gap-1.5 px-4 md:px-5 py-2.5 rounded-xl
+                          glass text-white/85 hover:text-white hover:border-white/20 text-sm transition">
+                    ← 返回后台
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="rounded-xl p-4 border backdrop-blur
+                    {% if category == 'success' %}
+                        border-emerald-500/40 bg-emerald-500/10 text-emerald-200
+                    {% elif category == 'danger' %}
+                        border-rose-500/40 bg-rose-500/10 text-rose-200
+                    {% else %}
+                        border-cyber-500/40 bg-cyber-500/10 text-cyan-200
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- 左侧：头像 + 概览 -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- 头像卡片 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-5">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    头像设置
+                </h2>
+                <div class="flex flex-col items-center gap-4">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full blur opacity-60 group-hover:opacity-90 transition"></div>
+                        <img id="avatar-preview"
+                             src="{{ profile.avatar_url if profile else '' }}"
+                             data-fallback-seed="{{ (profile.nickname if profile and profile.nickname else 'coder') | urlencode }}"
+                             class="relative w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 border-slate-900 shadow-2xl bg-slate-800">
+                    </div>
+                    <div class="w-full space-y-3">
+                        <label class="block cursor-pointer">
+                            <span class="sr-only">上传头像</span>
+                            <input type="file" name="avatar" id="avatar-input" accept=".png,.jpg,.jpeg,.gif,.webp"
+                                   class="block w-full text-xs text-white/60
+                                          file:mr-3 file:py-2.5 file:px-4
+                                          file:rounded-xl file:border-0
+                                          file:text-sm file:font-semibold
+                                          file:bg-cyber-gradient file:text-white file:shadow-cyber-sm
+                                          hover:file:opacity-90">
+                        </label>
+                        <div class="flex gap-2">
+                            <label class="flex items-center gap-1.5 text-xs text-white/60 hover:text-rose-300 cursor-pointer transition select-none">
+                                <input type="checkbox" name="remove_avatar" value="1"
+                                       class="accent-rose-500 w-3.5 h-3.5">
+                                移除当前头像（使用默认）
+                            </label>
+                        </div>
+                        <p class="text-[11px] text-white/40 leading-relaxed">
+                            选择图片后可在弹窗中拖拽选取正方形区域裁剪 · 支持 PNG/JPG/JPEG/GIF/WEBP
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 基本信息快捷 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    核心标识
+                </h2>
+                <div>
+                    <label class="text-sm text-white/70 mb-1.5 block">昵称 <span class="text-rose-400">*</span></label>
+                    <input type="text" name="nickname" value="{{ profile.nickname or '' }}" required maxlength="50"
+                           placeholder="例如：极客小李"
+                           class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                  focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                </div>
+                <div>
+                    <label class="text-sm text-white/70 mb-1.5 block">个人头衔</label>
+                    <input type="text" name="title" value="{{ profile.title or '' }}" maxlength="100"
+                           placeholder="例如：全栈开发 / 独立开发者"
+                           class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                  focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                </div>
+                <div>
+                    <label class="text-sm text-white/70 mb-1.5 block">一句话简介</label>
+                    <textarea name="bio" rows="3" maxlength="500"
+                              placeholder="给访客看的一句自我介绍，将显示在主页和个人卡片上。"
+                              class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                     focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30 resize-none">{{ profile.bio or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：详细表单 -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- 个人信息 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-5">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    个人信息
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            📍 所在城市
+                        </label>
+                        <input type="text" name="location" value="{{ profile.location or '' }}" maxlength="100"
+                               placeholder="例如：杭州"
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            📧 邮箱
+                        </label>
+                        <input type="email" name="email" value="{{ profile.email or '' }}" maxlength="120"
+                               placeholder="you@example.com"
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            ⏱️ 从业年限
+                        </label>
+                        <input type="number" name="career_years" value="{{ profile.career_years or 0 }}" min="0" max="80"
+                               placeholder="例如：6"
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            🌐 个人网站
+                        </label>
+                        <input type="url" name="website" value="{{ profile.website or '' }}" maxlength="255"
+                               placeholder="https://..."
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 社交链接 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-5">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    社交链接
+                    <span class="text-xs font-normal text-white/40 ml-1">留空将不显示</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            <span class="text-slate-300">🐙</span> GitHub
+                        </label>
+                        <input type="url" name="github" value="{{ profile.github or '' }}" maxlength="255"
+                               placeholder="https://github.com/yourname"
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            <span class="text-rose-400">📺</span> B 站
+                        </label>
+                        <input type="url" name="bilibili" value="{{ profile.bilibili or '' }}" maxlength="255"
+                               placeholder="https://space.bilibili.com/..."
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            <span class="text-cyan-400">✍️</span> 掘金
+                        </label>
+                        <input type="url" name="juejin" value="{{ profile.juejin or '' }}" maxlength="255"
+                               placeholder="https://juejin.cn/user/..."
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            <span class="text-blue-400">💡</span> 知乎
+                        </label>
+                        <input type="url" name="zhihu" value="{{ profile.zhihu or '' }}" maxlength="255"
+                               placeholder="https://www.zhihu.com/people/..."
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                    <div>
+                        <label class="text-sm text-white/70 mb-1.5 block flex items-center gap-1.5">
+                            <span class="text-red-400">🌶️</span> 微博
+                        </label>
+                        <input type="url" name="weibo" value="{{ profile.weibo or '' }}" maxlength="255"
+                               placeholder="https://weibo.com/..."
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技术栈 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    技术栈 / 兴趣标签
+                </h2>
+                <textarea name="tech_stack" rows="3" maxlength="500"
+                          placeholder="使用中文或英文逗号分隔，例如：Python,Flask,React,TypeScript,游戏开发"
+                          class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                 focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30 resize-none">{{ profile.tech_stack or '' }}</textarea>
+                <p class="text-xs text-white/40">
+                    这些标签将以「技能徽章」的形式展示在个人主页。
+                </p>
+            </div>
+
+            <!-- 关于我 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    关于我（关于页正文）
+                </h2>
+                <textarea name="about" rows="10"
+                          placeholder="详细介绍你自己、你的经历、你的技能、爱好等。支持纯文本换行。"
+                          class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-3
+                                 focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30 leading-relaxed font-mono text-sm">{{ profile.about or '' }}</textarea>
+            </div>
+
+            <!-- 背景图片 -->
+            <div class="rounded-2xl border border-cyber-500/20 bg-white/5 backdrop-blur p-6 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                    🖼️ 背景图片
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-white/60 mb-1.5">上传本地图片（推荐，立即生效）</label>
+                        <input type="file" name="bg_image_file" accept="image/png,image/jpeg,image/gif,image/webp"
+                               class="w-full rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white/90 px-4 py-2.5
+                                      file:text-white/70 file:mr-3 file:px-3 file:py-1 file:rounded-lg file:border-0 file:bg-cyber-gradient file:text-white file:font-semibold file:cursor-pointer
+                                      focus:outline-none focus:border-cyber-500/60 transition">
+                        <p class="text-[11px] text-white/40 mt-1">上传后将覆盖下方的 URL 设置；支持 png/jpg/jpeg/gif/webp</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-white/40 shrink-0">或使用 URL</span>
+                        <input type="text" name="bg_image" value="{{ profile.bg_image or '' }}"
+                               placeholder="https://example.com/bg.jpg 或 /bg/xxx.jpg"
+                               class="flex-1 rounded-xl bg-slate-900/70 border border-cyber-500/20 text-white px-4 py-2.5
+                                      focus:outline-none focus:border-cyber-500/60 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition placeholder:text-white/30">
+                        {% if profile.bg_image %}
+                        <label class="shrink-0 inline-flex items-center gap-1.5 text-xs text-red-300 cursor-pointer">
+                            <input type="checkbox" name="clear_bg" value="1" class="accent-red-500"> 清除
+                        </label>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs text-white/60 mb-1.5">
+                                透明度 <span id="bgOpacityVal" class="text-cyan-300 font-semibold">{{ (profile.bg_opacity if profile.bg_opacity is not none else 0.25) }}</span>
+                                <span class="text-white/40">（0 全透明 · 1 全不透明）</span>
+                            </label>
+                            <input type="range" name="bg_opacity" min="0" max="1" step="0.05"
+                                   value="{{ profile.bg_opacity if profile.bg_opacity is not none else 0.25 }}"
+                                   id="bgOpacityRange"
+                                   class="w-full accent-cyan-500">
+                        </div>
+                        {% if profile.bg_image %}
+                        <div class="shrink-0">
+                            <img src="{{ profile.bg_image }}" alt="预览"
+                                 class="w-20 h-14 rounded-lg border border-cyber-500/30 object-cover"
+                                 onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2256%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23334%22/></svg>'">
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-white/40">
+                        背景图片以固定全屏方式显示在页面最底层，透过玻璃卡片可见。深色主题建议透明度调高至 0.35~0.6 更明显。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 提交栏 -->
+            <div class="sticky bottom-4 z-20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3
+                        rounded-2xl border border-cyber-500/30 bg-slate-950/80 backdrop-blur-xl p-4 shadow-glow">
+                <div class="text-xs text-white/50 flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
+                    修改后点击保存，个人主页和关于页会立即更新。
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ url_for('admin_dashboard') }}"
+                       class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl glass
+                              text-white/80 hover:text-white hover:border-white/30 text-sm transition">
+                        取消
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-xl
+                                   bg-cyber-gradient text-white font-semibold shadow-cyber hover:shadow-glow transition text-sm">
+                        💾 保存修改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 头像裁剪模态框 -->
+<div id="avatarCropperModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     style="background:rgba(0,0,0,.7);backdrop-filter:blur(6px);">
+    <div class="rounded-3xl border border-cyber-500/30 bg-slate-900/95 shadow-2xl w-full max-w-lg overflow-hidden">
+        <div class="px-5 py-4 border-b border-cyber-500/20 flex items-center justify-between">
+            <h3 class="font-bold text-white flex items-center gap-2">
+                <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                ✂️ 裁剪头像
+            </h3>
+            <button type="button" id="cropperCancel" class="w-8 h-8 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition">✕</button>
+        </div>
+        <div class="p-5">
+            <div class="bg-black/40 rounded-xl overflow-hidden" style="height:320px;">
+                <img id="cropperImage" src="" alt="裁剪" class="max-w-full">
+            </div>
+            <p class="text-xs text-white/50 mt-3 text-center">拖拽选取正方形区域，可滚轮缩放 · 输出 256×256</p>
+        </div>
+        <div class="px-5 py-4 border-t border-cyber-500/20 flex items-center justify-between gap-3">
+            <div class="flex gap-2">
+                <button type="button" id="cropperRotate" class="px-3 py-2 rounded-lg glass text-white/80 hover:text-white text-sm transition">↻ 旋转</button>
+                <button type="button" id="cropperReset" class="px-3 py-2 rounded-lg glass text-white/80 hover:text-white text-sm transition">⟲ 重置</button>
+            </div>
+            <button type="button" id="cropperConfirm"
+                    class="px-5 py-2 rounded-xl bg-cyber-gradient text-white text-sm font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                ✓ 确认裁剪
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='cropperjs/cropper.min.css') }}">
+<script src="{{ url_for('static', filename='cropperjs/cropper.min.js') }}"></script>
+<script>
+// 头像兜底
+(function () {
+    const preview = document.getElementById('avatar-preview');
+    const FALLBACK_BG = '0ea5e9,06b6d4,38bdf8,6366f1,8b5cf6';
+    function fallbackUrl() {
+        const seed = (preview && preview.dataset && preview.dataset.fallbackSeed) || 'coder';
+        return 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + FALLBACK_BG;
+    }
+    if (preview) {
+        preview.addEventListener('error', function () {
+            preview.onerror = null;
+            preview.src = fallbackUrl();
+        });
+        if (!preview.getAttribute('src') || preview.getAttribute('src') === 'None') {
+            preview.src = fallbackUrl();
+        }
+    }
+})();
+
+// 头像裁剪
+(function () {
+    const input = document.getElementById('avatar-input');
+    const preview = document.getElementById('avatar-preview');
+    const modal = document.getElementById('avatarCropperModal');
+    const cropperImage = document.getElementById('cropperImage');
+    const btnConfirm = document.getElementById('cropperConfirm');
+    const btnCancel = document.getElementById('cropperCancel');
+    const btnRotate = document.getElementById('cropperRotate');
+    const btnReset = document.getElementById('cropperReset');
+    if (!input || !modal) return;
+
+    let cropper = null;
+    let originalFile = null;
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function closeModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (cropper) { cropper.destroy(); cropper = null; }
+        cropperImage.src = '';
+    }
+
+    // 选择图片 → 打开裁剪框
+    input.addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const okType = /^image[\/](png|jpe?g|gif|webp)$/i.test(file.type || '');
+        if (!okType) {
+            alert('请上传图片格式的头像（png/jpg/jpeg/gif/webp）');
+            input.value = '';
+            return;
+        }
+        originalFile = file;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            cropperImage.src = ev.target.result;
+            openModal();
+            // 等图片加载后初始化 Cropper
+            cropperImage.onload = function () {
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.9,
+                    background: false,
+                    movable: true,
+                    zoomable: true,
+                    rotatable: true,
+                    scalable: false,
+                    responsive: true,
+                    minContainerHeight: 320,
+                });
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // 确认裁剪 → 生成图片 → 赋给 file input
+    btnConfirm.addEventListener('click', function () {
+        if (!cropper) return;
+        btnConfirm.disabled = true;
+        btnConfirm.textContent = '处理中…';
+        try {
+            const canvas = cropper.getCroppedCanvas({
+                width: 256, height: 256,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            canvas.toBlob(function (blob) {
+                try {
+                    const file = new File([blob], 'avatar_cropped.png', { type: 'image/png' });
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    if (preview) { preview.src = URL.createObjectURL(blob); preview.onerror = null; }
+                    closeModal();
+                } catch (err) {
+                    // DataTransfer 不支持时，直接预览原图（后端仍可用 originalFile）
+                    alert('浏览器不支持裁剪回填，将使用原图上传');
+                    if (preview && originalFile) {
+                        const r = new FileReader();
+                        r.onload = function (ev) { preview.src = ev.target.result; };
+                        r.readAsDataURL(originalFile);
+                    }
+                    closeModal();
+                }
+                btnConfirm.disabled = false;
+                btnConfirm.textContent = '✓ 确认裁剪';
+            }, 'image/png', 0.92);
+        } catch (err) {
+            alert('裁剪失败，请重试');
+            btnConfirm.disabled = false;
+            btnConfirm.textContent = '✓ 确认裁剪';
+        }
+    });
+
+    btnCancel.addEventListener('click', function () {
+        // 取消时清空已选文件（避免提交时上传未裁剪的原图）
+        input.value = '';
+        closeModal();
+    });
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) { input.value = ''; closeModal(); }
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) { input.value = ''; closeModal(); }
+    });
+    if (btnRotate) btnRotate.addEventListener('click', function () { if (cropper) cropper.rotate(90); });
+    if (btnReset) btnReset.addEventListener('click', function () { if (cropper) cropper.reset(); });
+})();
+
+// 背景图片透明度滑块实时显示
+(function () {
+    var range = document.getElementById('bgOpacityRange');
+    var val = document.getElementById('bgOpacityVal');
+    if (range && val) {
+        range.addEventListener('input', function () { val.textContent = parseFloat(range.value).toFixed(2); });
+    }
+})();
+</script>
+{% endblock %}

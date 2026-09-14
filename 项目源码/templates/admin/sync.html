@@ -1,0 +1,905 @@
+{% extends 'base.html' %}
+
+{% block title %}云同步 · {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in max-w-6xl mx-auto space-y-6">
+
+    <!-- 顶部标题 -->
+    <section class="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
+                <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl
+                             bg-cyber-gradient shadow-glow text-xl">☁️</span>
+                云同步 · Gitee
+                <span class="text-xs font-normal text-white/50 ml-2 hidden md:inline">
+                    Chrome/Edge 风格：一键同步 · 永不覆盖更新的数据
+                </span>
+            </h1>
+            <p class="text-sm text-white/60 mt-1.5">
+                「📥 立即恢复」= Gitee 拉取合并（LWW 不覆盖本地更新）；
+                「💾 立即备份」= 本地推送 Gitee；「🔄 立即同步」= 双向合并。
+            </p>
+        </div>
+        {% if sync_status.token_configured %}
+        <div class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+            <span class="text-emerald-300 font-semibold">已连接 Gitee · {{ sync_status.owner }}/{{ sync_status.repo }}</span>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- ============================================================
+         零门槛 · 新手向导（个人 Gitee）——已从备份模块迁移到此处
+         ============================================================ -->
+    <details id="guide-details" class="glass-strong rounded-3xl overflow-hidden border-2 border-amber-400/40 shadow-[0_0_40px_rgba(251,191,36,0.12)] group/guide">
+        <summary class="cursor-pointer list-none px-5 md:px-6 py-4 md:py-5 border-b border-amber-400/20 bg-gradient-to-r from-amber-500/10 via-transparent to-sky-500/10
+                        flex items-center justify-between gap-3 select-none">
+            <h2 class="font-bold text-white text-lg flex items-center gap-2.5">
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-900 shadow-lg">🚀</span>
+                零门槛 · 新手向导（个人 Gitee）
+                {% if not sync_status.token_configured %}
+                <span class="text-xs font-normal px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 animate-pulse">还没连接，点我展开</span>
+                {% endif %}
+            </h2>
+            <span class="text-white/50 text-sm group-open/guide:rotate-180 transition-transform">▾</span>
+        </summary>
+
+        <div class="p-5 md:p-6 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-5 md:gap-6 auto-rows-fr">
+
+            <!-- STEP 1 -->
+            <div class="step-card group relative rounded-2xl p-4 md:p-5 pt-10 md:pt-11
+                        border border-white/10 bg-white/[0.03]
+                        hover:border-amber-400/30 hover:bg-white/[0.05] transition">
+                <div class="absolute top-3 left-4 z-10 w-9 h-9 rounded-full
+                            bg-gradient-to-br from-amber-400 to-orange-500 text-slate-900
+                            font-black flex items-center justify-center shadow-lg">1</div>
+                <div class="text-2xl mb-2">🔐</div>
+                <h3 class="font-bold text-white mb-1.5 pr-8">跳转官网生成私人令牌</h3>
+                <p class="text-xs text-white/55 mb-3 leading-relaxed">
+                    会在你电脑默认浏览器打开 Gitee 官方页面（你通常已经登录）。
+                    名字写「个人博客」，有效期选「永不过期」，<span class="text-amber-300">权限只勾 projects</span>，其它都不要勾。
+                </p>
+                <a id="btn-step1" href="{{ gitee_new_token_url }}" target="_blank" rel="noopener"
+                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold
+                          bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 hover:brightness-110
+                          shadow-[0_0_20px_rgba(251,191,36,0.25)] transition text-center break-words">
+                    🌐 ① 去 Gitee 生成令牌（网页登录）
+                </a>
+                <div class="mt-3 text-[11px] text-white/40 leading-relaxed">
+                    💡 网页上会出现一长串字符（类似 <span class="font-mono">a1b2c3...32f</span>），复制它，然后回下一步粘贴。
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-card group relative rounded-2xl p-4 md:p-5 pt-10 md:pt-11
+                        border border-white/10 bg-white/[0.03]
+                        hover:border-cyan-400/30 hover:bg-white/[0.05] transition">
+                <div class="absolute top-3 left-4 z-10 w-9 h-9 rounded-full
+                            bg-gradient-to-br from-cyan-400 to-sky-500 text-slate-900
+                            font-black flex items-center justify-center shadow-lg">2</div>
+                <div class="text-2xl mb-2">📋</div>
+                <h3 class="font-bold text-white mb-1.5 pr-8">粘贴令牌，自动识别你是谁</h3>
+                <p class="text-xs text-white/55 mb-3 leading-relaxed">
+                    程序会立刻从 Gitee 拉你的 <em>用户名/昵称/头像</em>，并自动把下一步里的「所有者」填对，<span class="text-cyan-300">避免你把昵称当用户名填错</span>。
+                </p>
+                <label class="block text-xs text-white/60 mb-1.5">把上一步复制的 32 位令牌粘贴到这里：</label>
+                <div class="flex flex-wrap gap-2">
+                    <input id="step2-token" type="password"
+                           value="{{ gitee_settings.token }}"
+                           placeholder="a1b2c3d4e5f678901234abcd..."
+                           autocomplete="off"
+                           class="min-w-0 flex-1 min-w-[180px] rounded-lg bg-white/5 border border-white/10
+                                  px-3 py-2 text-sm text-white placeholder:text-white/30
+                                  focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20">
+                    <button id="btn-step2" type="button"
+                            class="px-3 py-2 rounded-lg font-semibold text-sm whitespace-nowrap
+                                   bg-cyan-500/90 text-white hover:bg-cyan-400 transition">
+                        ✔ 验证
+                    </button>
+                </div>
+                <div id="step2-status" class="mt-2 text-[11px] leading-relaxed whitespace-pre-wrap break-all"></div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-card group relative rounded-2xl p-4 md:p-5 pt-10 md:pt-11
+                        border border-white/10 bg-white/[0.03]
+                        hover:border-emerald-400/30 hover:bg-white/[0.05] transition">
+                <div class="absolute top-3 left-4 z-10 w-9 h-9 rounded-full
+                            bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-900
+                            font-black flex items-center justify-center shadow-lg">3</div>
+                <div class="text-2xl mb-2">📁</div>
+                <h3 class="font-bold text-white mb-1.5 pr-8">选仓库 · 或一键新建</h3>
+                <p class="text-xs text-white/55 mb-3 leading-relaxed">
+                    对新手最省心：<span class="text-emerald-300">直接点绿色按钮「一键新建私有同步仓库」</span>，程序会在你 Gitee 下创建一个叫 <span class="font-mono">个人博客备份</span> 的私有仓库，并自动填好分支名。
+                </p>
+                <div class="space-y-2.5">
+                    <label class="block text-xs text-white/60 mb-0.5">从已有仓库中选择（可选）：</label>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="step3-repo-select"
+                                class="min-w-0 flex-1 min-w-[160px] rounded-lg bg-white/5 border border-white/10
+                                       px-3 py-2 text-sm text-white
+                                       focus:outline-none focus:border-emerald-500/50">
+                            <option value="">—— 先点右侧按钮加载你名下仓库 ——</option>
+                        </select>
+                        <button id="btn-step3-list" type="button"
+                                class="px-3 py-2 rounded-lg text-sm whitespace-nowrap
+                                       bg-white/10 text-white hover:bg-white/20 transition">
+                            🔄 加载
+                        </button>
+                    </div>
+                    <button id="btn-step3-create" type="button"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold
+                                   bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:brightness-110
+                                   shadow-[0_0_20px_rgba(16,185,129,0.25)] transition break-words">
+                        ✨ 一键新建私有同步仓库（推荐新手）
+                    </button>
+                </div>
+                <div id="step3-status" class="mt-2.5 text-[11px] leading-relaxed whitespace-pre-wrap break-all"></div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="step-card group relative rounded-2xl p-4 md:p-5 pt-10 md:pt-11
+                        border border-white/10 bg-white/[0.03]
+                        hover:border-sky-400/30 hover:bg-white/[0.05] transition">
+                <div class="absolute top-3 left-4 z-10 w-9 h-9 rounded-full
+                            bg-gradient-to-br from-sky-400 to-indigo-500 text-white
+                            font-black flex items-center justify-center shadow-lg">4</div>
+                <div class="text-2xl mb-2">🛰️</div>
+                <h3 class="font-bold text-white mb-1.5 pr-8">连通性测试 · 保存</h3>
+                <p class="text-xs text-white/55 mb-3 leading-relaxed">
+                    一键验证令牌、用户名、仓库、分支权限是否全部 OK；失败会告诉你具体是哪一步没勾对、怎么改。
+                </p>
+                <div class="space-y-2">
+                    <button id="btn-step4-test" type="button"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold
+                                   bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:brightness-110
+                                   shadow-[0_0_20px_rgba(14,165,233,0.25)] transition break-words">
+                        🛰️ 连通性测试 & 自动保存配置
+                    </button>
+                    <button id="btn-step4-save-form" type="button" form="manual-config-form"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl
+                                   font-semibold text-sm bg-white/10 text-white hover:bg-white/20 transition break-words">
+                        只保存到配置文件（不测试）
+                    </button>
+                </div>
+                <div id="step4-status" class="mt-2.5 text-[11px] leading-relaxed whitespace-pre-wrap break-all"></div>
+            </div>
+        </div>
+
+        <div class="px-5 md:px-6 pb-5 -mt-2 text-[11px] text-white/40">
+            💡 走完 4 步后，点下方「💾 立即备份」即可把博客数据推到 Gitee 云端；换电脑时在新机走同一向导再点「📥 立即恢复」。
+        </div>
+    </details>
+
+    <!-- ============= 主卡：三按钮 + 状态 + 大开关 ============= -->
+    <section class="glass-strong rounded-3xl overflow-hidden relative">
+        <div class="absolute inset-0 pointer-events-none
+                    {% if sync_status.sync_enabled %}
+                    bg-[radial-gradient(ellipse_at_top_right,_rgba(16,185,129,.18),_transparent_60%)]
+                    {% else %}
+                    bg-[radial-gradient(ellipse_at_top_right,_rgba(56,189,248,.15),_transparent_60%)]
+                    {% endif %}"></div>
+
+        <div class="p-6 md:p-8 relative">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <!-- 左：状态描述 -->
+                <div class="flex items-start gap-4 md:gap-5 min-w-0 flex-1">
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-[24px] flex items-center justify-center
+                                    bg-gradient-to-br
+                                    {% if sync_status.sync_enabled %}
+                                    from-emerald-400/25 to-teal-500/10 border border-emerald-400/40
+                                    {% else %}
+                                    from-cyan-400/25 to-sky-500/10 border border-cyan-400/40
+                                    {% endif %} shadow-glow">
+                            <span class="text-3xl md:text-4xl">
+                                {% if sync_status.sync_enabled %}
+                                ✅
+                                {% elif sync_status.token_configured %}
+                                🔐
+                                {% else %}
+                                ⚡
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if sync_status.sync_enabled %}
+                        <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full
+                                     bg-emerald-400 border-2 border-slate-900 animate-pulse"></span>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-xl md:text-2xl font-bold text-white">
+                            {% if sync_status.sync_enabled %}
+                                同步已开启（后台每 5 分钟自动双向合并）
+                            {% elif sync_status.token_configured %}
+                                已连接 Gitee · {{ sync_status.owner }}/{{ sync_status.repo }}
+                            {% else %}
+                                还没配置 Gitee 账号
+                            {% endif %}
+                        </h2>
+                        <p class="text-sm text-white/65 mt-2 leading-relaxed">
+                            {% if sync_status.token_configured %}
+                                🎉 配置已就绪，直接点右侧 <b class="text-white">三个按钮</b> 任一即可：
+                                <br>
+                                <b class="text-sky-300">📥 立即恢复</b>：Gitee 有不同的就拉下来合并，不覆盖本地更新。
+                                <b class="text-emerald-300"> 💾 立即备份</b>：本地更新推送到 Gitee（增量）。
+                                <b class="text-purple-300"> 🔄 立即同步</b>：先拉再推，双向自动合并。
+                            {% else %}
+                                还没连接 Gitee？点上方 <b class="text-amber-300">🚀 新手向导</b> 走 4 步，
+                                或展开下方「<b>Gitee 账号配置</b>」手动填入 <b>令牌 / 所有者 / 仓库名</b>（支持直接粘贴 Gitee 仓库链接）。
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 右：大开关（自动同步） -->
+                <div class="shrink-0 flex md:flex-col items-center gap-3">
+                    <form method="post" action="{{ url_for('admin_sync_toggle') }}"
+                          id="sync-toggle-form" class="flex flex-col items-center">
+                        <input type="hidden" name="enabled"
+                               value="{{ 'off' if sync_status.sync_enabled else 'on' }}">
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="sync-toggle-switch"
+                                   class="sr-only peer"
+                                   {% if sync_status.sync_enabled %}checked{% endif %}
+                                   {% if not sync_status.token_configured %}disabled{% endif %}>
+                            <div class="w-24 h-12 md:w-28 md:h-14 rounded-full
+                                        bg-white/10 border border-white/15 peer-checked:bg-emerald-500
+                                        peer-checked:border-emerald-400
+                                        transition-all duration-300
+                                        disabled:opacity-50 disabled:cursor-not-allowed"></div>
+                            <div class="absolute left-1 top-1 w-10 h-10 md:w-12 md:h-12
+                                        bg-white rounded-full shadow-lg
+                                        peer-checked:translate-x-12 md:peer-checked:translate-x-14
+                                        transition-transform duration-300
+                                        flex items-center justify-center text-lg">
+                                <span id="sync-toggle-icon">
+                                    {% if sync_status.sync_enabled %}✅{% else %}⏸️{% endif %}
+                                </span>
+                            </div>
+                        </label>
+                        <div class="text-xs text-white/50 mt-3">
+                            {% if sync_status.sync_enabled %}
+                                <span class="text-emerald-300 font-semibold">自动同步：开</span> · 每 5 分钟
+                            {% else %}
+                                <span class="text-white/70">自动同步：关</span> · 三按钮仍可手动使用
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============== 三操作按钮 ============== -->
+            <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                <!-- 📥 立即恢复 = Gitee → 本地（pull_only） -->
+                <form method="post" action="{{ url_for('admin_sync_run') }}" class="sync-run-form" data-mode="恢复">
+                    <input type="hidden" name="direction" value="pull">
+                    <button type="submit"
+                            {% if not sync_status.token_configured %}disabled{% endif %}
+                            class="w-full group relative overflow-hidden rounded-2xl p-5 text-left
+                                   border transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                                   from-sky-500/20 to-blue-500/5 border-sky-400/40
+                                   bg-gradient-to-br hover:shadow-glow">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-sky-400/10
+                                    group-hover:bg-sky-400/20 blur-2xl transition-all"></div>
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-3xl">📥</span>
+                                <span class="text-[10px] font-bold tracking-widest px-2 py-1 rounded-lg
+                                             bg-sky-500/15 text-sky-300 border border-sky-400/30">
+                                    GITEE → 本地
+                                </span>
+                            </div>
+                            <div class="font-bold text-white text-lg">立即恢复</div>
+                            <div class="text-xs text-white/60 mt-1 leading-relaxed">
+                                从 Gitee 拉取数据。<b class="text-sky-300">LWW 合并</b>，
+                                本地更新的字段绝不覆盖。
+                            </div>
+                        </div>
+                    </button>
+                </form>
+
+                <!-- 💾 立即备份 = 本地 → Gitee（push_only） -->
+                <form method="post" action="{{ url_for('admin_sync_run') }}" class="sync-run-form" data-mode="备份">
+                    <input type="hidden" name="direction" value="push">
+                    <button type="submit"
+                            {% if not sync_status.token_configured %}disabled{% endif %}
+                            class="w-full group relative overflow-hidden rounded-2xl p-5 text-left
+                                   border transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                                   from-emerald-500/20 to-teal-500/5 border-emerald-400/40
+                                   bg-gradient-to-br hover:shadow-glow">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-400/10
+                                    group-hover:bg-emerald-400/20 blur-2xl transition-all"></div>
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-3xl">💾</span>
+                                <span class="text-[10px] font-bold tracking-widest px-2 py-1 rounded-lg
+                                             bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
+                                    本地 → GITEE
+                                </span>
+                            </div>
+                            <div class="font-bold text-white text-lg">立即备份</div>
+                            <div class="text-xs text-white/60 mt-1 leading-relaxed">
+                                把本地更新推送到 Gitee（增量，只推变更）。
+                                换电脑前点一次，数据就都在云端。
+                            </div>
+                        </div>
+                    </button>
+                </form>
+
+                <!-- 🔄 立即同步 = 双向合并（both） -->
+                <form method="post" action="{{ url_for('admin_sync_run') }}" class="sync-run-form" data-mode="同步">
+                    <input type="hidden" name="direction" value="both">
+                    <button type="submit"
+                            {% if not sync_status.token_configured %}disabled{% endif %}
+                            class="w-full group relative overflow-hidden rounded-2xl p-5 text-left
+                                   border transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                                   from-purple-500/25 to-pink-500/5 border-purple-400/40
+                                   bg-gradient-to-br hover:shadow-glow">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-purple-400/10
+                                    group-hover:bg-purple-400/20 blur-2xl transition-all"></div>
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-3xl">🔄</span>
+                                <span class="text-[10px] font-bold tracking-widest px-2 py-1 rounded-lg
+                                             bg-purple-500/15 text-purple-300 border border-purple-400/30">
+                                    双向 · LWW
+                                </span>
+                            </div>
+                            <div class="font-bold text-white text-lg">立即同步</div>
+                            <div class="text-xs text-white/60 mt-1 leading-relaxed">
+                                先拉再推，自动双向合并。
+                                <b class="text-purple-300">日常每天一次</b>，保持所有机器一致。
+                            </div>
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 配置折叠 + 重置游标：小按钮 -->
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+                <details id="cfg-details" class="flex-1 min-w-[260px] rounded-2xl bg-white/[0.04] border border-white/10 group">
+                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-white/85
+                                   flex items-center justify-between select-none hover:text-white">
+                        <span>⚙️ Gitee 账号配置（手动填写，与上方向导二选一即可）</span>
+                        <span class="text-white/50 text-xs group-open:rotate-90 transition-transform">▶</span>
+                    </summary>
+                    <div class="px-4 pb-5 pt-1 space-y-3 text-sm">
+                        <form id="manual-config-form" method="post" action="{{ url_for('admin_sync_save_settings') }}" class="grid md:grid-cols-2 gap-3">
+                            <div class="md:col-span-2">
+                                <label class="text-white/60 text-xs">Gitee 私人令牌（projects 权限）
+                                    <a href="{{ gitee_new_token_url }}"
+                                       target="_blank" class="text-sky-300 hover:underline ml-1">点我去 Gitee 生成 →</a>
+                                </label>
+                                <input type="password" id="config-token" name="token" autocomplete="off"
+                                       value="{{ gitee_settings.token or '' }}"
+                                       placeholder="例如 9a3b...（32 位）"
+                                       class="mt-1 w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10
+                                              text-white text-sm placeholder-white/30 focus:border-cyan-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-xs">所有者（你的 Gitee 用户名）</label>
+                                <input type="text" id="config-owner" name="owner" value="{{ gitee_settings.owner or '' }}"
+                                       placeholder="例如 myname123"
+                                       class="mt-1 w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10
+                                              text-white text-sm placeholder-white/30 focus:border-cyan-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-xs">仓库名（或直接粘贴仓库 URL）</label>
+                                <input type="text" id="config-repo" name="repo" value="{{ gitee_settings.repo or '' }}"
+                                       placeholder="例如 my-blog-backup 或 https://gitee.com/myname/my-blog-backup"
+                                       class="mt-1 w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10
+                                              text-white text-sm placeholder-white/30 focus:border-cyan-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-xs">分支（默认 master）</label>
+                                <input type="text" id="config-branch" name="branch" value="{{ gitee_settings.branch or 'master' }}"
+                                       placeholder="master / main"
+                                       class="mt-1 w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10
+                                              text-white text-sm placeholder-white/30 focus:border-cyan-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-xs">仓库内子目录（默认 blog-backup）</label>
+                                <input type="text" id="config-prefix" name="path_prefix" value="{{ gitee_settings.path_prefix or 'blog-backup' }}"
+                                       placeholder="blog-backup"
+                                       class="mt-1 w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10
+                                              text-white text-sm placeholder-white/30 focus:border-cyan-400 outline-none">
+                            </div>
+                            <div class="md:col-span-2 flex items-center justify-between gap-2 pt-1">
+                                <p class="text-xs text-white/45 leading-relaxed">
+                                    ✅ 配置只保存在本机 <code class="text-cyan-300">data/gitee_sync_settings.json</code>，
+                                    绝不发送到任何第三方服务器。
+                                </p>
+                                <button type="submit"
+                                        class="px-4 py-2 rounded-xl bg-cyber-gradient text-white font-semibold text-sm
+                                               shadow-cyber-sm hover:shadow-glow transition">
+                                    💾 保存配置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </details>
+
+                <form method="post" action="{{ url_for('admin_sync_reset_cursors') }}"
+                      onsubmit="return confirm('确认清空同步游标？\n下次运行会重新做一次全量 LWW 比对（更慢但更准确）。');">
+                    <button type="submit" class="px-3 py-2 text-xs rounded-xl
+                                                 bg-white/5 border border-white/10 text-white/75
+                                                 hover:bg-rose-500/10 hover:border-rose-400/30 hover:text-rose-200 transition">
+                        🧹 重置同步游标
+                    </button>
+                </form>
+            </div>
+
+            <!-- 仓库位置信息 -->
+            {% if sync_status.token_configured %}
+            <div class="mt-6 pt-6 border-t border-white/10 grid md:grid-cols-3 gap-3 text-sm">
+                <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                    <div class="text-white/50 text-xs mb-1">Gitee 所有者</div>
+                    <div class="text-white font-semibold truncate">{{ sync_status.owner or '-' }}</div>
+                </div>
+                <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                    <div class="text-white/50 text-xs mb-1">同步仓库</div>
+                    <div class="text-white font-semibold truncate">{{ sync_status.repo or '-' }}</div>
+                </div>
+                <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                    <div class="text-white/50 text-xs mb-1">同步路径</div>
+                    <div class="text-cyan-300 font-mono text-xs md:text-sm truncate">
+                        {{ sync_status.path_prefix or 'blog-backup' }}/sync_*
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- ============= 上次同步摘要 / 原理说明 ============= -->
+    <section class="grid md:grid-cols-2 gap-5">
+        {% set lr = sync_status.last_run or {} %}
+        <div class="glass rounded-2xl p-5 md:p-6">
+            <h3 class="font-bold text-white flex items-center gap-2 mb-4">
+                <span class="w-1.5 h-5 rounded-full bg-cyber-gradient"></span>
+                📊 上次运行摘要
+            </h3>
+            {% if lr %}
+                {% if lr.ok %}
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-semibold
+                                         bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                成功 · {{ {'both':'立即同步','push_only':'只备份','pull_only':'只恢复'}[lr.mode|default('both')] }}
+                            </span>
+                            <span class="text-xs text-white/55">{{ lr.finished_at or '' }}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            {% set pushed = lr.pushed or {} %}
+                            {% set pulled = lr.pulled or {} %}
+                            {% set att = lr.attachments or {} if lr.attachments is mapping else {} %}
+                            {% set order = ['posts','tags','comments','likes','friend_links','profile','post_tags','site_settings'] %}
+                            {% for k in order %}
+                                {% set pu = pushed.get(k, 0) %}
+                                {% set pl = pulled.get(k, 0) %}
+                                {% if pu or pl %}
+                                <div class="rounded-xl bg-white/[0.04] border border-white/10 p-3">
+                                    <div class="text-white/50 text-xs mb-1">{{ k }}</div>
+                                    <div class="flex gap-3 text-xs">
+                                        <span class="text-sky-300">↑推送 {{ pu }}</span>
+                                        <span class="text-purple-300">↓拉取 {{ pl }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% set ns = namespace(any=false) %}
+                            {% for k in order %}{% if (pushed.get(k,0) or pulled.get(k,0)) %}{% set ns.any = true %}{% endif %}{% endfor %}
+                            {% if not ns.any and att %}
+                                <div class="col-span-2 text-xs text-white/50 py-2">
+                                    上次没有记录变动。
+                                </div>
+                            {% endif %}
+                            {% if att.get('uploaded') or att.get('downloaded') %}
+                                <div class="col-span-2 rounded-xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10
+                                            border border-cyan-500/20 p-3 text-xs text-white/80">
+                                    📦 附件：⬆️ 上传 {{ att.get('uploaded', 0) }} 个
+                                    &nbsp;·&nbsp; ⬇️ 下载 {{ att.get('downloaded', 0) }} 个
+                                    &nbsp;·&nbsp; 跳过（相同）{{ att.get('skipped', 0) }} 个
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-semibold
+                                         bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                                失败
+                            </span>
+                            <span class="text-xs text-white/55">{{ lr.finished_at or '' }}</span>
+                        </div>
+                        <div class="text-sm text-rose-200/80 rounded-xl bg-rose-500/10
+                                    border border-rose-500/20 p-3 whitespace-pre-wrap break-all">
+                            {{ lr.error or '未知错误' }}
+                        </div>
+                        <div class="text-xs text-white/55">
+                            常见原因：令牌无效 / 仓库名错误 / 没网。先检查配置，再点「重置同步游标」后重试。
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-sm text-white/55 py-4 leading-relaxed">
+                    ⏳ 还没有运行记录。<br>
+                    配置完 Gitee 后，点上方 <b class="text-sky-300">📥 立即恢复</b> 或
+                    <b class="text-purple-300">🔄 立即同步</b> 启动首次运行即可。
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 同步原理说明 -->
+        <div class="glass rounded-2xl p-5 md:p-6 space-y-4">
+            <h3 class="font-bold text-white flex items-center gap-2">
+                <span class="w-1.5 h-5 rounded-full bg-gradient-to-b from-purple-400 to-pink-500"></span>
+                🧭 工作原理（永不覆盖更新的数据）
+            </h3>
+            <ul class="space-y-2.5 text-sm text-white/75 leading-relaxed">
+                <li class="flex gap-2">
+                    <span class="text-sky-300 shrink-0">📥</span>
+                    <span><b>立即恢复（pull）</b>：扫描 Gitee 的 jsonl 数据，每条记录用
+                    <code class="text-purple-300">updated_at</code> 和本地比，
+                    远端更新才写入；本地更新字段一律保留（字段级填空）。</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="text-emerald-300 shrink-0">💾</span>
+                    <span><b>立即备份（push）</b>：只把本地 updated_at > 上次游标 的记录增量推送到 Gitee。
+                    相同二进制附件自动免传（SHA 比对）。</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="text-purple-300 shrink-0">🔄</span>
+                    <span><b>立即同步（both）</b>：先 pull 再 push，两端都合并，相当于 Chrome 同步。</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="text-amber-300 shrink-0">🧱</span>
+                    <span>同步范围：文章 / 标签 / 文章-标签 / 评论 / 点赞 / 友链 /
+                    个人资料 / 站点设置 / 头像·背景图·文章图（二进制附件）。</span>
+                </li>
+            </ul>
+            <div class="mt-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10
+                        border border-cyan-500/20 p-3 text-xs text-white/70">
+                💡 <b>换新电脑：</b> 安装 → 打开云同步 → 走上方「🚀 新手向导」填同一个 Gitee 令牌
+                → 点「📥 立即恢复」→ 数据自动合并到本机。已在新机器写的文章绝不会被覆盖。
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    // ============================================================
+    // 零门槛 · 新手向导 4 步交互（AJAX 调用 /admin/sync/* JSON APIs）
+    // ============================================================
+    const $ = (id) => document.getElementById(id);
+    const fToken = $('config-token'), fOwner = $('config-owner'), fRepo = $('config-repo'),
+          fBranch = $('config-branch'), fPrefix = $('config-prefix');
+    const s2 = $('step2-token'), s2Status = $('step2-status');
+    const sel3 = $('step3-repo-select'), btnList3 = $('btn-step3-list'),
+          btnCreate3 = $('btn-step3-create'), s3Status = $('step3-status');
+    const btnTest4 = $('btn-step4-test'), btnSaveForm4 = $('btn-step4-save-form'),
+          s4Status = $('step4-status');
+
+    // 步骤2 的 token 输入和配置区 token 字段双向同步
+    function syncTwoWay(a, b) {
+        ['input', 'change', 'paste'].forEach(ev => {
+            a.addEventListener(ev, () => { if (document.activeElement === a) b.value = a.value; });
+            b.addEventListener(ev, () => { if (document.activeElement === b) a.value = b.value; });
+        });
+    }
+    syncTwoWay(s2, fToken);
+
+    function setStatus(el, text, ok) {
+        el.textContent = text || '';
+        el.className = 'mt-2 text-[11px] leading-relaxed whitespace-pre-wrap ' +
+          (ok === true ? 'text-emerald-300' : (ok === false ? 'text-rose-300' : 'text-white/60'));
+    }
+    async function postJSON(url, payload) {
+        const r = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload || {}),
+        });
+        let data = {};
+        try { data = await r.json(); } catch (e) { data = {error: '服务器返回非 JSON: ' + r.status}; }
+        if (!r.ok && !data.error) data.error = data.message || ('HTTP ' + r.status);
+        return {ok: r.ok && !!data.ok, data};
+    }
+
+    // ============ Step 2: 验证令牌 → 自动填 owner ============
+    $('btn-step2').addEventListener('click', async () => {
+        const token = s2.value.trim();
+        if (!token) { setStatus(s2Status, '请先粘贴上一步复制的令牌。', false); return; }
+        setStatus(s2Status, '正在访问 Gitee…⏳');
+        const {ok, data} = await postJSON("{{ url_for('admin_sync_bootstrap_user') }}", {token});
+        if (ok && data.ok) {
+            const u = data.user;
+            fOwner.value = u.login;
+            fToken.value = token; // 同步
+            setStatus(s2Status,
+                `✅ 验证通过！\n  · Gitee 用户名 (URL): ${u.login}\n  · 昵称: ${u.name}\n  · 已自动填入「所有者」字段。`,
+                true);
+            btnList3.classList.add('ring-2', 'ring-amber-400/70');
+        } else {
+            setStatus(s2Status, '❌ ' + (data.error || '验证失败，请重新到 Gitee 页面生成（只勾 projects），然后复制完整 32 位粘贴。'), false);
+        }
+    });
+
+    // ============ Step 3a: 加载我的仓库（下拉） ============
+    btnList3.addEventListener('click', async () => {
+        const token = (s2.value || fToken.value).trim();
+        if (!token) { setStatus(s3Status, '请先完成步骤②（令牌验证）。', false); return; }
+        setStatus(s3Status, '拉取你的仓库列表…⏳');
+        const {ok, data} = await postJSON("{{ url_for('admin_sync_list_repos') }}", {token});
+        if (ok && data.ok) {
+            const repos = data.repos || [];
+            sel3.innerHTML = '';
+            const blank = document.createElement('option'); blank.value = '';
+            blank.textContent = repos.length === 0
+                ? '—— 你还没有任何仓库，点下方绿色按钮一键新建 ——'
+                : `—— 请选择一个仓库（共 ${repos.length} 个）——`;
+            sel3.appendChild(blank);
+            repos.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = JSON.stringify({name: r.name, branch: r.default_branch || 'master', full: r.full_name});
+                opt.textContent = `${r.full_name}   [${r.private ? '私有' : '公开'} · 默认分支:${r.default_branch||'master'}]`;
+                sel3.appendChild(opt);
+            });
+            setStatus(s3Status, `✅ 已加载你名下 ${repos.length} 个仓库。选一个即自动填入配置，或直接点绿色按钮一键新建。`, true);
+        } else {
+            setStatus(s3Status, '❌ 加载失败：' + (data.error || '未知原因（常见：令牌未勾 projects 权限）'), false);
+        }
+    });
+    sel3.addEventListener('change', () => {
+        if (!sel3.value) return;
+        let parsed; try { parsed = JSON.parse(sel3.value); } catch { return; }
+        if (!parsed || !parsed.name) return;
+        fRepo.value = parsed.name;
+        fBranch.value = parsed.branch || fBranch.value;
+        if (!fOwner.value && parsed.full && parsed.full.includes('/')) {
+            fOwner.value = parsed.full.split('/')[0];
+        }
+        setStatus(s3Status, `✅ 已选中仓库 ${parsed.full}，分支名已自动更正为 ${parsed.branch||'master'}。可以进入步骤④啦。`, true);
+    });
+
+    // ============ Step 3b: 一键新建私有同步仓库 ============
+    btnCreate3.addEventListener('click', async () => {
+        const token = (s2.value || fToken.value).trim();
+        let owner = fOwner.value.trim();
+        if (!token) { setStatus(s3Status, '请先完成步骤②（令牌验证）。', false); return; }
+        if (!owner) {
+            setStatus(s3Status, '还没获取到用户名，正在从令牌反查…⏳');
+            const r2 = await postJSON("{{ url_for('admin_sync_bootstrap_user') }}", {token});
+            if (r2.ok && r2.data.ok) { owner = r2.data.user.login; fOwner.value = owner; }
+        }
+        if (!owner) { setStatus(s3Status, '无法确定你的 Gitee 用户名：请回到步骤②，先点「验证」按钮。', false); return; }
+        const name = prompt('新仓库名（推荐默认，直接点确定）：', '个人博客备份');
+        if (name === null) return;
+        const repoName = (name || '').trim() || '个人博客备份';
+        setStatus(s3Status, `正在为你创建私有仓库 ${owner}/${repoName}…⏳\n（如果失败并提示「实名认证」，请先完成 Gitee 实名认证后再试一次）`);
+        const {ok, data} = await postJSON("{{ url_for('admin_sync_create_repo') }}", {token, owner, repo_name: repoName});
+        if (ok && data.ok) {
+            const info = data.info || {};
+            fRepo.value = info.name || repoName;
+            fBranch.value = info.default_branch || 'master';
+            if (!fPrefix.value) fPrefix.value = 'blog-backup';
+            const msg = [
+                (info.created ? '✅ 新仓库创建成功！🎉  已自动保存配置并启用同步。' : 'ℹ️ 仓库你已创建过同名，已把它设为同步仓库。'),
+                `   · 地址: ${info.html_url || 'https://gitee.com/' + owner + '/' + (info.name || repoName)}`,
+                `   · 分支: ${info.default_branch || 'master'}  子目录: blog-backup`,
+                `\n现在点第④步的「连通性测试 & 保存」最后确认一遍，然后就可以点下方「💾 立即备份」啦。`,
+            ].join('\n');
+            setStatus(s3Status, msg, true);
+            btnTest4.classList.add('ring-2','ring-emerald-400/80');
+        } else {
+            setStatus(s3Status, '❌ 创建失败：\n' + (data.error || '未知原因'), false);
+        }
+    });
+
+    // ============ Step 4: 连通性测试 & 自动保存 ============
+    function collectSettings() {
+        return {
+            token: fToken.value.trim(),
+            owner: fOwner.value.trim(),
+            repo: fRepo.value.trim(),
+            branch: fBranch.value.trim(),
+            path_prefix: fPrefix.value.trim(),
+        };
+    }
+    btnTest4.addEventListener('click', async () => {
+        const payload = collectSettings();
+        if (!payload.token) { setStatus(s4Status, '请先完成步骤①②，拿到令牌并粘贴验证。', false); return; }
+        setStatus(s4Status, '连通性测试中…（1. 令牌 2. 用户名 3. 仓库访问 4. 分支名）⏳');
+        const {ok, data} = await postJSON("{{ url_for('admin_sync_test_connection') }}", payload);
+        const lines = [];
+        const result = data.result || {};
+        (result.steps || []).forEach(st => {
+            lines.push((st.ok ? '✅ ' : '❌ ') + st.name + '  →  ' + (st.msg || ''));
+        });
+        lines.push(''); lines.push(result.summary || '');
+        if (data.ok && ok) {
+            const sv = result.saved_settings || {};
+            if (sv) {
+                fOwner.value = sv.owner || fOwner.value;
+                fRepo.value  = sv.repo  || fRepo.value;
+                fBranch.value= sv.branch|| fBranch.value;
+                fPrefix.value= sv.path_prefix!==undefined ? sv.path_prefix : fPrefix.value;
+                fToken.value = sv.token || fToken.value; s2.value = fToken.value;
+            }
+        }
+        setStatus(s4Status, lines.join('\n'), (data.ok && ok));
+    });
+
+    // 「只保存到配置文件（不测试）」→ 触发表单提交
+    btnSaveForm4.addEventListener('click', () => {
+        s2.value = fToken.value;
+        const form = document.getElementById('manual-config-form');
+        if (form) form.submit();
+    });
+
+    // Step1 按钮：桌面环境下尽量用默认浏览器跳，避免 WebView 内没登录
+    const s1 = $('btn-step1');
+    if (s1) {
+        s1.addEventListener('click', (e) => {
+            const url = s1.getAttribute('href');
+            if (!url) return;
+            if (window.pywebview && typeof window.pywebview.api !== 'undefined') {
+                e.preventDefault();
+                try { window.open(url, '_blank', 'noopener'); } catch { location.href = url; }
+            }
+        });
+    }
+
+    // 仓库字段支持粘贴整段 URL → 自动拆 owner/repo（配置区）
+    function trySplitRepoURL(text) {
+        if (!text) return null;
+        text = text.trim();
+        let t = text;
+        const prefixes = ['https://gitee.com/','http://gitee.com/','gitee.com/','git@gitee.com:','ssh://git@gitee.com/'];
+        let matched = false;
+        for (const p of prefixes) if (t.toLowerCase().startsWith(p.toLowerCase())) { t = t.slice(p.length); matched = true; break; }
+        if (t.toLowerCase().endsWith('.git')) t = t.slice(0, -4);
+        t = t.replace(/^\/+|\/+$/g,'');
+        const segs = t.split('/').filter(x=>x);
+        if (!matched || segs.length < 2) return null;
+        return {owner: segs[0], repo: segs[1]};
+    }
+    function bindRepoAutoSplit(inputEl) {
+        inputEl.addEventListener('paste', e => {
+            const txt = (e.clipboardData || window.clipboardData).getData('text');
+            const parsed = trySplitRepoURL(txt);
+            if (!parsed) return;
+            e.preventDefault();
+            inputEl.value = parsed.repo;
+            if (!fOwner.value) fOwner.value = parsed.owner;
+        });
+        inputEl.addEventListener('blur', () => {
+            const parsed = trySplitRepoURL(inputEl.value);
+            if (!parsed) return;
+            inputEl.value = parsed.repo;
+            if (!fOwner.value) fOwner.value = parsed.owner;
+        });
+    }
+    bindRepoAutoSplit(fRepo);
+
+    // 已配置时默认收起向导；未配置时默认展开
+    const guide = $('guide-details');
+    if (guide) {
+        {% if sync_status.token_configured %}
+        guide.removeAttribute('open');
+        {% else %}
+        guide.setAttribute('open', '');
+        {% endif %}
+    }
+
+    // ============================================================
+    // 原有：自动同步开关 + 三按钮 + 重置游标
+    // ============================================================
+    var sw = document.getElementById('sync-toggle-switch');
+    var form = document.getElementById('sync-toggle-form');
+    var icon = document.getElementById('sync-toggle-icon');
+    if (sw && form) {
+        sw.addEventListener('change', function () {
+            var input = form.querySelector('input[name="enabled"]');
+            if (input) input.value = sw.checked ? 'on' : 'off';
+            if (icon) icon.textContent = sw.checked ? '✅' : '⏸️';
+            sw.disabled = true;
+            var fd = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: fd
+            }).then(function (r) {
+                return r.json().catch(function () { return {}; });
+            }).then(function (data) {
+                sw.disabled = false;
+                if (typeof window.BlogLoading !== 'undefined') window.BlogLoading.hide();
+                if (data && data.ok) {
+                    if (typeof window.BlogFlash !== 'undefined')
+                        window.BlogFlash.show('自动同步已 ' + (sw.checked ? '开启 ✅' : '关闭'), sw.checked ? 'success' : 'info');
+                } else if (data && data.error) {
+                    if (typeof window.BlogFlash !== 'undefined')
+                        window.BlogFlash.show(data.error, 'warning');
+                    sw.checked = !sw.checked;
+                    if (icon) icon.textContent = sw.checked ? '✅' : '⏸️';
+                }
+            }).catch(function () {
+                sw.disabled = false;
+                form.submit();
+            });
+        });
+    }
+
+    var runForms = document.querySelectorAll('form.sync-run-form');
+    var MODE_LABEL = { '恢复': '📥 立即恢复', '备份': '💾 立即备份', '同步': '🔄 立即同步' };
+    var MODE_DESC = {
+        '恢复': '正在从 Gitee 拉取数据到本地（LWW 合并）…',
+        '备份': '正在把本地数据推送到 Gitee（增量）…',
+        '同步': '正在双向 LWW 合并（先拉再推）…'
+    };
+    Array.prototype.forEach.call(runForms, function (f) {
+        f.addEventListener('submit', function (e) {
+            var btn = f.querySelector('button[type="submit"]');
+            if (!btn || btn.disabled) return;
+            e.preventDefault();
+            var mode = f.getAttribute('data-mode') || '运行';
+            btn.disabled = true;
+            if (typeof window.BlogLoading !== 'undefined') {
+                window.BlogLoading.show({
+                    title: '正在' + mode + '…',
+                    desc: MODE_DESC[mode] || '请稍候，Gitee API 响应可能需要 5~30 秒…'
+                });
+            }
+            var fd = new FormData(f);
+            fetch(f.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: fd
+            }).then(function (r) {
+                return r.json().catch(function () { return { ok: false, error: '服务器返回非 JSON' }; });
+            }).then(function (data) {
+                btn.disabled = false;
+                if (typeof window.BlogLoading !== 'undefined') window.BlogLoading.hide();
+                if (data && data.ok) {
+                    var p = data.pushed || {}, pl = data.pulled || {}, att = data.attachments || {};
+                    var pSum = 0, plSum = 0;
+                    Object.keys(p).forEach(function (k) { pSum += p[k] || 0; });
+                    Object.keys(pl).forEach(function (k) { plSum += pl[k] || 0; });
+                    var attUp = att.uploaded || 0, attDn = att.downloaded || 0;
+                    if (typeof window.BlogFlash !== 'undefined') {
+                        window.BlogFlash.show(
+                            (MODE_LABEL[mode] || '✅') + ' 完成！推送 ' + pSum + ' 条 / 拉取 ' + plSum +
+                            ' 条 · 附件 ↑' + attUp + ' / ↓' + attDn,
+                            'success');
+                    }
+                    setTimeout(function () { location.reload(); }, 1500);
+                } else {
+                    if (typeof window.BlogFlash !== 'undefined') {
+                        window.BlogFlash.show(mode + '失败：' + (data && data.error ? String(data.error).slice(0, 200) : '未知错误'),
+                                              'danger');
+                    }
+                }
+            }).catch(function (err) {
+                btn.disabled = false;
+                if (typeof window.BlogLoading !== 'undefined') window.BlogLoading.fail('网络错误：' + err);
+            });
+        });
+    });
+
+    var resetForm = document.querySelector('form[action*="reset_cursors"]');
+    if (resetForm) {
+        resetForm.addEventListener('submit', function () {
+            if (typeof window.BlogLoading !== 'undefined') {
+                window.BlogLoading.show({ title: '🧹 重置同步游标…', desc: '下次同步会做全量 LWW 比对…' });
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

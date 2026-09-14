@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}标签: {{ tag.name }}{% if query %} · 搜索: {{ query }}{% endif %} · {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in space-y-8">
+
+    <!-- Hero -->
+    <section class="relative rounded-[28px] overflow-hidden glass-strong p-6 md:p-10">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 700px 400px at 10% -20%, rgba(14,165,233,.4), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 110% 10%, rgba(99,102,241,.4), transparent 60%);">
+        </div>
+        <div class="absolute inset-0 opacity-40 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 30% 40%, #000 30%, transparent 80%);">
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative">
+            <div class="flex items-center gap-4">
+                <div class="shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl
+                            bg-white/10 backdrop-blur flex items-center justify-center text-4xl
+                            border border-white/10 shadow-cyber-sm">
+                    🏷️
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-4xl font-extrabold">
+                        <span class="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            #{{ tag.name }}
+                        </span>
+                    </h1>
+                    <p class="mt-1 text-cyan-200/70 text-sm md:text-base">
+                        {% if query %}
+                            在标签下搜索「<span class="text-white font-semibold">{{ query }}</span>」，
+                            找到 <span class="text-white font-semibold">{{ pagination.total }}</span> 篇
+                        {% else %}
+                            共 <span class="text-white font-semibold">{{ pagination.total }}</span> 篇相关文章
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <a href="{{ url_for('all_tags') }}"
+               class="self-start inline-flex items-center gap-1.5 px-4 py-2 rounded-xl
+                      glass text-white/80 hover:text-white hover:border-cyber-500/40 text-sm transition">
+                ← 查看所有标签
+            </a>
+        </div>
+
+        <!-- 标签内搜索框 -->
+        <form action="{{ url_for('tag_posts', slug=tag.slug) }}" method="GET" class="mt-6 max-w-xl relative">
+            <div class="flex items-center bg-ink-900/60 backdrop-blur border border-cyber-500/30 rounded-xl p-1.5 shadow-cyber-sm">
+                <svg class="w-5 h-5 text-cyan-300/60 ml-2.5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" name="q" value="{{ query }}" placeholder="在该标签下搜索标题 / 内容……"
+                       class="flex-1 px-3 py-2 outline-none bg-transparent text-white placeholder:text-white/40 text-sm">
+                <button type="submit"
+                        class="px-3.5 py-2 bg-cyber-gradient text-white rounded-lg text-sm font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                    🔍 搜索
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- 文章列表 -->
+    <div class="space-y-5">
+        {% if posts %}
+            {% for post in posts %}
+                <article class="post-card glass rounded-3xl p-5 md:p-6 group relative overflow-hidden cursor-pointer"
+                         onclick="if(!event.target.closest('a')) location.href='{{ url_for('post_detail', post_id=post.id) }}'">
+                    <div class="absolute top-0 right-0 w-52 h-52 bg-cyber-500/5 rounded-full -translate-y-20 translate-x-20 blur-3xl group-hover:bg-cyber-500/10 transition"></div>
+
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-white/50 mb-3 relative">
+                        <span class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">
+                            📅 {{ post.created_at.strftime('%Y-%m-%d') }}
+                        </span>
+                        {% if post.category %}
+                            <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                                📂 {{ post.category }}
+                            </span>
+                        {% endif %}
+                        <span class="px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-200 ml-auto">
+                            👀 {{ post.view_count or 0 }}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg md:text-xl font-bold mb-2.5">
+                        <a href="{{ url_for('post_detail', post_id=post.id) }}"
+                           class="text-white group-hover:text-cyan-300 transition line-clamp-2">
+                            {{ post.title|highlight(query)|safe }}
+                        </a>
+                    </h3>
+
+                    <p class="text-white/65 text-sm md:text-base mb-4 line-clamp-3 leading-relaxed">
+                        {% if query and post.search_snippet %}
+                            {{ post.search_snippet|highlight(query)|safe }}
+                        {% else %}
+                            {{ post.summary|highlight(query)|safe }}
+                        {% endif %}
+                    </p>
+
+                    {% if post.tags %}
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for t in post.tags %}
+                                <a href="{{ url_for('tag_posts', slug=t.slug) }}"
+                                   class="text-xs px-2.5 py-1 rounded-full transition
+                                   {% if t.id == tag.id %}
+                                       bg-cyber-gradient text-white shadow-cyber-sm
+                                   {% else %}
+                                       bg-white/5 text-white/70 border border-white/10 hover:text-white hover:border-cyber-500/50
+                                   {% endif %}">
+                                    {{ t.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </article>
+            {% endfor %}
+
+            {% if pagination.pages > 1 %}
+                <nav class="flex flex-wrap items-center justify-center gap-2 pt-4">
+                    {% if pagination.has_prev %}
+                        <a href="{{ url_for('tag_posts', slug=tag.slug, page=pagination.prev_num, q=query) }}"
+                           class="px-3.5 py-2 rounded-xl glass text-white/80 hover:text-white text-sm transition">← 上一页</a>
+                    {% endif %}
+                    {% for p in pagination.iter_pages() %}
+                        {% if p %}
+                            <a href="{{ url_for('tag_posts', slug=tag.slug, page=p, q=query) }}"
+                               class="min-w-[42px] px-3 py-2 rounded-xl text-center text-sm transition
+                               {% if p == pagination.page %}bg-cyber-gradient text-white shadow-cyber-sm
+                               {% else %}glass text-white/75 hover:text-white hover:border-cyber-500/40{% endif %}">
+                                {{ p }}
+                            </a>
+                        {% else %}<span class="px-2 text-white/40">…</span>{% endif %}
+                    {% endfor %}
+                    {% if pagination.has_next %}
+                        <a href="{{ url_for('tag_posts', slug=tag.slug, page=pagination.next_num, q=query) }}"
+                           class="px-3.5 py-2 rounded-xl glass text-white/80 hover:text-white text-sm transition">下一页 →</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="glass rounded-3xl p-12 text-center">
+                <div class="text-6xl mb-4 float-slow">🗂️</div>
+                <h3 class="text-lg font-semibold text-white mb-2">
+                    {% if query %}未找到匹配「{{ query }}」的文章{% else %}该标签下暂无文章{% endif %}
+                </h3>
+                <p class="text-white/50 text-sm">
+                    {% if query %}换个关键词或<a href="{{ url_for('tag_posts', slug=tag.slug) }}" class="text-cyan-300 hover:underline">查看全部</a>{% else %}期待后续更新～{% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

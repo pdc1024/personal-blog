@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}关于我 · {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in space-y-8">
+
+    <!-- Hero Card -->
+    <section class="relative rounded-[28px] overflow-hidden glass-strong p-8 md:p-12 text-center">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 700px 400px at 50% -20%, rgba(14,165,233,.35), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 50% 140%, rgba(139,92,246,.35), transparent 60%);">
+        </div>
+        <div class="absolute inset-0 opacity-40 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 80%);">
+        </div>
+
+        <div class="relative">
+            <div class="relative inline-block mb-6">
+                <div class="absolute -inset-3 rounded-full bg-cyber-gradient blur-2xl opacity-60 animate-pulse"></div>
+                <img src="{{ profile.avatar_url if profile }}"
+                     onerror="this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed=coder&backgroundColor=0ea5e9,06b6d4,38bdf8,6366f1,8b5cf6'"
+                     class="relative w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white/15 object-cover shadow-glow-strong bg-gradient-to-br from-cyber-600 to-purple-700 float-slow">
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-2
+                       bg-gradient-to-r from-white via-cyan-100 to-purple-200 bg-clip-text text-transparent">
+                {{ profile.nickname if profile else '关于我' }}
+            </h1>
+            {% if profile.title %}
+                <p class="text-cyan-300 font-medium tracking-wide">{{ profile.title }}</p>
+            {% else %}
+                <p class="text-white/60">编程爱好者 · 独立开发者 · 生活记录者</p>
+            {% endif %}
+            {% if profile.bio %}
+                <p class="mt-3 text-white/70 max-w-2xl mx-auto">{{ profile.bio }}</p>
+            {% endif %}
+
+            <div class="mt-6 flex flex-wrap justify-center gap-2">
+                {% if profile.github %}
+                    <a href="{{ profile.github }}" target="_blank" rel="noopener"
+                       class="tag-pill px-4 py-2 rounded-xl text-sm bg-white/5 text-white/80 hover:text-white border border-white/10">📦 GitHub</a>
+                {% endif %}
+                {% if profile.juejin %}
+                    <a href="{{ profile.juejin }}" target="_blank" rel="noopener"
+                       class="tag-pill px-4 py-2 rounded-xl text-sm bg-white/5 text-white/80 hover:text-white border border-white/10">📘 掘金</a>
+                {% endif %}
+                {% if profile.zhihu %}
+                    <a href="{{ profile.zhihu }}" target="_blank" rel="noopener"
+                       class="tag-pill px-4 py-2 rounded-xl text-sm bg-white/5 text-white/80 hover:text-white border border-white/10">💡 知乎</a>
+                {% endif %}
+                {% if profile.email %}
+                    <a href="mailto:{{ profile.email }}"
+                       class="tag-pill px-4 py-2 rounded-xl text-sm bg-white/5 text-white/80 hover:text-white border border-white/10">📧 Email</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- 正文 -->
+    <section class="glass rounded-3xl p-6 md:p-10">
+        <div class="markdown-body">
+            {% if about_html %}
+                {{ about_html|safe }}
+            {% else %}
+                <h2>👋 Hello!</h2>
+                <p>欢迎来到我的个人博客！这里是我记录技术笔记、项目经历与生活感悟的小天地。</p>
+
+                <h2>🚀 技术栈</h2>
+                {% if profile and profile.tech_list %}
+                    <p>{{ profile.tech_stack }}</p>
+                {% else %}
+                    <ul>
+                        <li><strong>后端</strong>：Python / Flask / Django / FastAPI</li>
+                        <li><strong>前端</strong>：HTML / CSS / JavaScript / Vue / React</li>
+                        <li><strong>数据库</strong>：SQLite / MySQL / PostgreSQL / Redis</li>
+                        <li><strong>其他</strong>：Docker / Linux / Git / AI 相关</li>
+                    </ul>
+                {% endif %}
+
+                <h2>📝 博客内容</h2>
+                <ul>
+                    <li><strong>编程笔记</strong>：技术学习过程中的踩坑与总结</li>
+                    <li><strong>项目分享</strong>：个人开源项目、小工具的实现过程</li>
+                    <li><strong>生活随笔</strong>：读书、旅行、日常思考</li>
+                </ul>
+
+                <h2>💬 联系我</h2>
+                <p>如果你对我的文章或项目有兴趣，欢迎随时通过上方社交按钮或邮箱联系 💕</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

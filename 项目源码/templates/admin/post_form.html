@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if post %}编辑文章{% else %}新建文章{% endif %} · {{ site_name }}管理{% endblock %}
+
+{% block extra_head %}
+<!-- Vditor CSS（Typora 风格所见即所得编辑器，本地加载） -->
+<link rel="stylesheet" href="{{ url_for('static', filename='vditor/dist/index.css') }}" />
+<!-- tagify 风格的标签输入（原生JS实现） -->
+<style>
+    .tag-input-wrap {
+        display: flex; flex-wrap: wrap; gap: .4rem;
+        padding: .6rem;
+        border: 1px solid rgba(47,139,255,.3);
+        border-radius: .85rem;
+        background: rgba(5,8,22,.55);
+        min-height: 48px; cursor: text;
+        transition: all .2s ease;
+    }
+    .tag-input-wrap:focus-within {
+        border-color: rgba(34,211,238,.8);
+        box-shadow: 0 0 0 3px rgba(14,165,233,.18), 0 0 20px rgba(47,139,255,.15);
+        background: rgba(5,8,22,.75);
+    }
+    .tag-chip {
+        display: inline-flex; align-items: center; gap: .3rem;
+        padding: .25rem .65rem;
+        background: linear-gradient(135deg, rgba(14,165,233,.2), rgba(99,102,241,.2));
+        color: #bfdbfe;
+        border: 1px solid rgba(47,139,255,.35);
+        border-radius: 999px; font-size: .82rem;
+    }
+    .tag-chip button {
+        background: transparent; color: #93c5fd; font-weight: bold;
+        cursor: pointer; border: none; line-height: 1; font-size: 1rem;
+    }
+    .tag-chip button:hover { color: #fca5a5; }
+    .tag-input-wrap input {
+        border: none; outline: none; flex: 1; min-width: 120px;
+        padding: .25rem; background: transparent; color: #e2e8f0;
+        font-size: .9rem;
+    }
+    .tag-input-wrap input::placeholder { color: rgba(255,255,255,.3); }
+
+    /* 蓝色输入框通用风格 */
+    .cyber-input, .cyber-textarea {
+        width: 100%;
+        background: rgba(5,8,22,.55);
+        border: 1px solid rgba(47,139,255,.3);
+        border-radius: .85rem;
+        color: #e2e8f0;
+        padding: .75rem 1rem;
+        outline: none;
+        transition: all .2s ease;
+    }
+    .cyber-input::placeholder, .cyber-textarea::placeholder { color: rgba(255,255,255,.3); }
+    .cyber-input:focus, .cyber-textarea:focus {
+        border-color: rgba(34,211,238,.8);
+        box-shadow: 0 0 0 3px rgba(14,165,233,.18), 0 0 20px rgba(47,139,255,.15);
+        background: rgba(5,8,22,.75);
+    }
+    .cyber-label {
+        display: block;
+        font-size: .875rem;
+        font-weight: 600;
+        color: rgba(255,255,255,.85);
+        margin-bottom: .5rem;
+    }
+
+    /* ============ Vditor 编辑器：浅色 Typora 风格（白色编辑区嵌入深色玻璃卡片） ============ */
+    .vditor {
+        border: 1px solid rgba(47,139,255,.35) !important;
+        border-radius: .85rem !important;
+        overflow: hidden;
+        background: #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(14,165,233,.10), 0 10px 30px rgba(0,0,0,.28);
+        min-height: 500px;
+        height: auto !important;
+    }
+    .vditor-toolbar {
+        background: #f1f5f9 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 0 8px !important;
+    }
+    .vditor-toolbar__item .vditor-tooltipped { color: #475569; }
+    .vditor-toolbar__item .vditor-tooltipped:hover { color: #1b6dff; }
+    .vditor-toolbar__item button.vditor-menu--current { color: #1b6dff; }
+    .vditor-content { background: #ffffff !important; height: auto !important; }
+    .vditor-wysiwyg, .vditor-ir, .vditor-sv {
+        background: #ffffff !important;
+        height: auto !important;
+        min-height: 440px;
+        overflow: visible !important;
+    }
+
+    /* 代码块编辑态修复：
+       编辑器内代码块包含两个 pre —— 输入层(first-child) 与高亮预览层(last-child)，
+       Vditor 用负 margin 叠放。非编辑态输入层内联 style="display:none"（只显示高亮预览）；
+       编辑态输入层恢复显示，此时必须隐藏预览层，否则两份代码错位重叠。 */
+    .vditor-wysiwyg__block > pre:first-child:not([style*="none"]) + pre {
+        display: none !important;
+    }
+
+    /* 代码块浅色框样式：输入层 pre.vditor-wysiwyg__pre 与高亮预览层 pre.vditor-wysiwyg__preview 共用 */
+    .vditor-wysiwyg pre.vditor-wysiwyg__pre,
+    .vditor-wysiwyg pre.vditor-wysiwyg__preview {
+        background: #f8f8f8 !important;
+        border: 1px solid #e1e4e8 !important;
+        border-radius: 8px !important;
+    }
+
+    /* 隐藏块浮动工具条（代码块/标题等聚焦时弹出的上移、下移、删除按钮小弹框） */
+    .vditor-wysiwyg > .vditor-panel,
+    .vditor-ir > .vditor-panel {
+        display: none !important;
+    }
+
+    /* 立即发布开关：选中时背景为实心绿色 */
+    .publish-toggle:checked + .publish-track {
+        background-color: #22c55e !important;
+        border-color: transparent !important;
+        box-shadow: 0 0 12px rgba(34,197,94,.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in space-y-6">
+
+    <!-- 标题栏 -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+            <span class="w-1.5 h-8 rounded-full bg-cyber-gradient shadow-glow"></span>
+            {% if post %}✏️ 编辑文章{% else %}➕ 新建文章{% endif %}
+        </h1>
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="self-start sm:self-auto px-4 py-2 rounded-xl glass text-white/75 hover:text-white text-sm transition">
+            ← 返回后台
+        </a>
+    </div>
+
+    <form method="POST" id="postForm" class="space-y-5">
+        <!-- 基础信息 -->
+        <div class="glass-strong rounded-3xl p-5 md:p-6 relative overflow-hidden space-y-5">
+            <div class="absolute -top-16 -right-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
+                <div class="md:col-span-2">
+                    <label class="cyber-label">
+                        标题 <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" name="title" required
+                           value="{{ post.title if post else '' }}"
+                           placeholder="请输入文章标题"
+                           class="cyber-input text-base">
+                </div>
+                <div>
+                    <label class="cyber-label">分类</label>
+                    <input type="text" name="category"
+                           value="{{ post.category if post else '' }}"
+                           placeholder="如：编程、生活、笔记…"
+                           class="cyber-input">
+                </div>
+            </div>
+
+            <div class="relative">
+                <label class="cyber-label">摘要（不填自动截取前180字）</label>
+                <textarea name="summary" rows="2"
+                          placeholder="文章摘要，用于列表展示"
+                          class="cyber-textarea">{{ post.summary if post else '' }}</textarea>
+            </div>
+
+            <div class="relative">
+                <label class="cyber-label">标签（回车或逗号分隔）</label>
+                <div class="tag-input-wrap" id="tagInputWrap" onclick="document.getElementById('tagRealInput').focus()">
+                    <input type="hidden" name="tags" id="tagsHidden"
+                           value="{{ tag_str if tag_str is defined else '' }}">
+                    <input type="text" id="tagRealInput" placeholder="输入后回车或逗号分隔…" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 relative">
+                <label class="inline-flex items-center gap-2.5 cursor-pointer select-none group">
+                    <span class="relative">
+                        <input type="checkbox" name="published"
+                               {% if not post or post.published %}checked{% endif %}
+                               class="sr-only peer publish-toggle">
+                        <span class="publish-track block w-10 h-6 rounded-full bg-white/10 border border-white/20 transition"></span>
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md
+                                     peer-checked:translate-x-4 transition-transform"></span>
+                    </span>
+                    <span class="text-sm text-white/80 group-hover:text-white transition">立即发布</span>
+                    <span class="text-xs text-white/40">（勾选=发布，绿色；不勾选=草稿）</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 编辑器（Typora 风格：单栏所见即所得 + 源代码模式切换） -->
+        <div class="glass-strong rounded-3xl p-4 md:p-6 relative overflow-hidden">
+            <div class="absolute -top-16 -left-16 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex items-center justify-between mb-4 relative">
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="font-semibold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
+                        📝 Markdown 编辑器（浅色 · 单栏实时渲染）
+                    </span>
+                    <span class="text-xs text-white/40">工具栏右侧「编辑模式」按钮可切换 源代码 / 所见即所得</span>
+                </div>
+            </div>
+
+            <!-- 隐藏字段：存储 Markdown 源码，用于表单提交 -->
+            <input type="hidden" name="content" id="mdEditor"
+                   value="{{ post.content if post else '' }}">
+
+            <!-- Vditor 挂载容器（单栏所见即所得编辑器） -->
+            <div id="vditor" style="min-height: 520px;"></div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="flex flex-wrap items-center justify-end gap-3 pb-4">
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="px-5 py-2.5 rounded-xl glass text-white/80 hover:text-white text-sm transition">
+                取消
+            </a>
+            <button type="submit"
+                    class="px-6 py-2.5 rounded-xl bg-cyber-gradient text-white font-semibold shadow-cyber-sm hover:shadow-glow transition text-sm">
+                💾 保存文章
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Vditor JS（Typora 风格所见即所得 Markdown 编辑器，本地加载） -->
+<script src="{{ url_for('static', filename='vditor/dist/index.min.js') }}"></script>
+<script>
+/* ============ 标签输入管理 ============ */
+(function(){
+    const wrap = document.getElementById('tagInputWrap');
+    const realInput = document.getElementById('tagRealInput');
+    const hiddenInput = document.getElementById('tagsHidden');
+    let tags = [];
+
+    function loadInitial() {
+        const v = hiddenInput.value.trim();
+        if (v) tags = v.split(',').map(s => s.trim()).filter(Boolean);
+        renderTags();
+    }
+
+    function renderTags() {
+        wrap.querySelectorAll('.tag-chip').forEach(n => n.remove());
+        tags.forEach((t, i) => {
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            chip.innerHTML = `${escapeHtml(t)} <button type="button" data-i="${i}" aria-label="删除">×</button>`;
+            wrap.insertBefore(chip, realInput);
+        });
+        hiddenInput.value = tags.join(',');
+    }
+
+    function escapeHtml(s){return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+    function addTag(name) {
+        name = name.trim();
+        if (name && !tags.includes(name)) {
+            tags.push(name);
+            renderTags();
+        }
+    }
+
+    realInput.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ',' || e.key === '，') {
+            e.preventDefault();
+            if (this.value.trim()) {
+                this.value.split(/[,，]/).forEach(s => addTag(s));
+                this.value = '';
+            }
+        } else if (e.key === 'Backspace' && !this.value && tags.length) {
+            tags.pop();
+            renderTags();
+        }
+    });
+
+    realInput.addEventListener('blur', function(){
+        if (this.value.trim()) {
+            this.value.split(/[,，]/).forEach(s => addTag(s));
+            this.value = '';
+        }
+    });
+
+    wrap.addEventListener('click', function(e){
+        if (e.target.tagName === 'BUTTON' && e.target.dataset.i !== undefined) {
+            tags.splice(Number(e.target.dataset.i), 1);
+            renderTags();
+        }
+    });
+
+    loadInitial();
+})();
+
+/* ============ Vditor 编辑器初始化（Typora 风格所见即所得） ============ */
+let vditor = null;
+let vditorInitialValue = '';
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hiddenInput = document.getElementById('mdEditor');
+    vditorInitialValue = hiddenInput.value || '';
+
+    // 检查 Vditor 是否成功加载
+    if (typeof Vditor === 'undefined') {
+        // Vditor 加载失败，回退到普通 textarea
+        console.error('Vditor failed to load, falling back to textarea');
+        const container = document.getElementById('vditor');
+        container.innerHTML = '<textarea rows="24" '
+            + 'class="cyber-textarea font-mono text-sm leading-relaxed resize-y" '
+            + 'style="min-height: 520px; background:#fff; color:#1f2937; border:1px solid #cbd5e1; font-family: JetBrains Mono, Consolas, monospace;">'
+            + vditorInitialValue.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            + '</textarea>'
+            + '<p class="text-yellow-400 text-xs mt-2">⚠ 编辑器加载失败，已回退到纯文本模式。</p>';
+        // 通过 input 事件同步到隐藏字段（不设 name，避免表单字段冲突）
+        const ta = container.querySelector('textarea');
+        ta.value = vditorInitialValue;
+        ta.addEventListener('input', function() {
+            hiddenInput.value = this.value;
+        });
+        return;
+    }
+
+    vditor = new Vditor('vditor', {
+        cdn: '/static/vditor',  // 本地加载所有运行时资源（icons/highlight.js/i18n 等）
+        lang: 'zh_CN',         // 中文界面
+        theme: 'classic',      // 浅色主题（白色编辑区，Typora 风格）
+        mode: 'wysiwyg',       // 单栏所见即所得：输入 Markdown 实时渲染，不分裂双框
+        placeholder: '开始撰写文章… 支持 Markdown 语法；工具栏右侧可切换「源代码模式」',
+        toolbar: [
+            'emoji', 'headings', 'bold', 'italic', 'strike', '|',
+            'line', 'quote', 'list', 'ordered-list', 'check', 'outdent', 'indent', '|',
+            'code', 'inline-code', 'link', 'table', '|',
+            'undo', 'redo', '|',
+            'edit-mode',    // 模式切换组（初始化后仅保留：所见即所得 / 源代码）
+            'fullscreen'
+        ],
+        toolbarConfig: { pin: true },
+        cache: { enable: false },
+        preview: {
+            hljs: { lineNumber: true, style: 'github' },  // 浅色代码高亮主题
+            theme: {                                        // Typora 风格浅色排版主题
+                current: 'light',
+                path: '/static/vditor/dist/css/content-theme'
+            },
+            markdown: { toc: true }
+        },
+        // 输入时实时同步 Markdown 源码到隐藏字段（用于表单提交）
+        input: function(value) {
+            hiddenInput.value = value;
+        },
+        // Vditor 初始化完成后
+        after: function() {
+            // 模式切换组只保留「所见即所得(wysiwyg)」与「源代码(sv)」两个按钮，
+            // 隐藏中间的「即时渲染(ir)」按钮，实现单框实时显示 ↔ 源代码 两态切换。
+            // 注意：Vditor 实例的内部对象（含 toolbar）挂在 .vditor 属性上
+            var internals = vditor.vditor || vditor;
+            var group = internals.toolbar && internals.toolbar.elements
+                        && internals.toolbar.elements['edit-mode'];
+            if (group) {
+                var irBtn = group.querySelector('button[data-mode="ir"]');
+                if (irBtn) irBtn.style.display = 'none';
+            }
+            // 加载已有文章内容
+            if (vditorInitialValue) {
+                vditor.setValue(vditorInitialValue);
+            }
+        }
+    });
+});
+
+/* ============ 离开确认（适配 Vditor） ============ */
+(function(){
+    const form = document.getElementById('postForm');
+    const hiddenInput = document.getElementById('mdEditor');
+    let submitting = false;
+    // 提交时标记，避免 beforeunload 误拦正常保存
+    form.addEventListener('submit', function(){
+        submitting = true;
+        // 确保 Vditor 最新值已同步到隐藏字段
+        if (vditor && typeof vditor.getValue === 'function') {
+            hiddenInput.value = vditor.getValue();
+        }
+    });
+    window.addEventListener('beforeunload', function(e){
+        if (submitting) return;  // 正在提交，放行
+        let current = hiddenInput.value;
+        if (vditor && typeof vditor.getValue === 'function') {
+            current = vditor.getValue();
+        }
+        if (current !== vditorInitialValue) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+})();
+</script>
+{% endblock %}

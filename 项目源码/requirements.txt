@@ -1,0 +1,11 @@
+Flask>=3.0.0
+Flask-SQLAlchemy>=3.1.1
+Werkzeug>=3.0.0
+Markdown>=3.5.1
+Pygments>=2.17.2
+PyYAML>=6.0.1
+python-dateutil>=2.8.2
+# 生产 WSGI 服务器（多线程、无调试器，更稳定；不强制要求，app.py 未安装时自动退回 Flask 内置）
+waitress>=3.0.0
+# 桌面版窗口壳（pywebview 6.x，Windows 下自动使用 Edge WebView2；打包桌面版必需）
+pywebview>=5.0

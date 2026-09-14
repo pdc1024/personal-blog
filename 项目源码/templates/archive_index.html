@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}归档 · {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in space-y-8">
+
+    <!-- Hero -->
+    <section class="relative rounded-[28px] overflow-hidden glass-strong p-6 md:p-10">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 700px 400px at 10% -20%, rgba(16,185,129,.35), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 110% 10%, rgba(14,165,233,.35), transparent 60%);">
+        </div>
+        <div class="absolute inset-0 opacity-40 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 30% 40%, #000 30%, transparent 80%);">
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center gap-5 md:gap-8 relative">
+            <div class="shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl
+                        bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 shadow-glow flex items-center justify-center text-4xl">
+                📅
+            </div>
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl md:text-4xl font-extrabold bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent">
+                    归档时间线
+                </h1>
+                <p class="mt-2 text-cyan-200/70 text-sm md:text-base">
+                    按时间整理的所有文章 · 共 <span class="text-white font-semibold">{{ total_posts }}</span> 篇
+                    · <span class="text-white font-semibold">{{ groups|length }}</span> 个月份
+                </p>
+            </div>
+            <!-- 月份快速跳转 -->
+            {% if groups %}
+            <div class="flex flex-wrap gap-1.5 max-w-md">
+                {% for ym in groups.keys() %}
+                <a href="#archive-{{ ym }}"
+                   class="px-2.5 py-1 rounded-full text-xs border border-white/10 bg-white/5 text-white/70 hover:text-white hover:border-cyber-500/50 hover:bg-cyber-500/10 transition">
+                    {{ ym }}<span class="ml-1 text-[10px] opacity-60">{{ counts.get(ym, 0) }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- 时间线主体 -->
+    <section class="glass rounded-3xl p-5 md:p-8 relative overflow-hidden">
+        <div class="absolute -top-16 -right-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        {% if groups %}
+            {% for ym, posts in groups.items() %}
+            <div id="archive-{{ ym }}" class="mb-12 last:mb-0 scroll-mt-24">
+                <!-- 月份标题 -->
+                <div class="flex items-center gap-3 mb-6 md:mb-8 pl-1">
+                    <div class="relative">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500/30 to-emerald-500/30 rounded-2xl blur-md"></div>
+                        <div class="relative px-4 py-2 rounded-2xl bg-slate-900/80 border border-cyber-500/40 backdrop-blur">
+                            <span class="bg-gradient-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent font-black text-lg md:text-xl tracking-wider">
+                                {{ ym }}
+                            </span>
+                            <span class="ml-3 text-xs px-2 py-0.5 rounded-full bg-cyber-500/10 border border-cyber-500/30 text-cyan-300 font-semibold">
+                                {{ posts|length }} 篇
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 该月文章列表 -->
+                <ul class="relative border-l border-cyber-500/25 ml-3 md:ml-5 space-y-5">
+                    {% for post in posts %}
+                    <li class="pl-5 md:pl-7 relative">
+                        <span class="absolute -left-[7px] md:-left-[9px] top-4 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full
+                                     bg-cyber-gradient shadow-glow border-2 border-ink-800"></span>
+                        <article class="post-card rounded-2xl p-4 md:p-5 cursor-pointer
+                                        bg-white/[0.03] border border-white/10 hover:border-cyber-500/40 transition"
+                                 onclick="if(!event.target.closest('a')) location.href='{{ url_for('post_detail', post_id=post.id) }}'">
+                            <div class="flex flex-wrap items-center gap-2 text-xs text-white/50 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">
+                                    {{ post.created_at.strftime('%m-%d') }}
+                                </span>
+                                {% if post.category %}
+                                <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                                    📂 {{ post.category }}
+                                </span>
+                                {% endif %}
+                                {% if post.view_count %}
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300">
+                                    👀 {{ post.view_count }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h3 class="text-base md:text-lg font-bold text-white mb-1.5">
+                                <a href="{{ url_for('post_detail', post_id=post.id) }}"
+                                   class="hover:text-cyan-300 transition line-clamp-2">
+                                    {{ post.title }}
+                                </a>
+                            </h3>
+                            {% if post.summary %}
+                            <p class="text-sm text-white/60 line-clamp-2">{{ post.summary }}</p>
+                            {% endif %}
+                        </article>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-16 text-white/50 relative">
+                <div class="text-6xl mb-4 float-slow">📭</div>
+                <p>还没有任何文章，先去写第一篇吧～</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block title %}友链管理 · {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in space-y-6">
+
+    <!-- 顶部条 -->
+    <section class="relative rounded-3xl overflow-hidden glass-strong p-5 md:p-7">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 600px 300px at -10% -20%, rgba(16,185,129,.3), transparent 60%),
+                radial-gradient(ellipse 600px 400px at 110% 10%, rgba(14,165,233,.3), transparent 60%);">
+        </div>
+        <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="shrink-0 w-12 h-12 rounded-2xl bg-cyber-gradient flex items-center justify-center text-2xl shadow-cyber-sm">
+                    🤝
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-white">友情链接管理</h1>
+                    <p class="text-sm text-white/60 mt-0.5">
+                        共 <span class="text-cyan-300 font-semibold">{{ links|length }}</span> 个友链
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="document.getElementById('newLinkForm').classList.toggle('hidden')"
+                        class="tag-pill inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl
+                               bg-cyber-gradient text-white text-sm font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                    ➕ 新建友链
+                </button>
+                <a href="{{ url_for('friend_links') }}"
+                   class="tag-pill inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl
+                          glass text-white/85 hover:text-white hover:border-cyber-500/40 text-sm transition">
+                    👁️ 查看公开页
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="tag-pill inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl
+                          glass text-white/85 hover:text-white text-sm transition">
+                    ← 返回后台
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 新建表单 -->
+    <section id="newLinkForm" class="glass-strong rounded-3xl p-5 md:p-7 hidden">
+        <h2 class="font-bold text-white flex items-center gap-2.5 mb-4">
+            <span class="w-1.5 h-6 rounded-full bg-cyber-gradient shadow-glow"></span>
+            ➕ 添加友情链接
+        </h2>
+        <form action="{{ url_for('admin_link_create') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">名称 *</label>
+                <input type="text" name="name" required maxlength="50"
+                       placeholder="如：阮一峰的博客"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">URL *</label>
+                <input type="url" name="url" required
+                       placeholder="https://example.com"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs text-white/60 mb-1.5">描述（可选）</label>
+                <input type="text" name="description" maxlength="255"
+                       placeholder="一句话介绍该站点……"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">头像 / 图标 URL（可选）</label>
+                <input type="url" name="avatar"
+                       placeholder="https://example.com/favicon.ico"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">排序权重（小在前）</label>
+                <input type="number" name="sort_order" value="0" min="0"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div class="md:col-span-2 flex items-center gap-3">
+                <label class="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer">
+                    <input type="checkbox" name="is_visible" value="1" checked
+                           class="w-4 h-4 rounded accent-cyan-500">
+                    公开显示
+                </label>
+                <button type="submit"
+                        class="ml-auto px-5 py-2 rounded-xl bg-cyber-gradient text-white text-sm font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                    ✅ 添加
+                </button>
+                <button type="button"
+                        onclick="document.getElementById('newLinkForm').classList.add('hidden')"
+                        class="px-5 py-2 rounded-xl glass text-white/80 hover:text-white text-sm transition">
+                    取消
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- 友链列表 -->
+    <section class="glass-strong rounded-3xl overflow-hidden relative">
+        <div class="absolute -top-16 -right-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="px-5 md:px-6 py-4 md:py-5 border-b border-cyber-500/15 relative">
+            <h2 class="font-bold text-white flex items-center gap-2.5">
+                <span class="w-1.5 h-6 rounded-full bg-cyber-gradient shadow-glow"></span>
+                📋 全部友链
+            </h2>
+        </div>
+
+        {% if links %}
+            <div class="overflow-x-auto relative">
+                <table class="w-full text-sm">
+                    <thead class="text-white/50">
+                        <tr class="border-b border-white/5">
+                            <th class="text-left px-5 md:px-6 py-3.5 font-medium whitespace-nowrap">站点</th>
+                            <th class="text-left px-3 md:px-4 py-3.5 font-medium hidden md:table-cell">描述</th>
+                            <th class="text-left px-3 py-3.5 font-medium hidden sm:table-cell">排序</th>
+                            <th class="text-left px-3 py-3.5 font-medium">状态</th>
+                            <th class="text-right px-5 md:px-6 py-3.5 font-medium whitespace-nowrap">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for link in links %}
+                            <tr class="hover:bg-white/[0.03] transition">
+                                <td class="px-5 md:px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ link.avatar }}" alt=""
+                                             onerror="this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed={{ link.name }}&backgroundColor=0ea5e9,06b6d4,38bdf8,6366f1,8b5cf6'"
+                                             class="w-9 h-9 rounded-lg border border-white/15 object-cover bg-cyber-700 shrink-0">
+                                        <div class="min-w-0">
+                                            <div class="font-medium text-white/90 truncate">{{ link.name }}</div>
+                                            <a href="{{ link.url }}" target="_blank" rel="noopener" class="text-xs text-cyan-300/70 hover:text-cyan-300 truncate block max-w-[220px]">
+                                                {{ link.url }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-3 md:px-4 py-4 hidden md:table-cell max-w-[260px]">
+                                    <span class="text-white/65 text-xs line-clamp-2">{{ link.description or '—' }}</span>
+                                </td>
+                                <td class="px-3 py-4 hidden sm:table-cell">
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+                                        {{ link.sort_order }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-4">
+                                    {% if link.is_visible %}
+                                        <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full
+                                                   bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"></span>
+                                            显示中
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full
+                                                   bg-yellow-500/10 border border-yellow-500/30 text-yellow-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                                            已隐藏
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 md:px-6 py-4">
+                                    <div class="flex gap-1.5 justify-end whitespace-nowrap">
+                                        <button onclick="openEditForm({{ link.id }}, {{ {
+                                            'name': link.name, 'url': link.url,
+                                            'description': link.description or '',
+                                            'avatar': link.avatar or '',
+                                            'sort_order': link.sort_order,
+                                            'is_visible': link.is_visible
+                                        }|tojson }})"
+                                                class="px-2.5 py-1 rounded-lg text-emerald-300 hover:bg-emerald-500/10 text-xs"
+                                                title="编辑">✏️</button>
+                                        <form method="POST" action="{{ url_for('admin_link_delete', link_id=link.id) }}" class="inline"
+                                              onsubmit="return confirm('确定删除友链「{{ link.name }}」吗？');">
+                                            <button type="submit" class="px-2.5 py-1 rounded-lg text-red-300 hover:bg-red-500/10 text-xs" title="删除">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-12 text-center text-white/40">
+                <div class="text-5xl mb-3 float-slow">🤝</div>
+                <p>还没有友链，<button onclick="document.getElementById('newLinkForm').classList.remove('hidden')"
+                        class="text-cyan-300 hover:underline">立即添加 →</button></p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+
+<!-- 编辑弹层 -->
+<div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,.6); backdrop-filter: blur(4px);">
+    <div class="glass-strong rounded-3xl p-5 md:p-7 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+        <button onclick="closeEditForm()" class="absolute top-3 right-3 w-8 h-8 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition">✕</button>
+        <h2 class="font-bold text-white flex items-center gap-2.5 mb-4">
+            <span class="w-1.5 h-6 rounded-full bg-cyber-gradient shadow-glow"></span>
+            ✏️ 编辑友链
+        </h2>
+        <form id="editForm" method="POST" action="" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">名称 *</label>
+                <input type="text" name="name" id="edit_name" required maxlength="50"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">URL *</label>
+                <input type="url" name="url" id="edit_url" required
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs text-white/60 mb-1.5">描述</label>
+                <input type="text" name="description" id="edit_description" maxlength="255"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs text-white/60 mb-1.5">头像 / 图标 URL</label>
+                <input type="url" name="avatar" id="edit_avatar"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div>
+                <label class="block text-xs text-white/60 mb-1.5">排序权重</label>
+                <input type="number" name="sort_order" id="edit_sort_order" min="0"
+                       class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-cyber-500/50 transition">
+            </div>
+            <div class="flex items-end">
+                <label class="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer">
+                    <input type="checkbox" name="is_visible" id="edit_is_visible" value="1"
+                           class="w-4 h-4 rounded accent-cyan-500">
+                    公开显示
+                </label>
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeEditForm()"
+                        class="px-5 py-2 rounded-xl glass text-white/80 hover:text-white text-sm transition">
+                    取消
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 rounded-xl bg-cyber-gradient text-white text-sm font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                    💾 保存
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEditForm(id, data) {
+    const modal = document.getElementById('editModal');
+    const form = document.getElementById('editForm');
+    form.action = `/admin/links/${id}/update/`;
+    document.getElementById('edit_name').value = data.name || '';
+    document.getElementById('edit_url').value = data.url || '';
+    document.getElementById('edit_description').value = data.description || '';
+    document.getElementById('edit_avatar').value = data.avatar || '';
+    document.getElementById('edit_sort_order').value = data.sort_order || 0;
+    document.getElementById('edit_is_visible').checked = !!data.is_visible;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeEditForm() {
+    const modal = document.getElementById('editModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('editModal');
+    // 点击遮罩关闭
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeEditForm();
+    });
+    // ESC 关闭
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeEditForm();
+    });
+});
+</script>
+{% endblock %}

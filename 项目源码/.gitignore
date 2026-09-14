@@ -1,0 +1,25 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# ---- 运行时数据（请勿提交）----
+blog.db
+blog.db.bak
+blog.pid
+.session_key
+.env
+logs/
+uploads/avatars/
+uploads/bg/
+
+# ---- 构建产物 ----
+build/
+dist/
+*.spec.bak
+
+# ---- 系统文件 ----
+Thumbs.db
+Desktop.ini

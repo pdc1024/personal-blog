@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}上传文件 · {{ site_name }}管理{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in space-y-6">
+
+    <!-- 标题 -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+            <span class="w-1.5 h-8 rounded-full bg-cyber-gradient shadow-glow"></span>
+            📤 上传文件导入文章
+        </h1>
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="self-start sm:self-auto px-4 py-2 rounded-xl glass text-white/75 hover:text-white text-sm transition">
+            ← 返回后台
+        </a>
+    </div>
+
+    <!-- 拖拽上传区 -->
+    <section class="glass-strong rounded-3xl p-6 md:p-10 relative overflow-hidden">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 600px 400px at 10% -20%, rgba(14,165,233,.3), transparent 60%),
+                radial-gradient(ellipse 600px 500px at 110% 10%, rgba(99,102,241,.3), transparent 60%);">
+        </div>
+        <div class="absolute inset-0 opacity-30 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 50% 30%, #000 40%, transparent 80%);">
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="uploadForm"
+              class="dropzone space-y-6 relative">
+            <div id="dropArea"
+                 class="relative border-2 border-dashed border-white/15 hover:border-cyan-400/70 rounded-[24px] p-8 md:p-14 text-center transition cursor-pointer
+                        bg-white/[0.03] hover:bg-cyan-500/[0.05] group">
+                <!-- 角落装饰 -->
+                <div class="absolute top-3 left-3 w-6 h-6 border-l-2 border-t-2 border-cyber-500/40 rounded-tl-xl group-hover:border-cyan-400 transition"></div>
+                <div class="absolute top-3 right-3 w-6 h-6 border-r-2 border-t-2 border-cyber-500/40 rounded-tr-xl group-hover:border-cyan-400 transition"></div>
+                <div class="absolute bottom-3 left-3 w-6 h-6 border-l-2 border-b-2 border-cyber-500/40 rounded-bl-xl group-hover:border-cyan-400 transition"></div>
+                <div class="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-cyber-500/40 rounded-br-xl group-hover:border-cyan-400 transition"></div>
+
+                <input type="file" name="file" id="fileInput" accept=".md,.markdown,.yaml,.yml"
+                       class="hidden">
+
+                <div class="relative inline-block mb-5">
+                    <div class="absolute -inset-4 rounded-full bg-cyber-gradient blur-2xl opacity-50 animate-pulse"></div>
+                    <div class="relative w-20 h-20 rounded-2xl bg-cyber-gradient flex items-center justify-center text-5xl shadow-glow-strong">
+                        📁
+                    </div>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">拖拽文件到这里，或点击选择</h3>
+                <p class="text-white/55 text-sm md:text-base mb-5">
+                    支持格式：
+                    <code class="mx-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg text-cyan-200 text-xs">.md</code>
+                    <code class="mx-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg text-cyan-200 text-xs">.markdown</code>
+                    <code class="mx-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg text-cyan-200 text-xs">.yaml</code>
+                    <code class="mx-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg text-cyan-200 text-xs">.yml</code>
+                </p>
+                <div class="text-xs text-white/40">单个文件最大 16MB</div>
+                <div id="fileNameDisplay" class="mt-5 hidden">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                                bg-cyan-500/10 border border-cyan-500/30 text-cyan-200 text-sm font-medium">
+                        ✅ 已选择：<span id="fileName" class="font-semibold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-end gap-3 relative">
+                <a href="{{ url_for('post_new') }}"
+                   class="px-5 py-2.5 rounded-xl glass text-white/80 hover:text-white text-sm transition text-center">
+                    或改为在线编辑 →
+                </a>
+                <button type="submit"
+                        class="px-6 py-2.5 rounded-xl bg-cyber-gradient text-white font-semibold shadow-cyber-sm hover:shadow-glow transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="submitBtn" disabled>
+                    🚀 开始导入
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- 格式说明 -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Markdown 格式 -->
+        <div class="glass rounded-3xl p-6 relative overflow-hidden group">
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/15 transition"></div>
+            <h3 class="font-bold text-white mb-3 flex items-center gap-3">
+                <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-cyber-sm text-lg">📝</span>
+                Markdown (.md) 格式
+            </h3>
+            <p class="text-sm text-white/55 mb-3">推荐在顶部加 YAML front-matter 指定元信息：</p>
+            <pre class="rounded-2xl p-4 text-xs overflow-x-auto border border-white/10
+                        bg-ink-900/60 text-cyan-100 shadow-inner"><code>---
+title: 我的文章标题
+summary: 这是摘要，不写自动截取
+category: 编程笔记
+tags:
+  - Python
+  - Flask
+  - Web
+date: 2026-08-30
+published: true
+---
+
+# 这里是正文 Markdown 内容
+
+正常写就可以啦……</code></pre>
+            <p class="text-xs text-white/40 mt-3">💡 没写 title 时会自动从正文第一个 # 标题或文件名取</p>
+        </div>
+
+        <!-- YAML 格式 -->
+        <div class="glass rounded-3xl p-6 relative overflow-hidden group">
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/15 transition"></div>
+            <h3 class="font-bold text-white mb-3 flex items-center gap-3">
+                <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-lg">📋</span>
+                YAML (.yaml/.yml) 格式
+            </h3>
+            <p class="text-sm text-white/55 mb-3">单篇或多篇数组，适合批量导入：</p>
+            <pre class="rounded-2xl p-4 text-xs overflow-x-auto border border-white/10
+                        bg-ink-900/60 text-emerald-100 shadow-inner"><code># 单篇（对象）
+title: 文章标题
+category: 生活
+tags: [日记, 日常]
+content: |
+  # 标题
+  这里是正文内容……
+
+---
+
+# 或批量多篇（数组）
+- title: 文章一
+  category: 编程
+  tags: [Python]
+  content: "**正文**"
+
+- title: 文章二
+  category: 笔记
+  published: false
+  content: 内容……</code></pre>
+            <p class="text-xs text-white/40 mt-3">💡 常用字段：title / content 必填，tags 支持数组或逗号字符串</p>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const display = document.getElementById('fileNameDisplay');
+    const fileName = document.getElementById('fileName');
+    const form = document.getElementById('uploadForm');
+
+    function updateFile(file) {
+        if (!file) {
+            display.classList.add('hidden');
+            submitBtn.disabled = true;
+            return;
+        }
+        const sizeKb = (file.size/1024).toFixed(1);
+        const sizeTxt = sizeKb > 1024 ? (sizeKb/1024).toFixed(2) + ' MB' : sizeKb + ' KB';
+        fileName.textContent = `${file.name} (${sizeTxt})`;
+        display.classList.remove('hidden');
+        submitBtn.disabled = false;
+    }
+
+    dropArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', e => {
+        updateFile(e.target.files[0]);
+    });
+
+    ['dragenter', 'dragover'].forEach(ev => {
+        dropArea.addEventListener(ev, e => {
+            e.preventDefault();
+            dropArea.classList.add('border-cyan-400', 'bg-cyan-500/10');
+        });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+        dropArea.addEventListener(ev, e => {
+            e.preventDefault();
+            dropArea.classList.remove('border-cyan-400', 'bg-cyan-500/10');
+        });
+    });
+    dropArea.addEventListener('drop', e => {
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            const allowed = ['.md','.markdown','.yaml','.yml'];
+            if (!allowed.includes(ext)) {
+                alert('仅支持 .md / .markdown / .yaml / .yml 文件');
+                return;
+            }
+            fileInput.files = e.dataTransfer.files;
+            updateFile(file);
+        }
+    });
+
+    form.addEventListener('submit', function(){
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ 正在导入…';
+    });
+})();
+</script>
+{% endblock %}

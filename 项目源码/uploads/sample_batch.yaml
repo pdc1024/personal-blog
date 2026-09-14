@@ -1,0 +1,62 @@
+# 博客示例 YAML 批量导入文件
+# 使用方法：登录后台 → 上传文件 → 选择本文件即可
+
+- title: "Flask Web 开发入门指南"
+  category: "编程"
+  tags: ["Python", "Flask", "Web开发"]
+  summary: "从零开始认识 Flask，搭建你的第一个 Web 应用。"
+  published: true
+  content: |
+    # Flask 入门指南 🌶️
+
+    Flask 是一个轻量级的 Python Web 框架，上手简单，扩展性极强。
+
+    ## 安装
+
+    ```bash
+    pip install flask
+    ```
+
+    ## Hello World
+
+    ```python
+    from flask import Flask
+    app = Flask(__name__)
+
+    @app.route('/')
+    def index():
+        return 'Hello, Flask!'
+
+    app.run(debug=True)
+    ```
+
+    打开浏览器访问 `http://localhost:5000`，就可以看到你的第一个 Flask 应用啦！
+
+    ## 核心概念
+
+    1. **路由（Route）**：通过 `@app.route` 绑定 URL 与函数
+    2. **模板（Template）**：Jinja2 渲染 HTML
+    3. **请求与响应**：Request / Response 对象
+    4. **会话**：Session 保持用户状态
+
+    > 更多内容请参考官方文档 📚
+
+- title: "周末去了趟西湖"
+  category: "生活"
+  tags: ["旅行", "杭州", "随笔"]
+  published: true
+  content: |
+    # 周末西湖散步 🌿
+
+    周六天气特别好，于是临时决定去西湖走走。
+
+    沿苏堤一路逛，柳树倒映在湖面上，空气里都是桂花的香气。
+    拍了好多照片，选了几张最喜欢的留作纪念。
+
+    ## 今日份小确幸 ✨
+
+    - 早晨的阳光刚好落在湖面上
+    - 路上遇到了一只特别粘人的橘猫 🐱
+    - 午餐吃的杭帮菜味道很棒
+
+    > 忙碌的生活里，偶尔慢下来走一走也挺好的。

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}友情链接 · {{ site_name }}{% endblock %}
+{% block description %}{{ profile.nickname if profile else '博主' }} 的友情链接 - 优质的开发者社区与技术博客{% endblock %}
+
+{% block content %}
+<div class="fade-in space-y-8">
+
+    <!-- Hero -->
+    <section class="relative rounded-[28px] overflow-hidden glass-strong p-6 md:p-10 lg:p-14">
+        <div class="absolute inset-0 -z-10"
+             style="background:
+                radial-gradient(ellipse 700px 400px at -10% -30%, rgba(16,185,129,.35), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 110% -10%, rgba(59,130,246,.35), transparent 60%),
+                radial-gradient(ellipse 600px 400px at 50% 130%, rgba(139,92,246,.25), transparent 70%);">
+        </div>
+        <div class="absolute inset-0 opacity-40 pointer-events-none"
+             style="background-image: linear-gradient(rgba(47,139,255,.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(47,139,255,.08) 1px, transparent 1px);
+                    background-size: 30px 30px; mask-image: radial-gradient(ellipse at 50% 20%, #000 30%, transparent 80%);">
+        </div>
+
+        <div class="relative text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
+                        bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 mb-4">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+                FRIENDS · 互联互通
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+                <span class="bg-gradient-to-r from-white via-cyan-200 to-blue-200 bg-clip-text text-transparent">友情链接</span>
+                <br class="sm:hidden">
+                <span class="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">🤝 数字花园</span>
+            </h1>
+            <p class="text-white/75 text-sm md:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed">
+                这里收录了我常逛的技术博客、开发者社区与优质站点 ——
+                愿我们在代码的世界里彼此照亮 ✨
+            </p>
+            <div class="mt-5 inline-flex items-center gap-2 text-sm text-white/60">
+                <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">共 <span class="text-cyan-300 font-semibold">{{ links|length }}</span> 个友链</span>
+                <a href="{{ url_for('admin_links') }}"
+                   class="px-3 py-1 rounded-full bg-cyber-gradient text-white text-xs font-semibold shadow-cyber-sm hover:shadow-glow transition">
+                    🛠️ 管理
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 友链卡片网格 -->
+    {% if links %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {% for link in links %}
+                <a href="{{ link.url }}" target="_blank" rel="noopener nofollow"
+                   class="post-card group glass rounded-3xl p-5 md:p-6 relative overflow-hidden flex flex-col">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl group-hover:bg-cyan-500/10 transition"></div>
+                    <div class="absolute -top-1 -right-1 text-2xl opacity-30 group-hover:opacity-60 group-hover:rotate-12 transition">🔗</div>
+
+                    <div class="flex items-start gap-3 relative mb-3">
+                        <div class="relative shrink-0">
+                            <div class="absolute -inset-1.5 rounded-2xl bg-cyber-gradient blur opacity-30 group-hover:opacity-60 transition"></div>
+                            <img src="{{ link.avatar }}" alt="{{ link.name }}"
+                                 onerror="this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed={{ link.name }}&backgroundColor=0ea5e9,06b6d4,38bdf8,6366f1,8b5cf6'"
+                                 class="relative w-12 h-12 rounded-2xl border border-white/15 object-cover bg-cyber-700">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-white text-base md:text-lg group-hover:text-cyan-300 transition truncate">
+                                {{ link.name }}
+                            </h3>
+                            <p class="text-xs text-cyan-300/60 truncate mt-0.5">{{ link.url|replace('https://', '')|replace('http://', '')|truncate(40, true, '…') }}</p>
+                        </div>
+                    </div>
+
+                    {% if link.description %}
+                        <p class="text-sm text-white/65 leading-relaxed flex-1 line-clamp-2">
+                            {{ link.description }}
+                        </p>
+                    {% else %}
+                        <p class="text-sm text-white/30 italic flex-1">暂无描述</p>
+                    {% endif %}
+
+                    <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                        <span class="text-white/40">📁 #{{ loop.index }}</span>
+                        <span class="inline-flex items-center gap-1 text-cyan-300 group-hover:text-cyan-200 font-medium">
+                            访问站点
+                            <span class="transition-transform group-hover:translate-x-1">→</span>
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass rounded-3xl p-12 md:p-16 text-center">
+            <div class="text-6xl mb-4 float-slow">🤝</div>
+            <h3 class="text-lg font-semibold text-white mb-2">还没有友链</h3>
+            <p class="text-white/60 text-sm">
+                前往<a href="{{ url_for('admin_links') }}" class="text-cyan-300 hover:underline">后台管理</a>添加第一个友链吧
+            </p>
+        </div>
+    {% endif %}
+
+    <!-- 申请友链 CTA -->
+    <section class="relative rounded-3xl overflow-hidden p-6 md:p-8 text-center
+                    bg-gradient-to-br from-cyan-600/25 via-blue-600/15 to-purple-600/25
+                    border border-cyber-500/30">
+        <div class="absolute -top-16 -right-16 w-56 h-56 bg-cyan-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-emerald-500/15 rounded-full blur-3xl"></div>
+        <div class="text-5xl mb-3 float-slow relative">✨</div>
+        <h3 class="text-xl font-bold text-white mb-2 relative">想交换友链？</h3>
+        <p class="text-sm text-white/70 mb-5 relative max-w-xl mx-auto">
+            如果你有优质的原创技术博客或开发者社区，欢迎与我交换友链！请通过「关于我」页面的联系方式联系我 💌
+        </p>
+        <div class="flex flex-wrap gap-2 justify-center relative">
+            <a href="{{ url_for('about') }}"
+               class="tag-pill inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold
+                      bg-cyber-gradient text-white shadow-cyber-sm hover:shadow-glow transition">
+                📬 联系我
+            </a>
+            <a href="{{ url_for('index') }}"
+               class="tag-pill inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm
+                      glass text-white/80 hover:text-white hover:border-cyber-500/40 transition">
+                🏠 返回首页
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}
