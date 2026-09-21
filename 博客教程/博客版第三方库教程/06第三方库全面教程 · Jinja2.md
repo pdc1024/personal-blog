@@ -1,700 +1,767 @@
 # 第三方库全面教程 · Jinja2
 
-> 面向初学者：不假设你懂模板引擎，每个概念第一次出现都用大白话讲透。
-> 学完这份教程，你不仅能看懂博客 `templates/` 下所有 HTML，还能自己设计一套带宏、过滤器、继承链的复杂模板系统。
-> 适用版本：Jinja2 3.x（Flask 3.x 自带）｜ 博客项目：`templates/` 目录全部页面
+> 面向初学者到进阶者：博客所有 HTML 页面都是它渲染出来的。
+> 学完这份教程，你会掌握 Jinja2 的全部核心语法、模板继承、过滤器、宏、自定义扩展、自动转义，
+> 并能对照博客 `templates/base.html`、`index.html` 等真实模板读懂每个标签在做什么。
+>
+> 适用版本：Jinja2 3.x（Flask 内置）｜ 博客项目：`templates/*.html`（约 30 个模板）
+> 学习路线：基础语法（第 1~2 章）→ 模板继承与控制结构（第 3 章）→ 过滤器与宏（第 4 章）→ 项目实战（第 5 章）→ API 与排坑（第 6~7 章）→ 自测（第 8 章）
 
 ---
 
-# 第 1 章 这个库是什么
+# 第 1 章 认识 Jinja2
 
 ## 1.1 一句话定位
 
-Jinja2 是 Python 世界最流行的 **模板引擎（Template Engine）**。它解决的问题是：
-
-- 后端 Python 产生数据（文章列表、用户信息）；
-- 前端要展示成 HTML；
-- 直接用 Python 字符串拼接：`'<h1>' + post.title + '</h1>'`——引号、转义、缩进、XSS 全是坑。
-
-模板引擎的做法是：**写一个 HTML 骨架，在需要数据的地方留空位，让引擎把数据填进去**。
+Jinja2 是 Flask 内置的**模板引擎**。所谓"模板"，就是一个带占位符的 HTML 文件：
 
 ```html
-<!-- post.html -->
-<h1>{{ post.title }}</h1>
-<p>{{ post.body }}</p>
+<h1>{{ title }}</h1>
+<p>{{ content }}</p>
 ```
+
+Flask 把 Python 变量 `title='我的文章'`、`content='...'` 传进来，Jinja2 把 `{{ ... }}` 替换成真实值，输出纯 HTML：
+
+```html
+<h1>我的文章</h1>
+<p>...</p>
+```
+
+一句话：**Jinja2 是博客的"页面拼装工"**——HTML 骨架 + Python 数据 → 最终网页。
+
+## 1.2 为什么需要模板引擎
+
+不用模板引擎，你得在 Python 里拼字符串：
 
 ```python
-render_template('post.html', post={'title': '你好', 'body': '正文'})
-# → <h1>你好</h1><p>正文</p>
+html = '<h1>' + title + '</h1><p>' + content + '</p>'
 ```
 
-一句话：**Jinja2 是博客的"皮肤工厂"**。`base.html` 是公共骨架，每个子页面往里填自己的内容。
+字符串一多就乱成一锅粥，还要自己转义特殊字符防 XSS。Jinja2 解决：
 
-## 1.2 为什么博客选 Jinja2
+- 模板和代码分离（前端设计只管 HTML，后端只管逻辑）；
+- 自动 HTML 转义（防 XSS）；
+- 模板继承（base.html 统一头部尾部，子模板只写内容区）；
+- 过滤器（`{{ content|truncate(100) }}` 自动截断）。
 
-- **Flask 官方默认**：装 Flask 就自动带上，零配置；
-- **语法和 Django Templates / Nunjucks 几乎一样**：学会了一个，其他的也能看懂；
-- **性能好**：模板编译成 Python 字节码后执行，比"逐行解析字符串"快几个数量级；
-- **功能完整**：继承、宏、过滤器、自动转义、沙箱模式，企业级项目用得上的它都有。
+## 1.3 Jinja2 和同类对比
 
-## 1.3 一个最小 Jinja2 程序
+| 引擎 | 特点 |
+|---|---|
+| **Jinja2** | Flask 内置、语法像 Django、功能全 |
+| Mako | 更快、语法像 Python |
+| Django Template | Django 自带 |
+| Tornado Template | Tornado 内置 |
 
-不通过 Flask，直接用 Jinja2：
+博客用 Jinja2 是因为 Flask 默认。
 
-```python
-from jinja2 import Environment, FileSystemLoader
+## 1.4 最小例子
 
-env = Environment(loader=FileSystemLoader('templates'))   # 模板从哪找
-template = env.get_template('post.html')                   # 加载
-html = template.render(title='你好', body='正文')          # 渲染
-print(html)
-```
+`templates/hello.html`：
 
-Flask 的 `render_template()` 就是对这套 API 的封装，帮你把 `env` 初始化、上下文传参、自动转义都做好了。
-
----
-
-# 第 2 章 核心概念与原理
-
-## 2.1 三种定界符
-
-| 符号 | 名字 | 作用 | 例子 |
-|---|---|---|---|
-| `{{ 变量 }}` | 表达式输出 | 输出一个值 | `{{ post.title }}` |
-| `{% 语句 %}` | 控制结构 | 循环、判断、继承、宏 | `{% if post.published %}` |
-| `{# 注释 #}` | 注释 | 不输出到 HTML | `{# 这段不会出现在网页里 #}` |
-
-**记忆**：`{{ }}` 是"给数据"，`{% %}` 是"写逻辑"，`{# #}` 是"自言自语"。
-
-## 2.2 渲染流程：模板是怎么跑起来的
-
-```
-① 第一次请求某个模板
-   ↓
-Jinja2 读 .html 文件
-   ↓
-词法分析 → 语法分析 → 编译成 Python 函数
-   （这一步只在第一次做，之后缓存）
-   ↓
-② 后续每次请求
-   调用编译好的 Python 函数，把数据填进去
-   ↓
-得到 HTML 字符串
-```
-
-**为什么快？** 模板只在第一次访问时"编译"成 Python 代码。比如 `{{ post.title }}` 会被编译成 `str(post['title'])` 这样的 Python 表达式，直接跑——比"每次都重新解析模板字符串"快几十倍。
-
-**调试技巧**：在 Flask 里设置 `app.jinja_env.auto_reload = True`（debug 模式默认开），改模板不用重启。生产环境关掉这个检查能再快一点。
-
-## 2.3 变量查找：点号 `.` 是怎么解析的
-
-`{{ post.title }}` 里的 `.`，Jinja2 会按以下顺序尝试：
-
-1. `post['title']`（字典下标）
-2. `post.title`（属性访问）
-3. `post.title()`（方法调用，如果它是 callable）
-
-**好处**：你的视图函数返回一个 SQLAlchemy 模型对象，模板里写 `{{ post.title }}` 能直接拿到 `Post.title` 列——不管它是字典还是对象都行。
-
-**找不到怎么办？** Jinja2 把不存在的变量当作 `Undefined`，输出空字符串，**不报错**。这既是好事（模板容错）也是坏事（拼错变量名静默失败）。调试时用 `{{ post.title|default('未定义') }}` 能立刻发现。
-
-## 2.4 自动转义：安全的第一道防线
-
-Jinja2 默认把 `{{ 变量 }}` 输出前做 **HTML 转义**：
-
-```
-用户输入：<script>alert(1)</script>
-{{ 用户输入 }} 输出：&lt;script&gt;alert(1)&lt;/script&gt;
-```
-
-浏览器看到的就是普通文字，**不会执行**。这就是防 XSS（跨站脚本攻击）的默认保险。
-
-**什么时候用 `|safe`？** 只有当你确定内容是**自己生成的信任 HTML**（比如 Markdown 渲染好的 HTML 片段），才加 `|safe` 告诉 Jinja2"不用转义，直接输出"。
-
-```jinja
-{# 安全：post.rendered_html 是博客后端用 python-markdown 渲染的，作者本人内容 #}
-{{ post.rendered_html|safe }}
-
-{# 危险：如果 comment.content 是访客写的，加 safe 等于放行 XSS #}
-{{ comment.content|safe }}    {# ❌ 别这么干 #}
-```
-
-**MarkupSafe**：`|safe` 返回的是 `markupsafe.Markup` 类型——一种"已经安全、不用再转义"的字符串。理解它对写自定义过滤器很重要。
-
-## 2.5 模板继承（Template Inheritance）
-
-Jinja2 最强大的功能。博客 `base.html` 就是靠它让所有页面共用头部导航和页脚。
-
-### 2.5.1 父模板（base.html）
-
-```jinja
+```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>{% block title %}默认标题{% endblock %}</title>
-  {% block head %}{% endblock %}
-</head>
 <body>
-  {% include 'nav.html' %}
-  <main>
-    {% block content %}{% endblock %}
-  </main>
-  <footer>© {{ year }}</footer>
+  <h1>{{ name }} 的博客</h1>
+  <ul>
+  {% for post in posts %}
+    <li>{{ post.title }}</li>
+  {% endfor %}
+  </ul>
 </body>
 </html>
 ```
 
-`{% block 名字 %}` 是"插槽"——子模板可以填进来。
+Python：
 
-### 2.5.2 子模板（post_detail.html）
+```python
+from flask import Flask, render_template
+app = Flask(__name__)
 
-```jinja
-{% extends 'base.html' %}
-
-{% block title %}{{ post.title }} - 我的博客{% endblock %}
-
-{% block head %}
-<style>.post-body { line-height: 1.8; }</style>
-{% endblock %}
-
-{% block content %}
-  <article>
-    <h1>{{ post.title }}</h1>
-    {{ post.rendered_html|safe }}
-  </article>
-{% endblock %}
+@app.route('/')
+def index():
+    return render_template('hello.html',
+                           name='小明',
+                           posts=[{'title': 'Python 入门'}, {'title': 'Flask 实战'}])
 ```
 
-### 2.5.3 工作原理
+---
 
-1. `{% extends 'base.html' %}` 必须是子模板**第一行**；
-2. Jinja2 先加载父模板，把所有 `{% block %}` 记录成"插槽"；
-3. 子模板里同名 block 覆盖父模板；
-4. 子模板没定义的 block，用父模板默认内容；
-5. `{{ super() }}` 在子 block 里调用父 block 原内容——想"在父内容基础上加东西"时用。
+# 第 2 章 三种定界符与渲染原理
 
-### 2.5.4 include vs extends
+## 2.1 三种定界符
 
-| 语法 | 作用 | 类比 |
+Jinja2 模板里有三种特殊语法：
+
+| 定界符 | 用途 | 例子 |
 |---|---|---|
-| `{% extends 'base.html' %}` | 继承骨架，子填 block | 面向对象里的 class 继承 |
-| `{% include 'nav.html' %}` | 把另一个模板原样插进来 | 函数调用 |
-| `{% from 'macros.html' import card %}` | 导入宏（函数） | import |
+| `{{ ... }}` | 输出变量 | `{{ post.title }}` |
+| `{% ... %}` | 逻辑语句 | `{% for %}`, `{% if %}`, `{% extends %}` |
+| `{# ... #}` | 注释 | `{# 不输出到页面 #}` |
 
-## 2.6 上下文隔离与数据流向
+**注意**：HTML 注释 `<!-- ... -->` 会发送到浏览器；Jinja 注释 `{# ... #}` 在服务器端就被删掉，用户看不到。
 
-`render_template('x.html', a=1, b=2)` 传的变量，模板里直接用 `{{ a }}`。模板里定义的 `{% set x = 3 %}` 不会泄漏到其他模板。
+## 2.2 渲染流水线
 
-**请求期间注入的全局变量**（`@app.context_processor`）所有模板都能用，不用每次传——博客的 `inject_globals` 就是这么干的。
+```
+templates/index.html（源文件）
+  ↓ Jinja2 编译成 Python 函数
+  ↓ 把上下文（post、user）传进去
+  ↓ 执行函数，输出字符串
+最终 HTML
+```
+
+**理解**：Jinja2 模板本质上是被编译成 Python 函数。`{{ post.title }}` 编译成 `str(post.title)`；`{% for %}` 编译成 Python 循环。所以模板里的错误会报 Python 行号。
+
+## 2.3 自动转义（Autoescape）
+
+Jinja2 默认对 `{{ ... }}` 的输出做 HTML 转义：
+
+```python
+content = '<script>alert(1)</script>'
+{{ content }}
+```
+
+输出：
+
+```html
+&lt;script&gt;alert(1)&lt;/script&gt;
+```
+
+浏览器看到的是文本，不会执行。这是防 XSS 的第一道防线。
+
+**需要输出原始 HTML 时**加 `|safe`：
+
+```html
+{{ post.rendered_html|safe }}
+```
+
+博客的 `rendered_html` 列是服务端用 python-markdown 渲染好的 HTML，自己可信，所以用 `|safe`。
+
+**铁律**：`|safe` 只加在你信任的内容上；用户输入的内容绝对不要 `|safe`。
+
+## 2.4 点号查找顺序
+
+`{{ post.title }}` 里的 `.` 不是直接查字典键或属性。Jinja2 按顺序尝试：
+
+1. `post['title']`（字典键）；
+2. `post.title`（属性）；
+3. `post.get('title')`（字典方法）；
+4. `post['title']`（列表索引 0 时是 `post.0`）。
+
+所以 Python 类属性和字典键在模板里写法一样。
+
+## 2.5 变量不存在时
+
+Jinja2 默认不报错，输出空字符串：
+
+```html
+{{ user.nickname }}   <!-- user 是 None 也不报错，输出空 -->
+```
+
+这和 Python 不一样（Python 会抛 AttributeError）。好处是模板容错好，坏处是拼错字段名不会发现。调试时开 `TRAPUNDEFINED=True` 让它严格报错。
 
 ---
 
-# 第 3 章 安装与版本
+# 第 3 章 模板继承与控制结构
 
-```bash
-pip install jinja2          # 用 Flask 的话自动带上
-pip show jinja2             # 查看版本
-```
+## 3.1 模板继承：base.html
 
-Jinja2 3.x 要求 Python 3.7+。博客 `requirements.txt` 显式写出是为了锁定版本，避免未来升级 API 变化。
+所有页面共用头部、尾部、导航栏。用继承避免重复：
 
----
+`templates/base.html`：
 
-# 第 4 章 API 全面讲解
-
-> 标注：✅ = 博客项目正在用；➕ = 很常用但项目没用到；🧪 = 进阶能力。
-
-## 4.1 变量与属性访问
-
-```jinja
-{{ post.title }}              {# 属性访问 #}
-{{ post['title'] }}           {# 字典访问，效果一样 #}
-{{ posts[0].title }}          {# 列表下标 #}
-{{ post.tags|join(', ') }}    {# 过滤器：| 后面跟过滤器名 #}
-{{ post.created_at|strftime('%Y-%m-%d') }}   {# 自定义过滤器（见 4.6） #}
-```
-
-## 4.2 控制结构
-
-### 4.2.1 if / elif / else
-
-```jinja
-{% if post.published %}
-  <span class="badge-pub">已发布</span>
-{% elif post.draft %}
-  <span class="badge-draft">草稿</span>
-{% else %}
-  <span class="badge-del">已删除</span>
-{% endif %}
-```
-
-支持 `and` / `or` / `not` / `==` / `!=` / `>` / `<` / `in`：
-
-```jinja
-{% if post.published and post.comments|length > 0 %}
-  有评论
-{% endif %}
-
-{% if 'Python' in post.tags %}
-  这篇是 Python
-{% endif %}
-```
-
-### 4.2.2 for 循环
-
-```jinja
-{% for post in posts %}
-  <h2>{{ loop.index }}. {{ post.title }}</h2>
-{% else %}
-  <p>还没有文章</p>          {# 列表为空时才执行 #}
-{% endfor %}
-```
-
-**`{% else %}` 配合 for** 是 Jinja 的特色：`posts` 为空时执行 else 块。
-
-循环内特殊变量：
-
-| 变量 | 含义 |
-|---|---|
-| `loop.index` | 当前序号，从 1 开始 |
-| `loop.index0` | 当前序号，从 0 开始 |
-| `loop.first` | 是否第一条 |
-| `loop.last` | 是否最后一条 |
-| `loop.length` | 列表总长度 |
-| `loop.revindex` | 倒序序号（从 1 开始） |
-| `loop.cycle('even', 'odd')` | 交替输出（斑马纹表格） |
-| `loop.depth` | 当前递归层级（递归循环用） |
-
-✅ 博客用法：`loop.first` 给首页第一条文章加大图样式；`loop.cycle('row-a','row-b')` 做友链表格斑马纹。
-
-### 4.2.3 set：定义模板内变量
-
-```jinja
-{% set total = posts|length %}
-<p>共 {{ total }} 篇文章</p>
-```
-
-`{% with %}` 限定作用域：
-
-```jinja
-{% with x = 1 %}
-  在这个块里 x=1
-{% endwith %}
-出了块 x 不存在
-```
-
-## 4.3 过滤器（Filter）大全
-
-`{{ 值|过滤器名(参数) }}`，可叠加：`{{ name|trim|upper }}`。
-
-### 4.3.1 字符串类
-
-| 过滤器 | 作用 | 例子 |
-|---|---|---|
-| `upper` / `lower` | 大/小写 | `'hi'|upper` → HI |
-| `trim` | 去首尾空格 | |
-| `capitalize` | 首字母大写其余小写 | |
-| `title` | 每个单词首字母大写 | |
-| `center(80)` | 居中填充到 80 字符 | |
-| `replace('a','b')` | 替换 | |
-| `truncate(80, True)` | 截断到 80 字符（第二参数是否带省略号） | |
-| `wordcount` | 字数 | |
-
-### 4.3.2 列表/容器类
-
-| 过滤器 | 作用 |
-|---|---|
-| `length` | 长度 |
-| `first` / `last` | 取首/尾 |
-| `join(', ')` | 拼成字符串 |
-| `sort` | 排序 |
-| `unique` | 去重 |
-| `sum` / `max` / `min` | 聚合 |
-| `map('title')` | 对每个元素应用过滤器 |
-| `selectattr('published')` | 过滤属性为真的元素 |
-
-### 4.3.3 默认与安全类
-
-| 过滤器 | 作用 |
-|---|---|
-| `default('x')` / `d('x')` | 未定义时用默认值 |
-| `default('x', boolean=True)` | 空字符串/0/False 也用默认值 |
-| `safe` | 标记为信任 HTML，不转义 |
-| `escape` / `e` | 强制转义 |
-
-✅ 博客用法：`{{ post.summary|truncate(80) }}` 做摘要；`{{ post.rendered_html|safe }}` 输出 Markdown 渲染结果。
-
-### 4.3.4 日期/数字类
-
-| 过滤器 | 作用 |
-|---|---|
-| `int` / `float` | 转数字 |
-| `round(2)` | 四舍五入到 2 位 |
-| `tojson` | 转 JSON（给 JS 用，自动安全转义） |
-
-✅ 博客自定义：`strftime`、`localtime`、`timeago` 等（见 4.6）。
-
-### 4.3.5 tojson：把数据传给 JS
-
-```jinja
-<script>
-var POSTS = {{ posts|tojson }};
-</script>
-```
-
-`tojson` 自动处理引号、反斜杠、`</script>`——直接 `{{ posts|safe }}` 会出 XSS。
-
-## 4.4 宏（Macro）：模板里的函数
-
-重复的 HTML 片段定义一次，到处调用：
-
-```jinja
-{# macros.html #}
-{% macro post_card(post) %}
-  <div class="card">
-    <h3><a href="/post/{{ post.id }}/">{{ post.title }}</a></h3>
-    <p class="meta">{{ post.created_at|strftime('%Y-%m-%d') }}</p>
-    <p>{{ post.summary|truncate(60) }}</p>
-  </div>
-{% endmacro %}
-```
-
-其他模板导入并使用：
-
-```jinja
-{% from 'macros.html' import post_card %}
-{% for post in posts %}
-  {{ post_card(post) }}
-{% endfor %}
-```
-
-**宏的参数默认值**：
-
-```jinja
-{% macro post_card(post, show_summary=True) %}
-  ...
-  {% if show_summary %}<p>{{ post.summary }}</p>{% endif %}
-{% endmacro %}
-```
-
-**`call` 块**：让宏接受"一段内容"作为参数（像 slot）：
-
-```jinja
-{% macro dialog(title) %}
-  <div class="dialog">
-    <h3>{{ title }}</h3>
-    <div class="body">{{ caller() }}</div>
-  </div>
-{% endmacro %}
-
-{% call dialog('提示') %}
-  <p>这是对话框内容</p>
-{% endcall %}
-```
-
-## 4.5 其他常用语法
-
-| 语法 | 作用 |
-|---|---|
-| `{% raw %}...{% endraw %}` | 原样输出不解析（写模板教程时用） |
-| `{% if 'x' is defined %}` | 判断变量是否存在 |
-| `{% loop 递归 %}` | 递归渲染（目录树） |
-| `{{ url_for('static', filename='style.css') }}` | Flask 注入的全局函数 |
-| `{{ get_flashed_messages() }}` | Flask 注入的 flash 消息 |
-
-## 4.6 自定义过滤器（博客的精髓）
-
-Python 里写函数，注册给模板用：
-
-```python
-from markupsafe import Markup
-
-@app.template_filter('strftime')
-def _jinja_strftime(dt, fmt='%Y-%m-%d %H:%M'):
-    if dt is None:
-        return ''
-    # v2.8.3：把 UTC 时间转本地时间
-    local = _tpl_localtime(dt)
-    return local.strftime(fmt)
-```
-
-模板里：`{{ post.created_at|strftime('%Y-%m-%d') }}`。
-
-**博客的自定义过滤器族**（app.py 第 802、814 行附近）：
-
-- `strftime(fmt)`：日期格式化（自动转本地时区）；
-- `localtime`：UTC → 本地；
-- `timeago`：显示成"3 分钟前"；
-- `plural(n, 'post')`：复数。
-
-### 4.6.1 过滤器注册的三种方式
-
-```python
-# 方式一：装饰器（推荐）
-@app.template_filter('upper_first')
-def upper_first(s):
-    return s[0].upper() + s[1:]
-
-# 方式二：手动注册
-def my_filter(s): ...
-app.jinja_env.filters['myfilter'] = my_filter
-
-# 方式三：蓝图级
-@bp.app_template_filter('x')
-def x(s): ...
-```
-
-### 4.6.2 自定义全局函数
-
-除了过滤器，还能注册"直接调用的函数"：
-
-```python
-@app.template_global()
-def recent_posts(limit=5):
-    return Post.query.order_by(Post.created_at.desc()).limit(limit).all()
-```
-
-模板里直接 `{{ recent_posts(5) }}`——不必从视图传。
-
-### 4.6.3 自定义测试器（is）
-
-```python
-@app.template_test('even')
-def is_even(n):
-    return n % 2 == 0
-```
-
-模板里 `{% if loop.index is even %}` 用。
-
-## 4.7 环境配置（Environment）
-
-Flask 已经配好了，但你要知道几个关键开关：
-
-| 配置 | 作用 |
-|---|---|
-| `autoescape` | 是否自动转义（Flask 默认对 .html 开） |
-| `auto_reload` | 模板改了自动重载（debug 开，生产关） |
-| `trim_blocks` | 删掉 `{% %}` 后的第一个换行 |
-| `lstrip_blocks` | 删掉 `{% %}` 前的缩进空白 |
-
-`app.jinja_env.trim_blocks = True` 能让生成的 HTML 干净很多（不会一堆空行）。
-
----
-
-# 第 5 章 实战示例
-
-## 5.1 项目内示例：博客的 base.html 继承链
-
-```jinja
-{# base.html #}
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}{{ site_name }}{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  {% block head %}{% endblock %}
+  <title>{% block title %}我的博客{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <nav>
-    <a href="{{ url_for('index') }}">首页</a>
-    <a href="{{ url_for('archive_index') }}">归档</a>
-    <a href="{{ url_for('friend_links') }}">友链</a>
+    <a href="/">首页</a>
+    <a href="/archive">归档</a>
   </nav>
 
-  {% with msgs = get_flashed_messages(with_categories=true) %}
-    {% for cat, m in msgs %}<div class="alert-{{ cat }}">{{ m }}</div>{% endfor %}
-  {% endwith %}
+  {% block content %}{% endblock %}
 
-  <main>{% block content %}{% endblock %}</main>
-
-  <footer>© {{ current_year }} {{ site_name }}</footer>
+  <footer>© 2026</footer>
 </body>
 </html>
 ```
 
-子页面 `post_detail.html`：
+`templates/index.html`：
 
-```jinja
-{% extends 'base.html' %}
-{% block title %}{{ post.title }} - {{ site_name }}{% endblock %}
+```html
+{% extends "base.html" %}
+
+{% block title %}首页 - 我的博客{% endblock %}
+
 {% block content %}
-<article>
-  <h1>{{ post.title }}</h1>
-  <p class="meta">{{ post.created_at|strftime }} · 阅读 {{ post.view_count }}</p>
-  <div class="body">{{ post.rendered_html|safe }}</div>
-</article>
+  <h1>最新文章</h1>
+  {% for post in posts %}
+    <article>
+      <h2>{{ post.title }}</h2>
+      <p>{{ post.summary }}</p>
+    </article>
+  {% endfor %}
 {% endblock %}
 ```
 
-**调试"页面怎么没导航"**：先确认子页面第一行是 `{% extends 'base.html' %}`，再确认 `{% block content %}` 名字和 base 里一致（拼写错了不会报错，只是没内容）。
+**关键概念**：
 
-## 5.2 项目内示例：首页文章卡片
+- `{% extends "base.html" %}`：继承父模板；
+- `{% block name %}{% endblock %}`：定义可被子模板覆盖的区域；
+- 子模板只写自己的 `block`，其他部分全部继承父模板。
 
-```jinja
-{% for post in posts %}
-  <article class="card {% if loop.first %}featured{% endif %}">
-    <h2><a href="{{ url_for('post_detail', post_id=post.id) }}">
-      {{ post.title }}
-    </a></h2>
-    <p class="meta">
-      {{ post.created_at|strftime('%Y-%m-%d') }}
-      · {{ post.category or '未分类' }}
-      · {{ post.view_count }} 阅读
-    </p>
-    <p>{{ post.summary|truncate(100, True) }}</p>
-  </article>
+## 3.2 block 的三种用法
+
+### 3.2.1 覆盖（override）
+
+```html
+{% block content %}
+  新内容（父模板里的内容被替换）
+{% endblock %}
+```
+
+### 3.2.2 追加（super()）
+
+```html
+{% block content %}
+  {{ super() }}     <!-- 保留父模板内容 -->
+  <p>额外加的</p>
+{% endblock %}
+```
+
+### 3.2.3 嵌套 block
+
+```html
+{% block content %}
+  {% block header %}{% endblock %}
+  {% block body %}{% endblock %}
+{% endblock %}
+```
+
+## 3.3 include：包含局部模板
+
+```html
+{% include '_sidebar.html' %}
+{% include '_comments.html' with context %}
+```
+
+和继承的区别：
+- `extends`：子模板替换父模板的 block；
+- `include`：把另一个模板的内容"复制粘贴"进来。
+
+博客把分页、评论、表单片段抽成 `_macro.html` 或单独的 partial 模板。
+
+## 3.4 if 语句
+
+```html
+{% if post.published %}
+  <span class="badge">已发布</span>
+{% elif post.draft %}
+  <span class="badge">草稿</span>
 {% else %}
-  <p class="empty">还没有文章，去后台写一篇吧。</p>
+  <span class="badge">未知</span>
+{% endif %}
+
+{% if posts %}
+  <p>共 {{ posts|length }} 篇</p>
+{% else %}
+  <p>暂无文章</p>
+{% endif %}
+```
+
+**注意**：`{% elif %}` 不是 `else if`。
+
+## 3.5 for 循环
+
+```html
+{% for post in posts %}
+  <li>{{ loop.index }}. {{ post.title }}</li>
+{% else %}
+  <li>没有文章</li>
 {% endfor %}
 ```
 
-## 5.3 独立示例：用宏做分页器
+`{% else %}` 在列表为空时执行——比 Python 的 for/else 更常用。
 
-```jinja
+**loop 特殊变量**：
+
+| 变量 | 含义 |
+|---|---|
+| `loop.index` | 当前序号，从 1 开始 |
+| `loop.index0` | 从 0 开始 |
+| `loop.revindex` | 倒序序号 |
+| `loop.first` | 是否第一个 |
+| `loop.last` | 是否最后一个 |
+| `loop.length` | 列表长度 |
+| `loop.cycle('odd', 'even')` | 轮流取值（斑马纹） |
+
+```html
+{% for post in posts %}
+  <tr class="{{ loop.cycle('odd', 'even') }}">
+    <td>{{ loop.index }}</td>
+    <td>{{ post.title }}</td>
+  </tr>
+{% endfor %}
+```
+
+## 3.6 过滤器（Filter）：管道 `|`
+
+过滤器像 Unix 管道：把前一个的输出传给后一个。
+
+```html
+{{ post.title|upper }}
+{{ post.content|truncate(100) }}
+{{ post.created_at|date('%Y-%m-%d') }}
+```
+
+### 3.6.1 内置常用过滤器
+
+| 过滤器 | 作用 | 例子 |
+|---|---|---|
+| `default(v)` | 空值时用默认 | `{{ name|default('匿名') }}` |
+| `length` | 长度 | `{{ posts|length }}` |
+| `join(', ')` | 拼接 | `{{ tags|join(', ') }}` |
+| `upper` / `lower` | 大小写 | |
+| `trim` | 去空格 | |
+| `capitalize` | 首字母大写 | |
+| `title` | 每个单词首字母大写 | |
+| `truncate(n)` | 截断到 n 字符 | |
+| `striptags` | 去 HTML 标签 | |
+| `escape` / `e` | 转义 | |
+| `safe` | 不转义 | |
+| `first` / `last` | 取首/尾 | |
+| `round(2)` | 四舍五入 | |
+| `int` / `float` / `string` | 类型转换 | |
+| `tojson` | 转 JSON | `<script>var data = {{ data|tojson }};</script>` |
+| `items` | 字典转键值对 | `{% for k, v in d.items() %}` |
+
+### 3.6.2 过滤器链
+
+```html
+{{ post.summary|striptags|truncate(100) }}
+```
+
+先去 HTML 标签，再截断到 100 字符。
+
+## 3.7 表达式
+
+```html
+{% set name = '小明' %}
+{% set x, y = 1, 2 %}
+
+{{ [1, 2, 3]|sum }}
+{{ {'a': 1, 'b': 2} | length }}
+```
+
+---
+
+# 第 4 章 进阶：宏、自定义过滤器、环境配置
+
+## 4.1 宏（Macro）：模板里的函数
+
+宏就像 Python 函数，封装一段可复用的 HTML：
+
+```html
+{% macro input(name, value='', type='text') %}
+  <input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+{% endmacro %}
+
+{{ input('username') }}
+{{ input('password', type='password') }}
+{{ input('submit', value='登录', type='submit') }}
+```
+
+### 4.1.1 把宏抽到独立文件
+
+`templates/_macros.html`：
+
+```html
 {% macro render_pagination(pagination, endpoint) %}
-{% if pagination.pages > 1 %}
-<nav class="pagination">
-  {% if pagination.has_prev %}
-    <a href="{{ url_for(endpoint, page=pagination.prev_num) }}">上一页</a>
-  {% else %}
-    <span class="disabled">上一页</span>
-  {% endif %}
-
-  {% for p in pagination.iter_pages() %}
-    {% if p %}
-      {% if p == pagination.page %}
-        <strong>{{ p }}</strong>
-      {% else %}
+  <div class="pagination">
+    {% for p in pagination.iter_pages() %}
+      {% if p %}
         <a href="{{ url_for(endpoint, page=p) }}">{{ p }}</a>
+      {% else %}
+        <span>...</span>
       {% endif %}
-    {% else %}
-      <span class="ellipsis">…</span>
-    {% endif %}
-  {% endfor %}
-
-  {% if pagination.has_next %}
-    <a href="{{ url_for(endpoint, page=pagination.next_num) }}">下一页</a>
-  {% else %}
-    <span class="disabled">下一页</span>
-  {% endif %}
-</nav>
-{% endif %}
+    {% endfor %}
+  </div>
 {% endmacro %}
 ```
 
-任何列表页导入就能用：`{% from 'macros.html' import render_pagination %}{{ render_pagination(pagination, 'index') }}`。
+其他模板导入：
 
-## 5.4 独立示例：给模板加"时间友好化"过滤器
+```html
+{% from '_macros.html' import render_pagination %}
 
-```python
-@app.template_filter('timeago')
-def timeago(dt):
-    import datetime
-    if dt is None: return ''
-    delta = datetime.datetime.now() - dt
-    s = int(delta.total_seconds())
-    if s < 60:    return '刚刚'
-    if s < 3600:  return f'{s // 60} 分钟前'
-    if s < 86400: return f'{s // 3600} 小时前'
-    if s < 86400 * 30: return f'{s // 86400} 天前'
-    return dt.strftime('%Y-%m-%d')
+{{ render_pagination(pagination, 'index') }}
 ```
 
-模板：`<span>{{ post.created_at|timeago }}</span>`。
+博客的分页、表单字段、评论卡片都用宏封装。
+
+## 4.2 自定义过滤器（Flask 里）
+
+在 Python 侧给 Jinja2 注册过滤器：
+
+```python
+@app.template_filter('local_time')
+def local_time(dt):
+    return dt.strftime('%Y-%m-%d %H:%M') if dt else ''
+
+@app.template_filter('reading_time')
+def reading_time(content):
+    words = len(content) // 500
+    return max(1, words)
+```
+
+模板里：
+
+```html
+{{ post.created_at|local_time }}
+阅读约 {{ post.content|reading_time }} 分钟
+```
+
+博客的时区过滤器（app.py 第 802 行）就是这么注册的。
+
+## 4.3 自定义全局函数
+
+```python
+@app.template_global()
+def now():
+    return datetime.now()
+
+@app.template_global()
+def category_path(cat):
+    return f'/category/{cat}/'
+```
+
+模板里直接当函数用：`{{ now().year }}`、`{{ category_path('tech') }}`。
+
+## 4.4 自定义测试器（Test）
+
+```python
+@app.template_test('admin')
+def is_admin(user):
+    return user and user.role == 'admin'
+```
+
+模板里：
+
+```html
+{% if user is admin %}
+  <a href="/admin/">后台</a>
+{% endif %}
+```
+
+## 4.5 环境配置（Environment）
+
+Flask 默认环境够用。高级配置：
+
+```python
+app.jinja_env.trim_blocks = True     # 去掉标签后第一个换行
+app.jinja_env.lstrip_blocks = True   # 去掉标签前的空白
+app.jinja_env.autoescape = True
+app.jinja_env.undefined = StrictUndefined  # 未定义变量报错
+```
+
+`trim_blocks` + `lstrip_blocks` 让模板输出更干净（不会因为 `{% %}` 留下空行）。
+
+## 4.6 模板继承的坑
+
+- 子模板第一行必须是 `{% extends %}`；
+- block 名不要重名；
+- 父模板定义了 block 但子模板不覆盖，会输出父模板默认内容；
+- `include` 不会改变 block 关系。
+
+## 4.7 静态文件与 url_for
+
+模板里永远用 `url_for('static', filename=...)`，不要硬写 `/static/...`：
+
+```html
+<link href="{{ url_for('static', filename='css/style.css') }}">
+<img src="{{ url_for('static', filename='img/logo.png') }}">
+```
+
+原因：将来如果应用挂在子路径（如 `/blog/`），url_for 自动处理。
 
 ---
 
-# 第 6 章 高频坑与排查
+# 第 5 章 项目实战：博客真实模板逐段讲
+
+## 5.1 base.html：全站骨架
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">{{ site_name }}</a>
+    <nav>
+      <a href="/">首页</a>
+      <a href="/archive/">归档</a>
+      <a href="/friends/">友链</a>
+      <a href="/about/">关于</a>
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>© {{ current_year }} {{ site_name }}</footer>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
+```
+
+**亮点**：
+- `{{ site_name }}`、`{{ current_year }}` 来自 `inject_globals`（context_processor）；
+- flash 消息在所有页面都能显示；
+- `{% block head %}` 和 `{% block scripts %}` 让子模板能加额外的 CSS/JS。
+
+## 5.2 index.html：首页文章列表
+
+```html
+{% extends "base.html" %}
+
+{% block title %}{{ site_name }} - 首页{% endblock %}
+
+{% block content %}
+  <h1>最新文章</h1>
+
+  {% for post in posts %}
+    <article class="post-card">
+      <h2>
+        <a href="{{ url_for('post_detail', post_id=post.id) }}">
+          {{ post.title }}
+        </a>
+      </h2>
+      <p class="meta">
+        {{ post.created_at|local_time }} ·
+        <span>{{ post.view_count }} 阅读</span>
+      </p>
+      <p class="summary">{{ post.summary|truncate(120) }}</p>
+    </article>
+  {% else %}
+    <p>还没有文章。</p>
+  {% endfor %}
+
+  {% if pagination %}
+    <nav class="pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('index', page=pagination.prev_num) }}">上一页</a>
+      {% endif %}
+      <span>{{ pagination.page }} / {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('index', page=pagination.next_num) }}">下一页</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}
+```
+
+**逐段讲**：
+- `extends` 继承 base；
+- `{% for post in posts %}` 循环文章；
+- `{% else %}` 在 posts 为空时显示"还没有文章"；
+- `{{ post.created_at|local_time }}` 用自定义过滤器转时区；
+- `{{ post.summary|truncate(120) }}` 截断摘要；
+- 分页用 `pagination.has_prev/has_next`。
+
+## 5.3 post_detail.html：文章详情
+
+```html
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+  <article>
+    <h1>{{ post.title }}</h1>
+    <p class="meta">
+      {{ post.created_at|local_time }} · {{ post.view_count }} 阅读
+      <button class="like-btn" data-id="{{ post.id }}">
+        ❤️ <span class="count">{{ post.likes|length }}</span>
+      </button>
+    </p>
+    <div class="content">
+      {{ post.rendered_html|safe }}
+    </div>
+  </article>
+
+  <section class="comments">
+    <h3>评论</h3>
+    {% for c in comments %}
+      <div class="comment">
+        <strong>{{ c.author }}</strong>
+        <span>{{ c.created_at|local_time }}</span>
+        <p>{{ c.content }}</p>
+      </div>
+    {% else %}
+      <p>还没有评论，来抢沙发。</p>
+    {% endfor %}
+  </section>
+{% endblock %}
+```
+
+**关键点**：
+- `{{ post.rendered_html|safe }}` 是服务端渲染好的 HTML，加 safe 不转义；
+- 评论区 for/else 空状态。
+
+## 5.4 点赞按钮的 AJAX 部分
+
+```html
+<script>
+document.querySelector('.like-btn').addEventListener('click', async () => {
+  const id = this.dataset.id;
+  const res = await fetch(`/post/${id}/like/`, { method: 'POST' });
+  const data = await res.json();
+  this.querySelector('.count').textContent = data.count;
+});
+</script>
+```
+
+---
+
+# 第 6 章 完整 API 速查
+
+## 6.1 语句速查
+
+| 语法 | 作用 |
+|---|---|
+| `{{ var }}` | 输出变量 |
+| `{{ obj.attr }}` / `{{ obj['attr'] }}` | 访问属性 |
+| `{% extends "x.html" %}` | 继承 |
+| `{% block name %}...{% endblock %}` | 定义 block |
+| `{{ super() }}` | 调用父 block |
+| `{% include "x.html" %}` | 包含 |
+| `{% if %}...{% elif %}...{% else %}...{% endif %}` | 条件 |
+| `{% for x in xs %}...{% else %}...{% endfor %}` | 循环 |
+| `{% set x = 1 %}` | 赋值 |
+| `{{ x|filter }}` | 过滤器 |
+| `{% macro name(args) %}...{% endmacro %}` | 宏 |
+| `{% from "x" import y %}` | 导入宏 |
+| `{# comment #}` | 注释 |
+
+## 6.2 全局函数
+
+| 函数 | 作用 |
+|---|---|
+| `range(n)` | 类似 Python range |
+| `dict(a=1)` | 创建字典 |
+| `lipsum(n)` | 生成 Lorem Ipsum |
+| `cycler(a,b,c)` | 循环取值 |
+| `joiner(',')` | 智能拼接 |
+| `namespace()` | 可变容器（在 for 循环外存值） |
+
+## 6.3 全局测试器
+
+| 测试 | 例子 |
+|---|---|
+| `divisibleby(n)` | `{% if n is divisibleby(2) %}` |
+| `even` / `odd` | |
+| `defined` / `undefined` | |
+| `none` | |
+| `string` / `number` / `mapping` / `iterable` | |
+| `startingwith(s)` / `endingwith(s)` | |
+
+---
+
+# 第 7 章 高频坑与排查（15 条）
 
 | # | 坑 | 症状 | 解决 |
 |---|---|---|---|
-| 1 | 忘写 endfor/endif | TemplateSyntaxError，常报在下一行 | 每个 `{% %}` 配对；IDE 装 Jinja 插件 |
-| 2 | 该加 safe 没加 | 渲染好的 HTML 变成一堆 `<h1>` 文字 | 信任的内容加 `|safe` |
-| 3 | 用户输入加了 safe | 网页被脚本劫持（XSS） | 只给"自己生成的"内容加 safe |
-| 4 | block 名拼错 | 子页面内容不显示或错位 | extends/block 名与 base 完全一致 |
-| 5 | 变量拼错 | 静默显示空白 | `|default('未定义')` 定位 |
-| 6 | extends 不在第一行 | 继承不生效，输出空 | `{% extends %}` 必须第一行 |
-| 7 | include 里改了变量 | 外面跟着变 | Jinja include 共享上下文，要隔离用 with |
-| 8 | 循环里用了 Python 函数 | 报错 | 模板里只能用传入的、全局的、过滤器 |
-| 9 | tojson 忘了 | JS 里收到奇怪字符串 | 数据传 JS 用 `|tojson` |
-| 10 | 打包后模板改不动 | 改了源码 templates 没变化 | 模板在 `_internal` 只读区，改后重新打包 |
-| 11 | HTML 里一堆空行 | 源码难看 | `app.jinja_env.trim_blocks=True, lstrip_blocks=True` |
-| 12 | auto_reload 关了 | 改模板不生效 | debug 模式自动开；手动重启服务 |
-| 13 | 中文路径模板找不到 | TemplateNotFound | 用绝对路径或 `Config.TEMPLATE_DIR` |
-| 14 | 宏里用外部变量 | 闭包陷阱 | 宏默认只接受显式参数 |
-| 15 | 用户评论里写 `{% raw %}` | 被当模板语法解析 | 用户输入永远 `{{ }}` 输出，不会当模板执行（模板只渲染一次） |
-
-**排查万能法**：
-
-1. 报错信息里的 `template line N` 就是模板行号；
-2. Flask debug 模式下，浏览器出错页能直接看到模板源码和上下文变量；
-3. 临时在视图里 `print(render_template(...))` 看最终 HTML；
-4. `{{ post|pprint }}` 在模板里打印变量结构（Flask 自带 pprint 过滤器）。
+| 1 | 用户输入直接 safe | XSS | 只 safe 服务端渲染的内容 |
+| 2 | 模板变量拼错 | 不报错但空 | 开发开 StrictUndefined |
+| 3 | extends 不在第一行 | 继承不生效 | 子模板第一行必须 extends |
+| 4 | block 名重复 | 覆盖错地方 | 全项目 grep block 名 |
+| 5 | for 循环改外层变量不生效 | 看不到值 | 用 namespace() |
+| 6 | url_for 硬编码路径 | 改路由全坏 | 永远 url_for |
+| 7 | 静态文件 404 | 样式没了 | 检查 static 目录和 url_for |
+| 8 | 中文乱码 | 页面问号 | 文件存 UTF-8，HTML 加 charset |
+| 9 | 过滤器顺序错 | 输出怪 | 先 striptags 再 truncate |
+| 10 | |safe 用在用户输入 | 安全漏洞 | 审查所有 safe |
+| 11 | macro 参数默认值 | 不生效 | 默认值写在宏定义里 |
+| 12 | include 传变量 | 上下文丢失 | 默认带 context，不用 with context |
+| 13 | 模板缓存 | 改了不生效 | debug 模式自动重载；或清缓存 |
+| 14 | if 用 = 而不是 == | 语法错 | Jinja 用 == 比较 |
+| 15 | 循环里 loop.index 从 0 还是 1 | 错位 | loop.index 从 1，loop.index0 从 0 |
 
 ---
 
-# 第 7 章 学习路径与自测
+# 第 8 章 学习路径与自测
 
-## 7.1 推荐学习路径
+## 8.1 学习路径
 
-**第 1~2 天：基础语法**
-- 会写 `{{ }}`、`{% if %}`、`{% for %}`；
-- 读懂博客 `index.html`、`post_detail.html`；
-- 目标：能改首页文案、加一个静态页面。
+- 第 1 天：变量、if、for；
+- 第 2 天：模板继承、block；
+- 第 3 天：过滤器、宏；
+- 第 4 天：自定义过滤器、context_processor；
+- 第 5 天：对照博客 base.html / index.html 逐行读；
+- 第 6 天：尝试加一个自定义过滤器（阅读时长估算）。
 
-**第 3~4 天：继承与宏**
-- 理解 base.html 的 block 机制；
-- 把博客里重复的 HTML 片段抽成宏；
-- 目标：能新建一个"关于我"页面，继承 base。
+## 8.2 自测题
 
-**第 5~7 天：过滤器与上下文**
-- 学会写自定义过滤器；
-- 理解 `@app.context_processor` 注入全局变量；
-- 目标：给博客加一个"最后修改时间友好显示"过滤器。
+1. `{{ }}`、`{% %}`、`{# #}` 分别做什么？
+2. 自动转义是什么？为什么要 `|safe`？
+3. 模板继承和 include 的区别？
+4. block 里的 `{{ super() }}` 做什么？
+5. for 循环的 `{% else %}` 什么时候执行？
+6. `loop.index` 和 `loop.index0` 区别？
+7. 怎么把一个 Python 函数注册成模板过滤器？
+8. `{{ post.title }}` 点号查找按什么顺序？
+9. 怎么让所有模板都能用 `{{ site_name }}`？
+10. 宏是什么？怎么把宏抽到独立文件？
+11. 为什么永远用 `url_for('static')` 而不是硬写路径？
+12. 模板里改 for 外面的变量为什么不生效？怎么解决？
+13. autoescape 关掉会有什么风险？
+14. `{{ post.summary|striptags|truncate(100) }}` 执行顺序？
+15. 模板第一行必须写什么？
 
-**第 2 周：进阶**
-- 学沙箱模式（渲染用户提交的模板片段）；
-- 写一个完整的模板组件库（卡片、分页器、标签云）；
-- 优化生成 HTML（trim_blocks、去除空行）。
+## 8.3 答案
 
-## 7.2 自测题
+1. 输出、逻辑语句、注释。
+2. 自动转义 HTML 特殊字符防 XSS；`|safe` 告诉 Jinja 这段内容可信，不转义。
+3. extends 是父子继承（子覆盖 block）；include 是把另一个模板内容插入当前位置。
+4. 输出父模板该 block 的原始内容，再追加新内容。
+5. 列表为空时。
+6. 前者从 1，后者从 0。
+7. `@app.template_filter('名字')` 装饰函数。
+8. 字典键 → 属性 → 字典 get。
+9. `@app.context_processor` 返回 `{'site_name': ...}`。
+10. 宏是模板里的函数；抽到单独文件用 `{% from 'x' import y %}`。
+11. 将来应用挂在子路径时 url_for 自动处理；硬写路径全坏。
+12. Jinja 的 for 循环有作用域；用 `{% set outer = namespace() %}`。
+13. 用户能注入 `<script>`，XSS。
+14. 先 striptags 去 HTML，再 truncate 截断。
+15. `{% extends "父模板.html" %}`（如果要继承）。
 
-1. `{{ a|default('无') }}` 和 `{{ a }}` 的区别？
-2. `|safe` 什么时候能用、什么时候绝对不能用？
-3. 子页面要改标题栏，base.html 里需要提前写什么？
-4. `{% include %}` 和 `{% extends %}` 的区别？
-5. 循环里怎么判断"这是最后一条"？
-6. `{{ post.title }}` 的 `.` 按什么顺序查找？
-7. 怎么把一个 Python 列表传给前端 JS？
-8. 宏和 include 有什么区别？
-9. `{% for %}...{% else %}{% endfor %}` 的 else 什么时候执行？
-10. 为什么用户评论里写 `{{ 1+1 }}` 不会被执行？
-11. `{{ super() }}` 做什么？
-12. 怎么注册一个模板里能用的 Python 函数？
+## 8.4 进一步学习
 
-## 7.3 答案
-
-1. 前者在 a 未定义/空时显示"无"，后者输出空字符串。
-2. 内容是自己生成的信任 HTML（Markdown 渲染结果）时能用；用户输入/不可信内容绝对不能用。
-3. base.html 里要有 `<title>{% block title %}...{% endblock %}</title>` 插槽。
-4. include 是"嵌入一个片段"；extends 是"继承骨架"，子页填 block。
-5. `{% if loop.last %}`。
-6. 先字典下标 `post['title']`，再属性 `post.title`，再方法调用 `post.title()`。
-7. `{{ data|tojson }}`，自动安全转义。
-8. include 是把另一个模板原样渲染进来（无参数）；宏是模板里定义的函数，能传参、可复用。
-9. 列表为空时。
-10. 模板只在服务端渲染一次，用户评论作为数据字符串放进模板，`{{ }}` 输出时只做 HTML 转义，不会再被解析成模板语法。
-11. 在子 block 里调用父 block 原内容，"叠加"而非"覆盖"。
-12. 用 `@app.template_filter('名字')` 装饰函数（过滤器），或 `@app.template_global()` 注册直接调用的函数。
-
-## 7.4 进一步学习
-
-- 官方文档：https://jinja.palletsprojects.com/
-- Jinja2 沙箱模式（渲染用户模板）：https://jinja.palletsprojects.com/sandbox/
-- 模板继承进阶：https://jinja.palletsprojects.com/template-inheritance/
+- 官方模板文档：https://jinja.palletsprojects.com/templates/
+- Flask 模板：https://flask.palletsprojects.com/quickstart/#rendering-templates
 
 ---
 
-> 下一篇：Werkzeug —— Flask 底层引擎全面教程
+> 下一篇：Werkzeug —— Flask 的底层引擎全面教程

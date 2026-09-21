@@ -1,235 +1,200 @@
 # 第三方库全面教程 · pywebview
 
-> 面向初学者：博客双击 exe 后弹出的"原生窗口"就是它。
-> 学完这份教程，你会掌握窗口创建、JS-Python 桥接、托盘、菜单、窗口大小记忆——把 Web 应用打包成桌面应用的全部要点。
-> 适用版本：pywebview 5.x ｜ 博客项目：`main.py`（1241 行）
+> 面向初学者到进阶者：博客双击 exe 弹出的窗口就是它。
+> 学完这份教程，你会掌握 pywebview 的原生 WebView 桥、窗口生命周期、JS-Python 互操作、窗口大小记忆、托盘。
+>
+> 适用版本：pywebview 5.x ｜ 博客项目：`app.py` 第 2516 行附近 + 托盘 + 窗口大小记忆（v2.8.3 特性）
 
 ---
 
-# 第 1 章 这个库是什么
+# 第 1 章 认识 pywebview
 
 ## 1.1 一句话定位
 
-pywebview 用**操作系统自带的 WebView 内核**（Windows 上是 Edge WebView2，macOS 上是 WKWebView）打开一个原生窗口，里面显示你的网页。
-
-一句话：**pywebview 是博客的"窗口外壳"**——里面是 Flask 网页，外面是原生窗口。
-
-## 1.2 为什么不用 Electron
-
-| 对比 | Electron | pywebview |
-|---|---|---|
-| 内核 | 自带 Chromium | 用系统 WebView |
-| 体积 | 100MB+ | 30MB 左右 |
-| 内存 | 高 | 低 |
-| 跨平台 | 是 | 是 |
-
-博客选 pywebview：体积小、用系统内核、Windows 上体验和原生一致。
-
-## 1.3 一个最小例子
+pywebview 用操作系统自带的 **WebView**（Windows Edge WebView2、Mac WKWebView、Linux WebKitGTK）把本地网页包成原生桌面窗口：
 
 ```python
 import webview
-webview.create_window('我的博客', 'http://127.0.0.1:5000/')
+webview.create_window('我的博客', 'http://127.0.0.1:5000/', width=1200, height=800)
 webview.start()
 ```
 
+一句话：**它是博客的窗框**——不内嵌 Chrome，直接用系统浏览器内核。
+
+## 1.2 为什么选它
+
+| 方案 | 体积 | 包 WebView？ |
+|---|---|---|
+| Electron | 150MB+ | 自带 |
+| Tkinter + 浏览器 | 丑 | 无 |
+| **pywebview** | 10MB | 系统自带 |
+| QtWebEngine | 50MB | 自带 |
+
+博客选 pywebview 是因为小、原生、跨平台。
+
 ---
 
-# 第 2 章 核心概念与原理
+# 第 2 章 工作原理
 
 ## 2.1 架构
 
 ```
-main.py
-  ├─ 后台线程：waitress 跑 Flask（http://127.0.0.1:5000）
-  └─ 主线程：pywebview 打开窗口，加载这个 URL
+pywebview（Python）
+  ↓
+系统 WebView（Edge WebView2）
+  ↓
+加载 http://127.0.0.1:5000（本地 Flask）
 ```
 
-**关键**：Flask 跑在本地端口，pywebview 只是个"壳"。关窗口 = 退出整个程序。
+和"用 Chrome 打开 localhost"没本质区别，但：
+- 无地址栏、无标签页；
+- 标题是应用名；
+- 可加托盘、菜单；
+- 看起来像原生应用。
 
-## 2.2 JS-Python 桥接
+## 2.2 为什么要 Flask
 
-pywebview 允许 JS 直接调 Python 函数：
-
-```python
-# Python 侧
-class Api:
-    def greet(self, name):
-        return f'你好，{name}'
-
-webview.create_window('标题', 'index.html', js_api=Api())
-```
-
-```javascript
-// JS 侧
-window.pywebview.api.greet('小明').then(alert)
-```
-
-## 2.3 窗口大小记忆（v2.8.3 新特性）
-
-博客把窗口宽高、是否最大化存进 `config.json`，下次启动恢复。用户拖边调整大小后，窗口关闭时自动记录，下次打开就是最新尺寸。
+博客逻辑在 Flask；pywebview 只负责"窗户"。启动时先 waitress 起 Flask，再 webview 打开 localhost。
 
 ---
 
-# 第 3 章 安装与版本
+# 第 3 章 API
 
-```bash
-pip install pywebview
-pip show pywebview
-```
-
-Windows 首次运行会提示装 WebView2 Runtime（Win10/11 一般已自带）。
-
----
-
-# 第 4 章 API 全面讲解
-
-## 4.1 create_window
+## 3.1 create_window
 
 ```python
-webview.create_window(
+window = webview.create_window(
     title='我的博客',
     url='http://127.0.0.1:5000/',
     width=1200, height=800,
     resizable=True,
     confirm_close=False,
-    background_color='#ffffff',
+    on_top=False,
 )
 ```
 
-## 4.2 start
+## 3.2 窗口大小记忆（v2.8.3 特性）
 
-```python
-webview.start(debug=False, gui='edgechromium')
-```
-
-- `debug=True`：开 F12 开发者工具；
-- `gui='edgechromium'`：强制用 WebView2。
-
-## 4.3 窗口对象方法
-
-```python
-window = webview.create_window(...)
-window.show()
-window.hide()
-window.load_url('...')
-window.evaluate_js('alert(1)')
-window.destroy()
-```
-
-## 4.4 事件
-
-```python
-window.events.closed += on_closed
-window.events.closing += on_closing
-window.events.shown += on_shown
-```
-
-## 4.5 托盘（博客当前未用）
-
-```python
-webview.system_tray = {
-    'icon': 'icon.png',
-    'menu': [('显示', show), ('退出', quit)],
-}
-```
-
----
-
-# 第 5 章 实战示例
-
-## 5.1 项目内示例：博客启动（main.py）
-
-```python
-import threading, webview
-from app import app, init_db
-
-def run_server():
-    from waitress import serve
-    serve(app, host='127.0.0.1', port=5000, threads=8)
-
-def main():
-    init_db()
-    t = threading.Thread(target=run_server, daemon=True)
-    t.start()
-    window = webview.create_window(
-        '我的博客',
-        'http://127.0.0.1:5000/',
-        width=1200, height=800, resizable=True)
-    webview.start()
-
-if __name__ == '__main__':
-    main()
-```
-
-## 5.2 项目内示例：窗口大小记忆（v2.8.3）
+用户拖拉调整后，下次启动恢复上次大小：
 
 ```python
 import json, os
 
-CFG = os.path.join(DATA_DIR, 'window.json')
-
 def load_size():
-    if os.path.exists(CFG):
-        return json.load(open(CFG, encoding='utf-8'))
-    return {'width': 1200, 'height': 800, 'maximized': False}
+    try:
+        with open('data/window.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {'width': 1200, 'height': 800}
 
 def save_size(window):
-    data = {'width': window.width, 'height': window.height,
-            'maximized': window.maximized}
-    json.dump(data, open(CFG, 'w', encoding='utf-8'))
+    @window.events.closing
+    def on_close():
+        d = {'width': window.width, 'height': window.height}
+        with open('data/window.json', 'w', encoding='utf-8') as f:
+            json.dump(d, f)
+
+state = load_size()
+window = webview.create_window('我的博客', url,
+                               width=state['width'],
+                               height=state['height'])
+save_size(window)
+webview.start()
 ```
 
-每次窗口关闭时保存，下次启动恢复。
+**关键**：每次关闭都写最新大小，不是只记第一次。
+
+## 3.3 托盘
+
+pywebview 不直接管托盘，Windows 用 pystray：
+
+```python
+import pystray
+from PIL import Image
+
+def tray_setup(icon):
+    icon.run_detached()
+
+menu = pystray.Menu(
+    pystray.MenuItem('显示', lambda: window.show()),
+    pystray.MenuItem('退出', lambda: (icon.stop(), app.quit())),
+)
+icon = pystray.Icon('blog', Image.open('icon.png'), '我的博客', menu)
+```
+
+## 3.4 JS ↔ Python 互操作
+
+```python
+class Api:
+    def do_something(self, text):
+        return f'Python 收到：{text}'
+
+window = webview.create_window(..., js_api=Api())
+```
+
+JS 里：
+
+```js
+window.pywebview.api.do_something('你好').then(...)
+```
 
 ---
 
-# 第 6 章 高频坑与排查
+# 第 4 章 项目实战
 
-| # | 坑 | 症状 | 解决 |
-|---|---|---|---|
-| 1 | Flask 没起 | 窗口白屏 | 先起 waitress 再 create_window |
-| 2 | 端口被占 | 白屏 | 换端口 |
-| 3 | 关窗口 Flask 还在跑 | 进程残留 | daemon=True |
-| 4 | JS 调 Python 报错 | pywebview 未就绪 | DOMContentLoaded 后再调 |
-| 5 | 中文乱码 | 标题乱码 | 系统编码 UTF-8 |
-| 6 | WebView2 没装 | 启动失败 | 装 Evergreen Runtime |
-| 7 | 打包后图标不显示 | 用默认图标 | PyInstaller --icon |
-| 8 | 窗口大小不记忆 | 每次都默认 | 关闭事件里保存 |
+## 4.1 博客启动序列
 
----
+```python
+from waitress import serve
+import threading, webview
+from app import app
 
-# 第 7 章 学习路径与自测
+t = threading.Thread(target=serve,
+                     kwargs={'app': app, 'host': '127.0.0.1',
+                             'port': 5000, 'threads': 8},
+                     daemon=True)
+t.start()
 
-## 7.1 学习路径
+window = webview.create_window('我的博客',
+                               'http://127.0.0.1:5000/',
+                               width=1200, height=800)
+webview.start()
+```
 
-- 半天：create_window + start；
-- 半天：JS-Python 桥接；
-- 1 天：窗口事件、托盘、菜单；
-- 1 天：窗口大小记忆。
+## 4.2 关闭行为
 
-## 7.2 自测题
-
-1. pywebview 和 Flask 是什么关系？
-2. 为什么 Flask 要放后台线程？
-3. 怎么从 JS 调 Python 函数？
-4. 关窗口后 Flask 还在跑怎么修？
-5. 博客怎么记住窗口大小？
-6. pywebview 用什么内核？
-
-## 7.3 答案
-
-1. pywebview 是外壳，Flask 是内容；pywebview 加载 Flask 的 URL。
-2. 主线程必须给 webview.start()，否则窗口起不来。
-3. create_window 传 js_api，JS 里 window.pywebview.api.xxx()。
-4. 线程设 daemon=True，窗口关了主线程退出。
-5. 关闭事件里把 width/height/maximized 存 JSON，启动时读。
-6. Windows 上 Edge WebView2（系统自带）。
-
-## 7.4 进一步学习
-
-- 官方文档：https://pywebview.flowrl.com/
+点 X 时托盘驻留，不退出。托盘"退出"才真正结束。
 
 ---
 
-> 下一篇：PyInstaller —— 打包成 exe 全面教程
+# 第 5 章 高频坑
+
+| # | 坑 | 解决 |
+|---|---|---|
+| 1 | WebView2 没装 | 引导装 Edge WebView2 Runtime |
+| 2 | Flask 没起就开窗 | 等几秒或轮询 |
+| 3 | 中文标题乱码 | UTF-8 |
+| 4 | 关闭后后台还在 | 托盘处理退出 |
+| 5 | 窗口大小不记忆 | 监听 closing 写 JSON |
+| 6 | 打包没带图标 | --add-data |
+
+---
+
+# 第 6 章 自测
+
+1. pywebview 和 Electron 区别？
+2. 为什么博客用 waitress + pywebview 双层？
+3. 窗口大小记忆怎么做？
+4. JS 怎么调 Python 方法？
+5. Windows 托盘用什么库？
+
+**答案**：
+1. pywebview 用系统 WebView，体积小；Electron 自带 Chromium。
+2. waitress 起 Flask；pywebview 提供原生窗框。
+3. closing 事件写 JSON，下次启动读。
+4. create_window 传 js_api，JS 用 window.pywebview.api。
+5. pystray + PIL。
+
+---
+
+> 下一篇：PyInstaller —— 打包发布全面教程

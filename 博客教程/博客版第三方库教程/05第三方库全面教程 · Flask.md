@@ -1,227 +1,562 @@
 # 第三方库全面教程 · Flask
 
-> 面向初学者：不假设你已懂任何 Web 知识，每个概念第一次出现都用大白话解释；同时也不回避原理，凡是博客里用到的机制，都讲到"能自己改"的程度。
-> 学完这份教程，你不仅能读懂 `app.py` 的 2545 行，还能自己设计一个类似规模的 Web 项目。
-> 适用版本：Flask 3.x（博客 v2.8.3 实际使用）｜ 项目：`D:\blog_pkg\app.py`
+> 面向初学者到进阶者：这是博客项目的 Web 框架骨架。
+> 学完这份教程，你将掌握 Flask 从"Hello World"到"理解上下文栈、蓝图、应用工厂、请求钩子、信号机制"的全部核心知识，
+> 并能对照博客 v2.8.3 真实源码逐段读懂每个路由在做什么。
+>
+> 适用版本：Flask 3.x ｜ 博客项目：`app.py`（2545 行）、`main.py`（1241 行）
+> 学习路线：基础篇（第 1~3 章）→ 进阶篇（第 4 章）→ 项目实战（第 5 章）→ API 速查与排坑（第 6~7 章）→ 自测（第 8 章）
 
 ---
 
-# 第 1 章 这个库是什么
+# 第 1 章 认识 Flask
 
 ## 1.1 一句话定位
 
-Flask 是 Python 世界里最流行的 **Web 微框架（micro web framework）**。它做两件事：
+Flask 是一个用 Python 写的**轻量级 Web 框架**。所谓"Web 框架"，就是帮你把"浏览器发来的 HTTP 请求"接住、执行一段 Python 代码、再把结果作为 HTTP 响应发回去的一整套工具。
 
-1. **接收 HTTP 请求**：把浏览器发来的请求翻译成 Python 能读的对象；
-2. **调用你写的函数**：根据网址找到对应的处理函数，把返回值翻译成 HTTP 响应发回浏览器。
+它的哲学叫 **micro（微内核）**：核心只做一件事——把 URL 映射到 Python 函数；其他功能（数据库、表单、登录、迁移）全部交给扩展。这和 Django 的"全家桶"路线相反。
 
-数据库、用户登录、表单校验、权限系统——这些它都**不内置**，要用的时候自己装扩展。这种"小内核 + 强生态"的设计哲学叫"微"。
+一句话：**Flask 是博客的骨架**——所有页面（首页、文章详情、后台、点赞接口）都是它在接电话。
 
-一句话：**Flask 是博客项目的"骨架与指挥中心"**——所有网址（路由）由它登记，所有请求由它接住，所有页面由它调用模板渲染出来。博客项目 `app.py` 约 2545 行，其中 90% 是你写的业务代码，Flask 只负责把这些代码"挂"到网址上。
+## 1.2 Flask 和同类框架对比
 
-## 1.2 为什么博客选 Flask，不选别的
+| 框架 | 体量 | 特点 | 适合 |
+|---|---|---|---|
+| **Flask** | 微（约 1MB） | 灵活、扩展生态好 | 个人博客、API、小工具 |
+| Django | 重（10MB+） | 自带 ORM/Admin/表单/认证 | 大型内容站 |
+| FastAPI | 中 | 异步、类型提示、自动文档 | 现代 API |
+| Tornado | 中 | 长连接、异步 | 聊天、推送 |
 
-Python Web 框架不止 Flask 一个，主流对比：
+博客选 Flask 的原因：
+- 桌面应用内嵌 Web 服务，启动快、内存小；
+- Jinja2 模板和 Werkzeug 路由是它原生带的，上手成本低；
+- 扩展够用（Flask-SQLAlchemy、Flask-Login 等）。
 
-| 框架 | 定位 | 优点 | 缺点 | 适合谁 |
-|---|---|---|---|---|
-| **Flask** | 微框架 | 灵活、轻、上手快、生态全 | 大项目要自己组装 | 小型博客、工具、API |
-| Django | 全家桶 | 自带 ORM/Admin/表单/鉴权 | 重、约定死、初次配置多 | 大型内容站、后台系统 |
-| FastAPI | 现代异步 | 类型提示、自动文档、性能高 | 较新、生态不如 Flask | API 服务、AI 后端 |
-| Tornado | 异步服务器 | 长连接/WebSocket 强 | Web 功能弱 | 聊天、推送 |
+## 1.3 一个最小 Flask 应用
 
-博客选 Flask 的理由：
-
-- **桌面端单机应用**，不需要 Django 那套重型 Admin；
-- **学习成本低**，作者一个人写得动；
-- **扩展组合自由**：博客实际用了 Flask-SQLAlchemy（数据库）、Flask 自带模板（Jinja2）、waitress（服务器）——拼积木的过程自己可控；
-- **打包体积小**，PyInstaller 打出来 34MB，换成 Django 直接上百 MB。
-
-## 1.3 一个最小 Flask 程序长什么样
+把下面代码存为 `hello.py`：
 
 ```python
-# hello.py
 from flask import Flask
 
-app = Flask(__name__)          # 1. 创建应用对象
+app = Flask(__name__)
 
-@app.route('/')                 # 2. 把根路径 "/" 绑到下面的函数
+@app.route('/')
 def hello():
     return '<h1>你好，博客！</h1>'
 
 if __name__ == '__main__':
-    app.run(debug=True)         # 3. 启动开发服务器
+    app.run(debug=True)
 ```
 
-跑起来：`python hello.py`，浏览器打开 `http://127.0.0.1:5000`。三行核心代码，一个网站就有了——这就是"微框架"的含义。
+运行：
 
-## 1.4 关键名词预习
+```bash
+python hello.py
+#  * Serving Flask app 'hello'
+#  * Running on http://127.0.0.1:5000
+```
 
-后面章节反复出现，先混个脸熟：
+浏览器打开 `http://127.0.0.1:5000/` 就能看到"你好，博客！"。
 
-- **请求（Request）**：浏览器发给服务器的"我要看 `http://.../post/3/`"。
-- **响应（Response）**：服务器还回去的 HTML/JSON/状态码。
-- **路由（Route）**：网址 → 函数 的映射表。
-- **视图函数（View Function）**：你写的、被路由调用的那个函数。
-- **模板（Template）**：HTML 文件里掺了 `{{ 变量 }}` 占位符，Flask 渲染时替换成真实数据。
-- **WSGI**：Python Web 服务器和应用之间的统一接口标准（第 2 章详解）。
+**逐行解释**：
+
+1. `from flask import Flask`：从 flask 包导入 Flask 类。
+2. `app = Flask(__name__)`：创建一个 Flask 应用对象。`__name__` 是 Python 内置变量，Flask 用它定位项目根目录（找 templates、static）。
+3. `@app.route('/')`：装饰器，把下面这个函数和 URL `/` 绑在一起。
+4. `def hello():`：视图函数——浏览器访问 `/` 时执行的代码。
+5. `return '...'`：返回值作为 HTTP 响应体。
+6. `app.run()`：启动开发服务器（仅调试用，生产用 waitress）。
+
+## 1.4 安装
+
+```bash
+pip install flask
+pip show flask    # 看版本
+```
+
+Flask 3.x 要求 Python 3.8+。
+
+## 1.5 博客里的 app 是怎么创建的（app.py 第 122~125 行）
+
+```python
+from flask import Flask
+
+app = Flask(__name__,
+            static_folder='static',
+            template_folder='templates')
+app.config.from_object(Config)   # 从 config.py 的 Config 类读配置
+```
+
+博客把所有可调参数（数据库路径、密钥、端口）集中到 `config.py` 的 `Config` 类，再用 `from_object` 一次性加载——这是 Flask 推荐的配置管理方式。
 
 ---
 
-# 第 2 章 核心概念与原理
+# 第 2 章 WSGI 与请求-响应循环
 
-## 2.1 WSGI：Flask 与世界对话的"接口标准"
+## 2.1 WSGI：Python Web 世界的"插座标准"
 
-### 2.1.1 为什么需要 WSGI
+你可能听过"Flask 是个 WSGI 框架"。WSGI（Web Server Gateway Interface）是 Python 制定的接口标准：**服务器怎么把请求传给框架，框架怎么把结果传回去**。
 
-假设没有 WSGI。Flask 想换一个服务器（从开发用的 Werkzeug 换生产用的 waitress），就得为每个服务器重新写一遍"请求怎么传给 Flask"的胶水代码——N 个服务器 × M 个框架 = N×M 份胶水。
+只要一个东西遵守 WSGI，它就能和任何遵守 WSGI 的另一块配合：
 
-WSGI 把这件事变成"两边都遵守同一个协议"：服务器只要会调用 `app(environ, start_response)`，Flask 只要实现这个调用，就能互相接。N + M 份胶水就够了。
+```
+浏览器 ──HTTP──> waitress ──WSGI──> Flask ──调用──> 你的视图函数
+```
 
-### 2.1.2 WSGI 长什么样
-
-一个最小的"符合 WSGI 协议"的应用，甚至不需要 Flask：
+Flask 的 `app` 对象本身就是一个 **WSGI 可调用对象**：它能被当成函数调用，接收两个参数 `environ`（请求环境）和 `start_response`（回调函数）。
 
 ```python
-def my_app(environ, start_response):
-    # environ：一个大字典，装着请求方法、路径、headers、query string……
-    # start_response：一个回调函数，用来发送状态码和响应头
-    path = environ['PATH_INFO']
-    start_response('200 OK', [('Content-Type', 'text/plain; charset=utf-8')])
-    return [f'你访问了 {path}'.encode('utf-8')]
-
-# 用 waitress 跑它：
-from waitress import serve
-serve(my_app, host='127.0.0.1', port=8080)
+# 不要真的这么写，只是演示 WSGI 的本质
+def simple_wsgi_app(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
+    return [b'<h1>Hello</h1>']
 ```
 
-**Flask 本质上就是对这个协议的一层友好封装**：路由、模板、request 对象，全都是为了让你不用手搓 `environ`。
+Flask 做的事就是把这个枯燥的协议包装成了 `@app.route`、`request`、`return render_template(...)` 这种好用的 API。
 
-### 2.1.3 博客里 WSGI 在哪
+## 2.2 一次请求的完整生命周期
 
-- 开发模式：`app.run()` 启动 Werkzeug 自带的 WSGI 服务器（只适合开发）；
-- 生产模式：`run_server()` 调 `waitress.serve(app, ...)`，waitress 是 WSGI 服务器，`app` 就是 Flask 实例；
-- 桌面版：`create_server(app, ...)` 把同一个 `app` 对象放到后台线程跑。
-
-**同一个 `app` 对象，能跑在不同的 WSGI 服务器上，这就是 WSGI 标准的威力。**
-
-## 2.2 请求-响应循环（Request-Response Cycle）
-
-一次访问 `http://blog/post/3/` 的完整生命周期：
+浏览器访问 `http://127.0.0.1:5000/post/3/`，背后发生了：
 
 ```
-① 浏览器发出 HTTP 请求
-    GET /post/3/ HTTP/1.1
-    Host: 127.0.0.1:5000
-    User-Agent: ...
-        ↓
-② WSGI 服务器（waitress/Werkzeug）收到 TCP 连接
-    把请求解析成 environ 字典
-        ↓
-③ Flask 应用被调用：app(environ, start_response)
-    a. 创建 RequestContext（请求上下文）和 AppContext（应用上下文），压栈
-    b. URL 路由匹配：/post/<int:post_id>/ 对应 post_detail 函数，post_id=3
-    c. 跑 before_request 钩子
-    d. 调用视图函数 post_detail(3)
-       └─ 内部：查数据库 → 渲染 Jinja2 模板 → 得到 HTML 字符串
-    e. 视图返回值包装成 Response 对象
-    f. 跑 after_request 钩子（博客在这里加 Gzip、安全头）
-    g. 上下文出栈销毁
-        ↓
-④ WSGI 服务器拿到 Response，拼成 HTTP 响应发回浏览器
-    HTTP/1.1 200 OK
-    Content-Type: text/html; charset=utf-8
-    ...
-    <html>...</html>
+1. waitress 收到 TCP 连接，解析 HTTP 请求
+2. waitress 构造 environ 字典（method、path、headers、body...）
+3. waitress 调用 flask app(environ, start_response)
+4. Flask 做了这些事：
+   a. 建立 Request Context（把 request、session 挂到上下文栈）
+   b. 建立 Application Context（把 g、current_app 挂上去）
+   c. before_request 钩子依次执行
+   d. 用 URL Map 匹配到视图函数 post_detail(post_id=3)
+   e. 视图函数查数据库、render_template 渲染 HTML
+   f. after_request 钩子依次执行
+   g. 构造 Response 对象
+5. Flask 调用 start_response(status, headers)，返回 body
+6. waitress 把 HTTP 响应发回浏览器
+7. Flask 销毁两个上下文栈，释放资源
 ```
 
-**理解这张图，就读懂了 Flask 的全部工作方式。** 后面学的所有 API（request、session、钩子），都是在这条流水线的某个环节介入。
+理解这个流程，后面所有"为什么 request 能在视图里直接用"的问题都迎刃而解。
 
-## 2.3 上下文：新手最容易懵，但必须搞懂
+## 2.3 同步阻塞模型
 
-### 2.3.1 为什么需要"上下文"这个奇怪的东西
+Flask 默认是**同步**框架：一个请求占一个线程直到返回。waitress 开 8 个线程，意味着同时最多处理 8 个请求；第 9 个要排队。
 
-Flask 是**多线程并发**的：同时来 10 个请求，可能用 10 个线程同时跑你的视图函数。
+博客是个人应用，同时在线个位数访客，完全够用。如果将来要做高并发 API，应该上 FastAPI 或异步框架。
 
-如果 `request` 是一个普通全局变量：
+---
+
+# 第 3 章 基础篇：路由、请求、响应、模板、静态文件
+
+## 3.1 路由：URL 和函数的映射
+
+### 3.1.1 基本路由
 
 ```python
-request = None       # 伪代码
-def view():
-    global request
-    request = 当前请求    # 线程 A 刚设置
-    ...
-    request = 当前请求    # 线程 B 也设置，把 A 的覆盖了！
+@app.route('/')
+def index():
+    return '首页'
+
+@app.route('/about')
+def about():
+    return '关于我'
 ```
 
-10 个请求互相踩，乱套。
-
-Flask 的解法是**线程局部存储（thread-local）**：每个线程有自己的一份"看不见的全局变量"。你在视图函数里写 `from flask import request`，Flask 会自动返回**当前线程**对应的那个 request 对象——别的线程看不见。
-
-但这套机制有个前提：**必须处于"请求上下文"或"应用上下文"里**。否则 Flask 不知道你在哪个应用、哪个请求里。
-
-### 2.3.2 两个上下文盒子
-
-| 上下文 | 装着什么 | 什么时候有效 |
-|---|---|---|
-| **应用上下文（app context）** | `current_app`（当前应用实例）、`g`（请求期间的临时存储）、`current_app.config` | 请求处理期间；**脚本/线程里用 db 必须手动包** |
-| **请求上下文（request context）** | `request`（当前请求对象）、`session`（用户会话） | 每个请求处理期间 |
-
-### 2.3.3 经典报错：Working outside of application context
-
-博客的云同步是在后台线程跑的。如果直接写：
+### 3.1.2 带参数的路由
 
 ```python
-def sync_worker():
-    posts = Post.query.all()   # ❌ 报错：Working outside of application context
+@app.route('/post/<int:post_id>/')
+def post_detail(post_id):
+    return f'文章 ID 是 {post_id}'
 ```
 
-后台线程**不在请求处理中**，Flask 不知道你用哪个应用。必须手动推入上下文：
+`<int:post_id>` 是 URL 转换器：
+- `string`（默认）：接受除 `/` 外的字符；
+- `int`：正整数；
+- `float`：浮点数；
+- `path`：接受含 `/` 的路径；
+- `uuid`：UUID 字符串。
+
+博客里真实用法（app.py 第 1058 行）：
 
 ```python
-def sync_worker(app):
-    with app.app_context():    # ✅ 手动把应用上下文压栈
-        posts = Post.query.all()
+@app.route('/post/<int:post_id>/')
+def post_detail(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post_detail.html', post=post)
 ```
 
-**记忆口诀**：视图函数里随便用 `request`/`db`/`current_app`；后台线程、定时任务、导入脚本里用它们之前，先 `with app.app_context():`。
-
-### 2.3.4 `g` 对象：一个请求期间的临时仓库
-
-`g` 是"global"的简写，但它**不是真全局**——每个请求独立一份，请求结束就销毁。
-
-博客用 `g` 存"当前请求期间算出的访客指纹"：
+### 3.1.3 HTTP 方法
 
 ```python
-from flask import g
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # 处理表单提交
+        ...
+    # GET：显示登录页
+    return render_template('login.html')
+```
 
-@app.before_request
-def load_visitor_fingerprint():
-    g.fingerprint = hashlib.md5((request.remote_addr + request.headers.get('User-Agent','')).encode()).hexdigest()
+快捷装饰器：
 
+```python
+@app.get('/')     # 只接 GET
+@app.post('/like') # 只接 POST
+```
+
+博客点赞接口（app.py 第 1185 行）：
+
+```python
 @app.route('/post/<int:post_id>/like/', methods=['POST'])
 def post_like(post_id):
-    fp = g.fingerprint       # 直接用，不用再算一遍
+    # AJAX 接口，只接 POST
     ...
 ```
 
-**为什么用 `g` 而不是全局变量？** 多线程并发时 `g` 自动隔离，全局变量会互相覆盖。
+### 3.1.4 反向生成 URL：url_for
 
-## 2.4 蓝图（Blueprint）：让大项目不变成一坨
-
-### 2.4.1 为什么需要蓝图
-
-博客项目 37 个路由全堆在 `app.py` 里，还能管。但如果做成一个完整 CMS（前台 + 后台 + 用户中心 + API + 管理后台），几百个路由挤一个文件就是灾难。
-
-蓝图是 Flask 官方给的"分模块路由组"：
+不要在模板里硬编码 URL，用 `url_for('视图函数名')` 反向生成：
 
 ```python
-# admin.py —— 一个独立模块
+from flask import url_for
+
+@app.route('/')
+def index():
+    return redirect(url_for('about'))   # 跳到 /about
+```
+
+模板里：
+
+```html
+<a href="{{ url_for('post_detail', post_id=3) }}">文章</a>
+<!-- 生成 /post/3/ -->
+```
+
+**好处**：以后改 URL 规则，只要改 `@app.route` 一处，所有 `url_for` 自动跟着变。
+
+## 3.2 request：读取请求数据
+
+`request` 是一个**全局代理对象**，但它实际上只在请求上下文中有效。它包含浏览器发过来的一切：
+
+```python
+from flask import request
+
+@app.route('/search')
+def search():
+    # 查询参数：/search?q=python
+    q = request.args.get('q', '')
+
+    # 表单数据：POST application/x-www-form-urlencoded
+    username = request.form.get('username')
+
+    # JSON body：POST application/json
+    data = request.get_json()
+
+    # 上传文件
+    f = request.files['avatar']
+
+    # 请求头
+    ua = request.headers.get('User-Agent')
+
+    # Cookies
+    token = request.cookies.get('token')
+
+    # 路径信息
+    path = request.path          # '/search'
+    method = request.method      # 'GET'
+```
+
+### 3.2.1 request.args vs request.form
+
+| 属性 | 来源 | 典型场景 |
+|---|---|---|
+| `request.args` | URL 查询串 `?a=1&b=2` | GET 表单、搜索、分页 |
+| `request.form` | POST 表单 body | 登录、发文章 |
+| `request.values` | 两者合一 | 不推荐用 |
+| `request.get_json()` | POST JSON body | AJAX 接口 |
+
+博客首页分页：
+
+```python
+page = request.args.get('page', 1, type=int)
+# /?page=2 → page=2；没传 → 1；传 abc → 1（type=int 自动容错）
+```
+
+### 3.2.2 type 参数的魔法
+
+```python
+request.args.get('page', 1, type=int)
+```
+
+如果 URL 是 `?page=abc`，`int('abc')` 会抛 ValueError，Flask 会自动返回默认值 1——不用自己 try/except。
+
+## 3.3 响应：return 什么都行
+
+视图函数的返回值会被 Flask 包装成 `Response` 对象：
+
+| 返回值 | 结果 |
+|---|---|
+| `'字符串'` | 200 OK，Content-Type: text/html |
+| `'<h1>...</h1>'` | 同上 |
+| `render_template('x.html', ...)` | 渲染后的 HTML 字符串 |
+| `jsonify({...})` | 200 OK，Content-Type: application/json |
+| `redirect('/')` | 302 重定向 |
+| `(body, status)` | 自定义状态码 |
+| `(body, headers)` | 自定义响应头 |
+| `Response(...)` | 完全自定义 |
+
+### 3.3.1 jsonify：AJAX 接口
+
+```python
+from flask import jsonify
+
+@app.post('/post/<int:post_id>/like/')
+def post_like(post_id):
+    count = Like.query.filter_by(post_id=post_id).count()
+    return jsonify({'ok': True, 'count': count})
+```
+
+浏览器收到：
+
+```json
+{"ok": true, "count": 5}
+```
+
+自动处理 JSON 序列化、Content-Type、中文转义。
+
+### 3.3.2 redirect 与 url_for 配合
+
+```python
+from flask import redirect, url_for
+
+@app.post('/login')
+def login():
+    # 登录成功后跳回首页
+    return redirect(url_for('index'))
+```
+
+### 3.3.3 abort：主动抛 HTTP 错误
+
+```python
+from flask import abort
+
+@app.route('/admin')
+def admin():
+    if not logged_in:
+        abort(401)    # 直接返回 401 页面
+    ...
+```
+
+配合 `@app.errorhandler(404)` 自定义错误页：
+
+```python
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+```
+
+## 3.4 render_template：渲染模板
+
+```python
+from flask import render_template
+
+@app.route('/post/<int:post_id>/')
+def post_detail(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post_detail.html', post=post, now=datetime.now())
+```
+
+Flask 会自动在 `templates/` 目录找 `post_detail.html`，把 `post`、`now` 注入模板上下文。
+
+模板语法是 Jinja2（详见 06 教程）：
+
+```html
+<h1>{{ post.title }}</h1>
+<p>{{ post.content|safe }}</p>
+```
+
+## 3.5 静态文件：CSS/JS/图片
+
+放在 `static/` 目录，通过 `/static/xxx` 访问：
+
+```html
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+```
+
+模板里永远用 `url_for('static', filename=...)`，不要硬写路径。
+
+---
+
+# 第 4 章 进阶篇：上下文、蓝图、钩子、session、错误处理
+
+## 4.1 上下文栈：为什么 request 能"全局"用
+
+新手最困惑的问题：`request` 明明是从 flask import 的全局对象，为什么它能拿到"当前请求"的数据？
+
+答案是 **Thread Local（线程局部存储）+ 上下文栈**。
+
+Flask 内部维护两个栈：
+
+```
+app_ctx_stack      ← 应用上下文（current_app、g）
+request_ctx_stack  ← 请求上下文（request、session）
+```
+
+每个请求进来时，Flask 在栈顶 push 一个新的上下文对象；请求结束时 pop 掉。`request` 是一个 **LocalProxy**，它不直接存数据，而是"指向当前栈顶的请求对象"。
+
+```python
+# 你以为：
+request = ...当前请求数据...
+
+# 实际上：
+request = LocalProxy(_find_req)   # 每次访问都去栈顶找
+```
+
+### 4.1.1 什么时候会报错
+
+```
+RuntimeError: Working outside of request context.
+```
+
+出现场景：
+- 在普通函数里直接用 `request`，而这个函数不是被视图调用的；
+- 在后台线程里用 `request`；
+- 在交互式 Python 里直接 `from flask import request; request.path`。
+
+### 4.1.2 手动推上下文（脚本/后台任务用）
+
+```python
+with app.app_context():
+    # 这里 current_app 可用
+    print(app.name)
+
+with app.test_request_context('/?name=tom'):
+    # 这里 request 可用，模拟一个请求
+    print(request.path)
+```
+
+博客的初始化脚本就在 `app.app_context()` 里跑数据库建表。
+
+## 4.2 g 对象：一次请求内的临时存储
+
+`g` 是一个请求级别的全局对象，同一个请求里的所有视图、钩子、模板都能共享它：
+
+```python
+@app.before_request
+def before():
+    g.fingerprint = hashlib.sha256(...).hexdigest()
+
+@app.post('/like')
+def like():
+    fp = g.fingerprint    # 同一个请求里，before_request 存的还在
+```
+
+博客用 `g.fingerprint` 存访客指纹（app.py 第 691 行附近），所有视图都能取到。
+
+**关键**：`g` 在请求结束后销毁，不要拿它跨请求存数据（那是 session 或数据库的事）。
+
+## 4.3 请求钩子：在请求生命周期插代码
+
+Flask 提供 4 个钩子装饰器：
+
+| 钩子 | 时机 | 典型用途 |
+|---|---|---|
+| `@app.before_request` | 每个请求进来、视图之前 | 登录检查、记录指纹 |
+| `@app.after_request` | 视图执行完、响应发出前 | 加响应头、Gzip 压缩 |
+| `@app.teardown_request` | 响应发出后 | 清理资源 |
+| `@app.before_first_request` | 第一个请求前（已弃用） | 用 `init_db()` 代替 |
+
+### 4.3.1 before_request 实战（博客 inject_globals 不在这里）
+
+```python
+@app.before_request
+def attach_fingerprint():
+    g.fingerprint = hashlib.sha256(
+        (request.remote_addr + request.user_agent.string).encode()
+    ).hexdigest()
+```
+
+### 4.3.2 context_processor：给所有模板注入变量
+
+和 `before_request` 不同，`context_processor` 返回的字典会自动注入到**每个模板**的上下文中：
+
+```python
+@app.context_processor
+def inject_globals():
+    return {
+        'site_name': '我的博客',
+        'current_year': datetime.now().year,
+        'nav_links': NavLink.query.all(),
+    }
+```
+
+这样所有模板都能直接用 `{{ site_name }}`、`{{ current_year }}`。
+
+博客的 `inject_globals`（app.py 第 843 行）就是干这个：把站点设置、未读评论数、当前用户注入每个页面。
+
+## 4.4 session：跨请求存数据
+
+`request` 是一次性的，`session` 跨请求：
+
+```python
+from flask import session
+
+@app.post('/login')
+def login():
+    if check_password():
+        session['user_id'] = user.id   # 写 session
+        return redirect(url_for('admin'))
+
+@app.before_request
+def require_login():
+    if 'user_id' not in session and request.path.startswith('/admin'):
+        return redirect(url_for('login'))
+```
+
+**原理**：Flask 默认把 session 数据序列化后加密签名，存在浏览器的 Cookie 里（不是服务器端）。这叫 "client-side session"。
+
+**注意**：
+- session cookie 是**签名**不是加密——用户能看到内容但不能篡改；
+- 敏感数据（密码）不要放 session；
+- 要改服务端 session 存法，用 Flask-Session 扩展。
+
+## 4.5 flash：一次性提示消息
+
+flash 是"闪现消息"：写一次，下次模板渲染后自动清除。
+
+```python
+@app.post('/post/<int:id>/delete/')
+def delete_post(id):
+    ...
+    flash('文章已删除', 'success')
+    return redirect(url_for('index'))
+```
+
+模板里：
+
+```html
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, msg in messages %}
+    <div class="alert alert-{{ category }}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+```
+
+**为什么用 redirect 而不是直接渲染？** 这叫 POST/Redirect/GET 模式：避免用户刷新浏览器时重复提交表单。
+
+## 4.6 蓝图（Blueprint）：大型项目的模块化
+
+当路由超过 50 个全堆在 `app.py` 里会很难维护。Blueprint 把路由分组：
+
+```python
+# blueprints/admin.py
 from flask import Blueprint
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-@admin_bp.route('/')
+@admin_bp.route('/dashboard/')
 def dashboard():
     return '后台首页'
 
@@ -231,701 +566,451 @@ def posts():
 ```
 
 ```python
-# app.py —— 注册蓝图
-from admin import admin_bp
+# app.py
+from blueprints.admin import admin_bp
 app.register_blueprint(admin_bp)
 ```
 
-现在 `/admin/` 和 `/admin/posts/` 这两个路由归 `admin_bp` 管，但代码写在 `admin.py` 里。
+访问路径自动加上前缀：`/admin/dashboard/`、`/admin/posts/`。
 
-### 2.4.2 蓝图的好处
-
-- **分文件**：`routes/blog.py`、`routes/admin.py`、`routes/api.py` 各管一摊；
-- **带前缀**：`url_prefix='/admin'` 让所有蓝图内路由自动加前缀；
-- **带静态目录/模板目录**：蓝图可以有自己的 `templates` 文件夹，大型组件化项目常用；
-- **可插拔**：不同蓝图可以独立启用/禁用，做插件系统的基础。
-
-### 2.4.3 endpoint 命名：蓝图强制加前缀
-
-蓝图里定义的路由，endpoint 会自动变成 `蓝图名.函数名`：
+**url_for 要带蓝图名**：
 
 ```python
-@admin_bp.route('/posts/')
-def posts(): ...
-# endpoint 实际是 'admin.posts'
-
-url_for('admin.posts')   # → '/admin/posts/'
-url_for('posts')         # ❌ 报错，找不到
+url_for('admin.dashboard')   # 而不是 url_for('dashboard')
 ```
 
-这是新手用蓝图后最常见的错——`url_for` 里必须带蓝图名。
+博客目前路由都在 app.py 里，规模还不需要蓝图；如果将来加 API、管理后台分离，蓝图是标准做法。
 
-## 2.5 路由匹配算法（了解即可，调试时有用）
-
-Flask 用 Werkzeug 的路由系统：
-
-1. 启动时把所有 `@app.route` 注册到一个 URL Map；
-2. 每个进来的请求，Werkzeug 用 **正则 + 类型转换器** 逐条匹配；
-3. 匹配成功就调用对应视图函数，把动态段作为参数传进去；
-4. 多个路由都匹配时，按注册顺序取第一个。
-
-**调试技巧**：`app.url_map` 能打印所有路由，排查"405/404 为什么"很好用：
+## 4.7 应用工厂（Application Factory）
 
 ```python
-for rule in app.url_map.iter_rules():
-    print(rule.rule, '→', rule.endpoint, rule.methods)
+def create_app(config_name='default'):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from .main import main_bp
+    app.register_blueprint(main_bp)
+    return app
 ```
 
----
+**好处**：
+- 同一套代码能创建多个 app 实例（测试用不同配置）；
+- 延迟导入，避免循环依赖；
+- 配合蓝图天然模块化。
 
-# 第 3 章 安装与版本
+博客是单实例，直接 `app = Flask(__name__)` 就够了；学习 Flask 生态时会频繁看到工厂模式。
 
-## 3.1 标准安装
-
-```bash
-# 推荐先建虚拟环境
-python -m venv venv
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# 安装最新稳定版
-pip install flask
-
-# 指定版本（博客 requirements.txt 的写法）
-pip install flask==3.0.3
-
-# 验证
-python -c "import flask; print(flask.__version__)"
-```
-
-## 3.2 Flask 自带的"隐形同伴"
-
-`pip install flask` 不会只装 flask，会自动装上一串依赖：
-
-| 包 | 角色 |
-|---|---|
-| **Werkzeug** | WSGI 工具库（请求/响应对象、调试器、开发服务器） |
-| **Jinja2** | 模板引擎 |
-| **MarkupSafe** | 转义 HTML 的安全库 |
-| **itsdangerous** | 签名（session cookie 加密靠它） |
-| **click** | 命令行工具库（flask run 命令靠它） |
-
-所以博客 `requirements.txt` 里写了 Flask、Werkzeug、Jinja2 三个名字，其实装 Flask 时后面两个自动就来了——显式写出是为了锁定版本。
-
-## 3.3 版本选择
-
-- **Flask 2.x**：2021 年发布，引入 async 视图等；
-- **Flask 3.x**：2023 年发布，要求 Python 3.8+，推荐新项目用；
-- 博客 v2.8.3 用的是 Flask 3.x。
-
-**版本兼容警告**：Flask 2 → 3 之间 `@app.route` 一些细节有变化；博客锁版本是为了打包后行为一致。你在自己电脑装最新版一般没问题，但如果遇到奇怪报错，先 `pip show flask` 看版本。
-
----
-
-# 第 4 章 API 全面讲解
-
-> 标注：✅ = 博客项目正在用；➕ = 很常用但项目没用到（推荐掌握）；🧪 = 进阶能力（了解即可）。
-
-## 4.1 创建应用：Flask()
+## 4.8 自定义错误处理器
 
 ```python
-from flask import Flask
-
-app = Flask(
-    __name__,
-    template_folder='templates',       # 模板目录（默认就叫 templates）
-    static_folder='static',            # 静态资源目录（css/js/图片）
-    static_url_path='/static',         # 静态文件的 URL 前缀
-    instance_relative_config=False,   # 是否使用 instance 文件夹
-)
-```
-
-✅ 博客用法（app.py 第 122 行）：
-
-```python
-app = Flask(
-    __name__,
-    template_folder=str(Config.TEMPLATE_DIR),   # 用 RESOURCE_DIR 拼路径
-    static_folder=str(Config.STATIC_DIR),
-    static_url_path='/static',
-)
-app.config.from_object(Config)                   # 从 config.py 读配置
-```
-
-**为什么模板目录不写死 `'templates'`？** PyInstaller 打包后，模板在 `_internal/templates` 里，工作目录不是源码目录。用 `Config.RESOURCE_DIR` 拼出来的绝对路径，开发模式和打包后都能找到。
-
-**`__name__` 是什么？** 它是 Python 的"当前模块名"。Flask 用它定位"这个包在哪里"，从而找到默认的 templates/static 目录。传 `__name__` 是标准写法，不用纠结。
-
-## 4.2 路由：@app.route
-
-### 4.2.1 基本写法
-
-```python
-@app.route('/post/<int:post_id>/', methods=['GET', 'POST'])
-def post_detail(post_id):
-    ...
-```
-
-### 4.2.2 路径变量和类型转换器
-
-尖括号 `<xxx>` 表示动态段，冒号前是类型转换器：
-
-| 转换器 | 匹配什么 | 例子 | 传入视图函数的类型 |
-|---|---|---|---|
-| `string`（默认） | 不含斜杠的任意字符 | `<name>` | str |
-| `int` | 正整数 | `<int:post_id>` | int |
-| `float` | 浮点数 | `<float:score>` | float |
-| `path` | 含斜杠的路径 | `<path:filepath>` | str |
-| `uuid` | UUID 字符串 | `<uuid:uid>` | UUID 对象 |
-
-✅ 博客用法：文章详情 `/post/<int:post_id>/`；归档 `/archive/<int:year>/<int:month>/`。
-
-### 4.2.3 methods 参数
-
-默认只接受 GET。要处理表单 POST 必须显式声明：
-
-```python
-@app.route('/admin/posts/new/', methods=['GET', 'POST'])
-def new_post():
-    if request.method == 'POST':
-        # 处理表单提交
-        ...
-    # GET：显示表单
-    return render_template('new_post.html')
-```
-
-博客的登录、发文章、编辑资料都是这个模式：一个路由同时接 GET（显示表单）和 POST（处理提交）。
-
-### 4.2.4 endpoint：路由的别名
-
-Flask 默认用函数名当 endpoint。`url_for('post_detail', post_id=3)` 会反推出 `/post/3/`。
-
-显式起别名：
-
-```python
-@app.route('/post/<int:post_id>/', endpoint='view_post')
-def some_function_name(post_id):
-    ...
-url_for('view_post', post_id=3)   # /post/3/
-```
-
-**为什么需要 endpoint？** 函数名可能重复（尤其蓝图里），endpoint 是"身份证号"，函数名只是"外号"。
-
-### 4.2.5 重定向与 URL 生成：url_for
-
-```python
-from flask import url_for, redirect
-
-@app.route('/login/', methods=['POST'])
-def login():
-    # 验证成功后
-    return redirect(url_for('admin_dashboard'))   # 不写死 '/admin/'，写函数名
-```
-
-**为什么不写死网址？** 将来路由改了（比如 `/admin/` 改成 `/dashboard/`），只要 `url_for('admin_dashboard')` 自动跟着改，不用全局搜替换。
-
-## 4.3 读取请求数据：request
-
-`request` 是"当前请求"的全局代理，按场景选不同的属性：
-
-| 写法 | 读什么 | 例子 |
-|---|---|---|
-| `request.args.get('kw')` | **URL 问号参数** | `/search?kw=python` → `kw='python'` |
-| `request.form.get('title')` | **表单 POST 字段** | 发文章表单 |
-| `request.files.get('file')` | **上传文件对象** | 上传图片 |
-| `request.json` / `request.get_json()` | **JSON 请求体** | AJAX 接口 |
-| `request.headers.get('User-Agent')` | 请求头 | 点赞指纹 |
-| `request.method` | 请求方法字符串 | `'GET'` / `'POST'` |
-| `request.remote_addr` | 访客 IP | 点赞指纹 |
-| `request.path` | 请求路径（不含 query string） | `/post/3/` |
-| `request.full_path` | 路径 + query string | `/post/3/?page=2` |
-| `request.url` | 完整 URL | `http://.../post/3/?page=2` |
-| `request.referrer` | 来源页（从哪点过来的） | 统计 |
-| `request.cookies.get('name')` | Cookie | 记住登录 |
-
-✅ 博客用法：
-
-- 点赞接口（app.py 第 1185 行）：`g.fingerprint`（IP+UA）做去重；
-- 新手向导 API：`request.get_json()` 收 JSON；
-- 上传头像：`request.files.get('avatar')`。
-
-### 4.3.1 `.get()` vs `[]`
-
-```python
-request.args.get('page')      # 没有 page 参数 → None，不报错
-request.args['page']          # 没有 page 参数 → 抛 KeyError
-```
-
-**推荐永远用 `.get()`**，然后给默认值：
-
-```python
-page = request.args.get('page', 1, type=int)   # 自动转 int，缺省 1
-```
-
-`type=int` 会尝试把字符串转 int，失败自动返回默认值——这是 Flask 给的便利。
-
-### 4.3.2 文件上传：request.files
-
-```python
-@app.route('/upload/', methods=['POST'])
-def upload():
-    f = request.files['avatar']
-    if f.filename == '':
-        return '没选文件', 400
-    # 安全做法：用 werkzeug.utils.secure_filename 清洗文件名
-    f.save(os.path.join(Config.UPLOAD_DIR, secure_filename(f.filename)))
-```
-
-博客的头像上传就是这套，还额外做了 MIME 类型白名单校验（`allowed_avatar`，app.py 第 722 行）。
-
-## 4.4 返回响应
-
-视图函数可以返回多种东西，Flask 自动包装成 Response：
-
-| 返回值 | Flask 的处理 |
-|---|---|
-| `'hello'` | 200 + text/html |
-| `render_template('index.html', **数据)` | 渲染模板后返回 HTML |
-| `redirect(url_for('index'))` | 302 跳转 |
-| `jsonify({'ok': True})` | 200 + application/json |
-| `abort(404)` | 立即抛出 404（交给错误处理器） |
-| `(body, status)` | 自定义状态码，如 `('未登录', 401)` |
-| `(body, headers)` | 自定义响应头 |
-| `Response` 对象本身 | 直接返回 |
-
-### 4.4.1 jsonify：AJAX 接口专用
-
-```python
-from flask import jsonify
-
-@app.route('/post/<int:post_id>/like/', methods=['POST'])
-def post_like(post_id):
-    return jsonify({'ok': True, 'count': 42})
-# → HTTP/1.1 200 OK
-#   Content-Type: application/json
-#   {"ok": true, "count": 42}
-```
-
-直接 `return {'ok': True}` 在 Flask 1.x 不行，2.0+ 才支持自动转 JSON。**养成用 `jsonify` 的习惯**，明确意图。
-
-### 4.4.2 自定义状态码
-
-```python
-return jsonify({'error': '文章不存在'}), 404
-return '未登录', 401
-```
-
-AJAX 前端根据状态码判断成功/失败。
-
-### 4.4.3 abort 与错误处理器
-
-```python
-from flask import abort
-
-@app.route('/post/<int:post_id>/')
-def post_detail(post_id):
-    post = Post.query.get(post_id)
-    if post is None:
-        abort(404)              # 立即中断，跳到错误处理器
-    ...
-
 @app.errorhandler(404)
-def not_found(e):
-    return render_template('404.html'), 404   # 返回自定义 404 页
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
+
+@app.errorhandler(413)
+def too_large(e):
+    return '文件太大', 413
 ```
 
-✅ 博客有自己的 404/500 模板，用户看到的不是 Flask 默认的英文错误页。
+元组第二个值是状态码，默认 200 不要忘写。
 
-## 4.5 请求钩子：before/after/teardown
+## 4.9 信号（Signals）
 
-### 4.5.1 四种钩子
+信号是"发布订阅"机制：代码 A 发一个信号，代码 B 订阅它做反应，但两者不直接耦合。
 
 ```python
-@app.before_request          # 每个请求进来、进视图前执行
-def before():
-    pass
+from flask import signal
 
-@app.after_request           # 视图返回后、响应发给浏览器前执行
-def after(response):
-    return response           # 必须 return response
+# 订阅
+@blinker.signals('post_deleted').connect
+def log_post_delete(sender, post_id):
+    logger.info(f'文章 {post_id} 被删了')
 
-@app.teardown_request         # 请求结束后执行（即使没返回也执行）
-def teardown(exc):
-    pass
-
-@app.teardown_appcontext      # 应用上下文销毁时执行
-def teardown_ctx(exc):
-    pass
+# 发布
+blinker.signals('post_deleted').send(app, post_id=post_id)
 ```
 
-### 4.5.2 博客怎么用钩子
-
-- `@app.before_request`（app.py 第 373 行附近）：给静态文件加长缓存头；
-- `@app.after_request`：加安全头（X-Frame-Options）、Gzip 压缩；
-- `@app.teardown_appcontext`：每次请求结束自动 `db.session.remove()`（防止连接泄漏）。
-
-### 4.5.3 钩子的执行顺序
-
-```
-请求进来
-  → before_request（按注册顺序）
-  → 视图函数
-  → after_request（按注册**逆序**，类似栈）
-  → 响应发出
-  → teardown_request
-  → teardown_appcontext
-```
-
-记住 after_request 是"后注册先执行"——想加多个中间件时有用。
-
-## 4.6 会话与一次性提示：session / flash
-
-### 4.6.1 SECRET_KEY：必须设置
-
-```python
-app.secret_key = '一串随机字符串'   # 或者 app.config['SECRET_KEY'] = '...'
-```
-
-session 和 flash 都靠 SECRET_KEY 加密 Cookie。**不设 SECRET_KEY，第一次用 session 就崩**：
-
-```
-RuntimeError: The session is unavailable because no secret key was set.
-```
-
-✅ 博客做法：config.py 自动生成一个随机 SECRET_KEY，存到 `.session_key` 文件里，下次启动读出来——重启后用户还保持登录状态。
-
-### 4.6.2 session：跨请求保持用户数据
-
-```python
-from flask import session
-
-@app.route('/login/', methods=['POST'])
-def login():
-    if verify(request.form['username'], request.form['password']):
-        session['user_id'] = user.id        # 写进 session
-        return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/')
-def admin_dashboard():
-    if 'user_id' not in session:            # 读 session
-        return redirect(url_for('login'))
-    ...
-```
-
-**原理**：session 数据被序列化 + 加密签名后，存到浏览器的一个 Cookie 里。下次浏览器自动带上这个 Cookie，Flask 解密还原。服务器端不存 session 数据，所以叫"无状态"。
-
-### 4.6.3 flash：一次性提示
-
-```python
-from flask import flash
-
-@app.route('/login/', methods=['POST'])
-def login():
-    if 密码错:
-        flash('用户名或密码错误', 'error')
-        return redirect(url_for('login'))
-    flash('登录成功，欢迎回来', 'success')
-    return redirect(url_for('admin_dashboard'))
-```
-
-模板里：
-
-```jinja
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, msg in messages %}
-    <div class="alert alert-{{ category }}">{{ msg }}</div>
-  {% endfor %}
-{% endwith %}
-```
-
-**特点**：flash 的消息**只显示一次**——模板渲染完就从 session 里删掉，刷新页面不再出现。这就是"提交表单后跳转到列表页，顶部弹一行'保存成功'"的经典模式。
-
-## 4.7 context_processor：全局模板变量
-
-每个页面都要用的数据（站点名、导航、当前用户），不必每个路由都 `render_template(..., site_name=...)`：
-
-```python
-@app.context_processor
-def inject_globals():
-    return dict(
-        site_name=Config.SITE_NAME,
-        current_year=datetime.now().year,
-    )
-```
-
-之后**任何模板**都能直接用 `{{ site_name }}`，不用传。
-
-✅ 博客用法（app.py 第 843 行 `inject_globals`）：把站点名、导航、分类、未读评论数等注入模板。v2.8.3 还给它加了 5 秒 TTL 缓存，避免每个请求都查数据库。
-
-## 4.8 其他常用 API
-
-### 4.8.1 配置系统
-
-```python
-# 从对象加载
-app.config.from_object('config.ProductionConfig')
-
-# 从 py 文件加载
-app.config.from_pyfile('config.py')
-
-# 从环境变量加载
-app.config.from_envvar('BLOG_SETTINGS')
-
-# 手动设置
-app.config['SECRET_KEY'] = 'xxx'
-```
-
-✅ 博客：`app.config.from_object(Config)`（app.py 第 125 行），Config 是 config.py 里的类。
-
-### 4.8.2 日志
-
-```python
-app.logger.info('博客启动在 %s', url)
-app.logger.error('同步失败: %s', e)
-```
-
-Flask 自带一个标准 logging.Logger，比 `print` 好用——能带级别、时间、写到文件。
-
-### 4.8.3 测试客户端（➕ 写单元测试用）
-
-```python
-with app.test_client() as c:
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert '博客' in resp.get_data(as_text=True)
-```
-
-不启动真实服务器就能测路由，CI 跑测试必备。
-
-### 4.8.4 信号（🧪 进阶，了解即可）
-
-```python
-from flask import request_started, request_finished
-
-def log_request(sender, **extra):
-    app.logger.info('请求: %s', request.path)
-
-request_started.connect(log_request)
-```
-
-类似钩子但更松耦合，插件系统常用。博客没用，知道有这回事就行。
+Flask 内置一些信号（`request_started`、`request_finished`），博客目前没用到；了解概念即可。
 
 ---
 
-# 第 5 章 实战示例
+# 第 5 章 项目实战：博客真实路由逐段讲
 
-## 5.1 项目内示例：博客首页路由（app.py 第 1014 行）
+## 5.1 应用初始化（app.py 第 122~189 行）
+
+```python
+app = Flask(__name__,
+            static_folder='static',
+            template_folder='templates',
+            static_url_path='/static')
+app.config.from_object(Config)
+app.config['SQLALCHEMY_DATABASE_URI'] = Config.DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+```
+
+**逐句讲**：
+
+1. `Flask(__name__, ...)`：指定 static 和 templates 目录（默认就是这些，显式写出更清晰）。
+2. `from_object(Config)`：把 `Config` 类里的所有大写变量读进 `app.config`。
+3. `SQLALCHEMY_TRACK_MODIFICATIONS=False`：关掉 SQLAlchemy 对每个对象修改的追踪——它会发信号、费内存，博客不需要。
+4. `db.init_app(app)`：把 Flask-SQLAlchemy 绑定到 app（工厂模式写法）。
+
+## 5.2 首页路由（app.py 第 1014 行）
 
 ```python
 @app.route('/')
 @app.route('/page/<int:page>/')
 def index(page=1):
-    """首页：分页列出已发布文章"""
-    per_page = 10
-    query = Post.query.filter_by(published=True, deleted=False) \
-                      .order_by(Post.created_at.desc())
+    kw = (request.args.get('kw') or '').strip()
+    query = Post.query.filter_by(published=True, deleted=False)
 
-    # 搜索关键词
-    kw = request.args.get('kw', '').strip()
     if kw:
-        query = query.filter(
-            db.or_(Post.title.contains(kw), Post.body.contains(kw))
-        )
+        query = query.filter(or_(
+            Post.title.ilike(f'%{kw}%'),
+            Post.body.ilike(f'%{kw}%'),
+            Post.summary.ilike(f'%{kw}%'),
+        ))
 
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-    return render_template('index.html', posts=pagination.items, pagination=pagination)
+    pagination = query.order_by(Post.created_at.desc()).paginate(
+        page=page, per_page=10, error_out=False)
+
+    return render_template('index.html',
+                           posts=pagination.items,
+                           pagination=pagination,
+                           kw=kw)
 ```
 
-**要点拆解**：
+**逐段讲**：
 
-1. **一个函数绑两个路由**：`/` 和 `/page/N/`，分别是第 1 页和第 N 页；
-2. **published=True + deleted=False**：软删机制——删除不真删，标记 `deleted=True`；
-3. **paginate**：Flask-SQLAlchemy 自带分页，返回一个分页对象，模板里直接生页码；
-4. **`db.or_`**：标题或正文含关键词都算命中。
+- 两个 `@app.route` 装饰器：`/` 和 `/page/2/` 都走这个视图；`page` 默认 1。
+- `kw` 从查询串取 `?kw=python`；`or '').strip()` 是防空值。
+- `filter_by(published=True, deleted=False)`：只查已发布、未删除的文章。
+- 有搜索词时用 `or_` 把标题/正文/摘要三个字段 OR 起来；`ilike` 不区分大小写。
+- `order_by(created_at.desc())`：最新在前。
+- `paginate(page, per_page=10, error_out=False)`：每页 10 条；页码超界不报错返回空页。
+- `pagination.items`：当前页文章列表；模板里用 `pagination.iter_pages()` 画页码。
 
-## 5.2 项目内示例：点赞接口（app.py 第 1185 行）
+## 5.3 文章详情（app.py 第 1058 行）
 
 ```python
-@app.route('/post/<int:post_id>/like/', methods=['POST'])
+@app.route('/post/<int:post_id>/')
+def post_detail(post_id):
+    post = Post.query.get_or_404(post_id)
+    if not post.published and not session.get('is_admin'):
+        abort(404)
+    # 浏览量 +1（异步批量写库，见 288~363 行）
+    bump_view_count(post_id)
+    comments = Comment.query.filter_by(post_id=post_id, approved=True)\
+                            .order_by(Comment.created_at.asc()).all()
+    return render_template('post_detail.html', post=post, comments=comments)
+```
+
+**亮点**：
+- `get_or_404`：文章不存在直接 404，不用手写 `if post is None: abort(404)`。
+- 未发布的文章只有管理员能看，访客看到 404——假装它不存在。
+- 浏览量不直接写库，丢进内存队列 30 秒批量写一次，避免每访问一次就写 SQLite。
+
+## 5.4 点赞接口（app.py 第 1185 行）
+
+```python
+@app.post('/post/<int:post_id>/like/')
 def post_like(post_id):
     post = Post.query.get_or_404(post_id)
-    if not post.published:
-        return jsonify({'ok': False, 'error': '文章不可点赞'}), 404
+    fp = g.fingerprint
 
-    fp = getattr(g, 'fingerprint', None) or 'unknown'
     existing = Like.query.filter_by(post_id=post_id, fingerprint=fp).first()
     if existing:
         db.session.delete(existing)
-        db.session.commit()
-        action = False
+        action = 'unliked'
     else:
         db.session.add(Like(post_id=post_id, fingerprint=fp))
-        db.session.commit()
-        action = True
+        action = 'liked'
+    db.session.commit()
 
     count = Like.query.filter_by(post_id=post_id).count()
-    return jsonify({'ok': True, 'liked': action, 'count': count})
+    return jsonify({'ok': True, 'action': action, 'count': count})
 ```
 
-**设计决策**：计数用"重新查数据库数一遍"，而不是在 Post 表维护一个 `like_count` 列。数据永远准确，代价是多一次查询（博客数据量小，值得）。
+**设计思路**：
+- "切换式点赞"：点过再点 = 取消；
+- 用 IP+UA 哈希当指纹，同浏览器不能重复点；
+- 返回 JSON，前端 AJAX 无刷新更新按钮；
+- 不维护 `like_count` 列，每次 COUNT——数据准确，博客规模下性能够。
 
-## 5.3 独立示例：一个完整的登录 + 受保护页面
+## 5.5 后台首页（app.py 第 1347 行）
 
 ```python
-from flask import Flask, request, redirect, url_for, render_template_string, session, flash
-
-app = Flask(__name__)
-app.secret_key = 'dev-secret-key-change-me'
-
-LOGIN_FORM = '''
-<form method="post">
-  <input name="username" placeholder="用户名">
-  <input name="password" type="password" placeholder="密码">
-  <button>登录</button>
-</form>
-{% with m = get_flashed_messages() %}{% for x in m %}<p>{{ x }}</p>{% endfor %}{% endwith %}
-'''
-
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        if request.form['username'] == 'admin' and request.form['password'] == '123456':
-            session['user'] = request.form['username']
-            flash('登录成功')
-            return redirect(url_for('dashboard'))
-        flash('用户名或密码错误')
-    return render_template_string(LOGIN_FORM)
-
-@app.route('/dashboard/')
-def dashboard():
-    if 'user' not in session:
-        flash('请先登录')
-        return redirect(url_for('login'))
-    return f'欢迎 {session["user"]}，这是后台'
-
-@app.route('/logout/')
-def logout():
-    session.pop('user', None)
-    flash('已退出')
-    return redirect(url_for('login'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/admin/')
+@login_required
+def admin_dashboard():
+    stats = {
+        'posts': Post.query.filter_by(deleted=False).count(),
+        'comments': Comment.query.count(),
+        'likes': Like.query.count(),
+        'pending_comments': Comment.query.filter_by(approved=False).count(),
+    }
+    recent = Post.query.order_by(Post.updated_at.desc()).limit(10).all()
+    return render_template('admin/dashboard.html', stats=stats, recent=recent)
 ```
 
-跑起来访问 `http://127.0.0.1:5000/dashboard/`——会被踢到登录页；用 admin/123456 登录后再访问就能进。这就是所有"登录保护"页面的最小模型。
+`@login_required` 是自定义装饰器：检查 session，没登录就跳登录页。这种"装饰器包路由"是 Flask 做权限控制的标准手法。
 
-## 5.4 独立示例：RESTful JSON API
+## 5.6 文章删除后停留原位置（v2.8.3 修复点）
 
 ```python
-@app.route('/api/posts/')
-def api_posts():
-    posts = Post.query.filter_by(published=True).order_by(Post.created_at.desc()).all()
-    return jsonify([{'id': p.id, 'title': p.title} for p in posts])
-
-@app.route('/api/posts/<int:post_id>/')
-def api_post_detail(post_id):
-    p = Post.query.get_or_404(post_id)
-    return jsonify({'id': p.id, 'title': p.title, 'body': p.body})
+@app.post('/admin/post/<int:post_id>/delete/')
+@login_required
+def post_delete(post_id):
+    post = Post.query.get_or_404(post_id)
+    # 按顺序删：点赞 → 评论 → 文章（避免外键错）
+    Like.query.filter_by(post_id=post_id).delete()
+    Comment.query.filter_by(post_id=post_id).delete()
+    db.session.delete(post)
+    db.session.commit()
+    flash('文章已删除', 'success')
+    # 不 redirect 到首页，而是回 referer，保持滚动位置
+    return redirect(request.referrer or url_for('admin_posts'))
 ```
 
-手机 App、小程序、第三方前端想接博客数据，就走这种 JSON 接口。
+**关键**：`request.referrer` 是浏览器带来的"从哪页跳过来的"——回到原列表页，不用滚回顶部。
+
+## 5.7 Gzip 压缩中间件（app.py 第 196 行）
+
+```python
+class GzipMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        # 简单实现：检查 Accept-Encoding，压缩响应体
+        ...
+
+app.wsgi_app = GzipMiddleware(app.wsgi_app)
+```
+
+**原理**：WSGI 应用本身就是可调用对象。包一层中间件，等于在 Flask 和 waitress 之间插了一道工序——请求进来先压缩检查，响应出去前压缩 body。文本资源（HTML/CSS/JS）能压缩到 1/3。
+
+## 5.8 inject_globals（app.py 第 843 行）
+
+```python
+@app.context_processor
+def inject_globals():
+    profile = Profile.query.first()
+    return {
+        'site_name': profile.site_name if profile else '我的博客',
+        'profile': profile,
+        'unread_count': Comment.query.filter_by(approved=False).count(),
+        'current_year': datetime.now().year,
+    }
+```
+
+每个模板都能直接用 `{{ site_name }}`、`{{ profile.avatar }}`，不用每个视图都传一遍。
+
+## 5.9 时区过滤器（app.py 第 802 行）
+
+```python
+@app.template_filter('local_time')
+def local_time_filter(dt):
+    if dt is None:
+        return ''
+    # 存的是 UTC，显示转 Asia/Shanghai
+    return pytz.utc.localize(dt).astimezone(
+        pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M')
+```
+
+模板里：
+
+```html
+{{ post.created_at|local_time }}
+```
 
 ---
 
-# 第 6 章 高频坑与排查
+# 第 6 章 完整 API 速查表
+
+## 6.1 flask 包常用导入
+
+| 导入 | 用途 |
+|---|---|
+| `Flask` | 创建应用 |
+| `request` | 请求对象 |
+| `response` / `Response` | 响应对象 |
+| `jsonify` | JSON 响应 |
+| `redirect` | 重定向 |
+| `url_for` | 反向生成 URL |
+| `render_template` | 渲染模板 |
+| `session` | 跨请求会话 |
+| `flash` / `get_flashed_messages` | 闪现消息 |
+| `abort` | 抛 HTTP 错误 |
+| `g` | 请求级临时存储 |
+| `current_app` | 当前应用代理 |
+| `send_file` / `send_from_directory` | 下载文件 |
+| `make_response` | 构造响应 |
+
+## 6.2 app 对象常用属性/方法
+
+| 属性/方法 | 作用 |
+|---|---|
+| `app.config` | 配置字典 |
+| `app.route(path, methods=[...])` | 注册路由 |
+| `app.add_url_rule(...)` | 代码式注册路由 |
+| `app.before_request(f)` | 注册钩子 |
+| `app.after_request(f)` | 注册钩子 |
+| `app.context_processor(f)` | 模板变量注入 |
+| `app.template_filter(name)` | 注册模板过滤器 |
+| `app.errorhandler(code)` | 错误处理 |
+| `app.register_blueprint(bp)` | 注册蓝图 |
+| `app.run(...)` | 开发服务器 |
+| `app.test_client()` | 测试客户端 |
+| `app.app_context()` | 手动推应用上下文 |
+| `app.test_request_context(...)` | 模拟请求上下文 |
+| `app.url_map` | URL 映射表 |
+| `app.view_functions` | 视图函数字典 |
+
+## 6.3 request 对象常用属性
+
+| 属性 | 内容 |
+|---|---|
+| `request.method` | GET/POST/... |
+| `request.path` | 路径部分 |
+| `request.url` | 完整 URL |
+| `request.args` | 查询参数 |
+| `request.form` | 表单数据 |
+| `request.files` | 上传文件 |
+| `request.get_json()` | JSON body |
+| `request.headers` | 请求头字典 |
+| `request.cookies` | Cookies |
+| `request.remote_addr` | 客户端 IP |
+| `request.user_agent` | User-Agent |
+| `request.referrer` | 来源页 |
+| `request.is_secure` | 是否 HTTPS |
+
+## 6.4 配置项常用
+
+| 配置 | 作用 |
+|---|---|
+| `SECRET_KEY` | 签名 session/flash 的密钥 |
+| `DEBUG` | 调试模式 |
+| `TESTING` | 测试模式 |
+| `PERMANENT_SESSION_LIFETIME` | session 有效期 |
+| `MAX_CONTENT_LENGTH` | 请求体大小上限（防上传爆炸） |
+| `SERVER_NAME` | 域名 |
+| `APPLICATION_ROOT` | 子路径部署 |
+| `PREFERRED_URL_SCHEME` | http/https |
+
+---
+
+# 第 7 章 高频坑与排查（20 条）
 
 | # | 坑 | 症状 | 解决 |
 |---|---|---|---|
-| 1 | 视图函数重名 | `AssertionError: View function mapping is overwriting` | 换函数名或加 endpoint |
-| 2 | 忘了 methods | 直接打开页面 405 Method Not Allowed | `methods=['GET', 'POST']` |
-| 3 | form 取不到值 | 提交后字段全 None | HTML 的 `name` 属性必须和代码字段名一致 |
-| 4 | 没设 SECRET_KEY | session/flash 一用就 RuntimeError | `app.secret_key = '随机字符串'` |
-| 5 | 生产开 debug | 出错页泄露源码、可被远程执行代码 | 生产用 waitress，永远 `debug=False` |
-| 6 | 脚本里用 db | `Working outside of application context` | `with app.app_context():` 包起来 |
-| 7 | 两个装饰器叠一个函数 | 路由只最后一个生效 | 每个装饰器单独一行 |
-| 8 | `request.form['key']` 字段缺失 | KeyError 500 | 永远用 `.get('key')` 给默认值 |
-| 9 | 重定向后刷新重复提交 | 表单重复提交 | POST 处理完 `redirect(url_for(...))`（PRG 模式） |
-| 10 | 返回中文乱码 | 页面问号/乱码 | `Content-Type` 加 `charset=utf-8`，模板存成 UTF-8 |
-| 11 | 静态文件 404 | CSS/JS 加载不出来 | 检查 `static_folder` 路径、HTML 里 `url_for('static', filename=...)` |
-| 12 | 改代码不生效 | Flask 没自动重载 | debug=True 才自动重载；生产模式要手动重启 |
-| 13 | 蓝图 url_for 报错 | `Endpoint 'xxx' not found` | url_for 里写 `蓝图名.函数名` |
-| 14 | 上传文件名带中文 | 保存失败/乱码 | `secure_filename()` 清洗，或存哈希名 |
-| 15 | AJAX 跨域被拦 | 浏览器控制台 CORS 错误 | 装 flask-cors 或同源部署 |
-| 16 | session 重启失效 | 用户每次重启要重新登录 | SECRET_KEY 持久化到文件（博客做法） |
-| 17 | 后台线程里查数据库报错 | 同坑 6 | 把 app 作为参数传进线程，包 app_context |
-| 18 | 循环 import | `ImportError: cannot import name` | 把公共对象抽到 `extensions.py`，用 `init_app` 绑定 |
-
-**排查万能法**：
-
-1. 报错信息里找 `File "xxx.py", line N`，先看是哪个路由、哪一行；
-2. 打开 `http://127.0.0.1:5000/console`（debug 模式下），Flask 提供一个交互式 Python 控制台，可以现场查 `app.url_map`、`Post.query.all()`；
-3. 实在搞不定，在视图函数第一行写 `import pdb; pdb.set_trace()`，浏览器请求一次就在终端停下，现场 inspect。
+| 1 | `app.run()` 当生产 | 官方警告、性能差 | 用 waitress serve |
+| 2 | Working outside of context | 后台线程/脚本用 request | `with app.app_context():` |
+| 3 | 改了代码不生效 | 旧页面 | debug=True 自动重载；或重启 |
+| 4 | 模板变量未定义 | jinja 报错 | context_processor 或视图 render_template 传 |
+| 5 | session 不生效 | 登录刷新就掉 | SECRET_KEY 没设或变了 |
+| 6 | POST 403 Forbidden | CSRF 保护 | 表单加 `{{ csrf_token() }}` 或用 Flask-WTF |
+| 7 | 中文响应乱码 | 浏览器显示问号 | `Content-Type: text/html; charset=utf-8` |
+| 8 | 静态文件 404 | CSS 加载不出 | 检查 static 目录和 url_for('static') |
+| 9 | url_for 报错 | 端点找不到 | 蓝图要写 `蓝图.函数名` |
+| 10 | redirect 后 flash 没了 | 消息不显示 | 用 redirect 不是直接 render；模板调 get_flashed_messages |
+| 11 | 大文件上传 413 | 上传失败 | MAX_CONTENT_LENGTH 调大 |
+| 12 | g 串请求 | A 请求看到 B 的数据 | 不要跨请求存 g；请求结束自动清 |
+| 13 | 蓝图 url_for 命名 | 端点错 | `蓝图名.函数名` |
+| 14 | 循环导入 | ImportError | 延迟导入、工厂模式 |
+| 15 | 调试模式泄露 | 生产开 debug=True | 生产关 debug |
+| 16 | 404 但路由存在 | 末尾斜杠不一致 | `/admin` 和 `/admin/` 是两个路由 |
+| 17 | AJAX 返回 HTML | 接口不返回 JSON | 视图用 jsonify 不要 render_template |
+| 18 | before_request 死循环 | 一直重定向 | 白名单排除登录页本身 |
+| 19 | 多线程 sqlite 报错 | thread 错 | SQLALCHEMY 连接 check_same_thread=False |
+| 20 | 响应头不生效 | after_request 没执行 | return 之前确认钩子顺序 |
 
 ---
 
-# 第 7 章 学习路径与自测
+# 第 8 章 学习路径与自测
 
-## 7.1 推荐学习路径
+## 8.1 学习路径
 
-**第 1 周：跑起来**
-- 跟着 5.3 写一个登录小站；
-- 读博客 `app.py` 前 200 行（创建 app、配置、路由注册）；
-- 目标：能改首页文案、能加一个 `/about/` 页面。
+**第 1 周：基础**
+- Day 1：Hello World + 路由 + 模板；
+- Day 2：request/response/redirect；
+- Day 3：静态文件 + 模板继承；
+- Day 4：session + flash + 登录页；
+- Day 5：错误处理 + 自定义 404；
+- Day 6~7：写一个完整的待办应用。
 
-**第 2 周：理解原理**
-- 搞懂 WSGI（2.1）和请求-响应循环（2.2）；
-- 在博客里找一个 `@app.before_request`、一个 `@app.context_processor`，看懂它做了什么；
-- 目标：能给博客加一个"请求耗时统计"中间件。
+**第 2 周：进阶**
+- Day 8：理解 WSGI 和请求生命周期；
+- Day 9：上下文栈、g、钩子；
+- Day 10：蓝图拆分应用；
+- Day 11：应用工厂；
+- Day 12：中间件；
+- Day 13：信号（了解）；
+- Day 14：测试用 test_client。
 
-**第 3 周：上手业务**
-- 通读博客所有前台路由（index、post_detail、archive、friend_links）；
-- 通读博客所有后台路由（admin_*）；
-- 目标：能自己加一个"关于我"页面。
+**第 3 周：对照博客源码**
+- 读 app.py 每个路由；
+- 画出请求-响应时序图；
+- 尝试加一个新功能（如"文章置顶"）。
 
-**第 4 周：进阶**
-- 学蓝图，把博客的 `/admin/*` 拆到 `admin_routes.py`；
-- 学应用工厂 `create_app()`，把 app.py 改造成可测试结构；
-- 写几个 `pytest` 测试用 `test_client()`。
+## 8.2 自测题（20 道）
 
-## 7.2 自测题（答案在末尾）
+1. Flask 的"微"体现在哪里？和 Django 有什么取舍？
+2. WSGI 是什么？Flask app 为什么能被 waitress 调用？
+3. `@app.route('/post/<int:id>/')` 里 `<int:id>` 是什么意思？
+4. `request.args` 和 `request.form` 的区别？
+5. 视图函数返回 `(html, 404)` 是什么效果？
+6. `url_for('post_detail', post_id=3)` 解决什么问题？
+7. 为什么会报 `Working outside of request context`？
+8. `g` 和 `session` 的区别？
+9. `@app.before_request` 和 `@app.context_processor` 区别？
+10. flash 消息为什么要配合 redirect？
+11. Blueprint 解决什么问题？
+12. 应用工厂模式的好处？
+13. SECRET_KEY 是干什么的？
+14. 为什么生产不能用 app.run()？
+15. `abort(404)` 和 `return ('', 404)` 区别？
+16. POST/Redirect/GET 模式是什么？
+17. 怎么给所有模板注入一个 `site_name` 变量？
+18. 蓝图注册后，url_for 的端点名怎么写？
+19. after_request 钩子能修改响应吗？
+20. 博客点赞接口为什么返回 JSON 而不是 HTML？
 
-1. WSGI 是什么？为什么 Flask 能换服务器？
-2. `request.args.get('kw')` 和 `request.form.get('kw')` 分别读哪里的数据？
-3. 为什么两个视图函数不能重名？怎么解决？
-4. 在后台线程里想查数据库，第一行要写什么？
-5. `redirect(url_for('index'))` 做了什么？为什么不直接写网址？
-6. debug=True 为什么不能上生产环境？
-7. `session` 和 `flash` 的数据存在哪里？为什么需要 SECRET_KEY？
-8. `@app.context_processor` 解决什么问题？
-9. 蓝图是什么？用蓝图后 `url_for` 有什么变化？
-10. POST 处理完为什么要 redirect，而不是直接 return 页面？
-11. `g` 对象和普通全局变量有什么区别？
-12. `abort(404)` 和 `return '404'` 有什么区别？
+## 8.3 答案
 
-## 7.3 答案
+1. 核心只做路由+WSGI，其他靠扩展；Django 自带 ORM/Admin/表单。
+2. Python Web 服务器和框架的接口标准；app 本身是 WSGI 可调用对象。
+3. URL 转换器，把 `/post/3/` 里的 3 转成 int 传给视图。
+4. args 是 URL 查询串，form 是 POST 表单 body。
+5. 返回 404 状态码 + 该 HTML。
+6. 反向生成 URL，改路由规则不用改模板。
+7. 在没有请求上下文的地方（后台线程、脚本）用了 request。
+8. g 是单次请求内存；session 跨请求存浏览器 cookie。
+9. before_request 是预处理代码；context_processor 是往模板注入变量。
+10. POST 后 redirect 防止刷新重复提交，flash 存在 session 里跳一次再渲染。
+11. 大型项目把路由分组、解耦。
+12. 多配置实例、延迟导入、测试友好。
+13. 签名 session 和 flash，防止篡改。
+14. 单线程、性能差、官方明确不建议生产。
+15. abort 直接抛异常走错误处理器；return 是正常返回。
+16. 表单 POST → 302 重定向到 GET → 用户刷新不再重复提交。
+17. `@app.context_processor` 返回 `{'site_name': ...}`。
+18. `蓝图名.函数名`，如 `admin.dashboard`。
+19. 能，它接收 response 对象并返回修改后的。
+20. AJAX 接口要无刷新更新页面，JSON 让前端 JS 好处理。
 
-1. WSGI 是 Python Web 服务器和应用之间的统一调用约定；双方都遵守它，Flask 就能换 waitress/Werkzeug/gunicorn 等任意 WSGI 服务器。
-2. `args` 读 URL 问号后参数（GET）；`form` 读表单 POST 字段。
-3. Flask 用函数名当 endpoint 默认值，重名会互相覆盖；换函数名或显式 `endpoint='别名'`。
-4. `with app.app_context():`。
-5. 返回 302 让浏览器跳到 index 路由对应的 URL；路由改了 URL 自动跟着改，不用全局替换。
-6. debug 模式的出错页会泄露完整堆栈和源码，且 Werkzeug 调试器允许在浏览器里执行 Python 代码——生产环境开了等于把服务器送人。
-7. 都加密签名后存浏览器 Cookie；SECRET_KEY 用来签名，没有它 Flask 无法验证 Cookie 是不是被篡改过。
-8. 把每个模板都要用的公共变量注入上下文，避免每个路由 `render_template` 都重复传。
-9. 蓝图是分模块的路由组；蓝图里的 endpoint 自动变成 `蓝图名.函数名`，`url_for` 必须带蓝图前缀。
-10. PRG（Post/Redirect/Get）模式：防止用户刷新浏览器时重复提交表单；也让"保存成功"提示只出现一次。
-11. `g` 是线程局部的，每个请求/线程独立一份；普通全局变量多线程并发会互相覆盖。
-12. `abort(404)` 抛出 HTTPException，立即中断视图并走 `@app.errorhandler(404)`；`return '404'` 只是返回一个 200 状态码的字符串，浏览器不知道这是错误页。
+## 8.4 进一步学习
 
-## 7.4 进一步学习
-
-- 官方文档：https://flask.palletsprojects.com/（3.x 版）
-- Flask 大型项目结构推荐：https://flask.palletsprojects.com/patterns/packages/
-- Flask 生态圈：https://flask.palletsprojects.com/extensions/
-- 博客项目本身就是最好的教材——读完本教程后，对照 `app.py` 逐行读一遍，你就入门了。
+- 官方文档：https://flask.palletsprojects.com/
+- 多文件应用模式：https://flask.palletsprojects.com/patterns/packages/
+- 部署：https://flask.palletsprojects.com/deploying/
 
 ---
 

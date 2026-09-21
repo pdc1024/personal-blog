@@ -1,230 +1,175 @@
 # 第三方库全面教程 · PyInstaller
 
-> 面向初学者：博客从 Python 源码变成"双击就能跑的 exe"，就是它干的。
-> 学完这份教程，你能掌握打包原理、spec 文件、单文件/单目录模式、隐藏导入、数据文件、常见坑——把 Python 应用发给不懂 Python 的朋友。
-> 适用版本：PyInstaller 6.x ｜ 博客项目：`build.spec` / `build.bat`
+> 面向初学者到进阶者：博客 exe 怎么来的？就是它打的。
+> 学完这份教程，你会掌握 PyInstaller 打包流程、spec 文件、隐藏导入、数据文件、单文件 vs 单目录、纯净版清单。
+>
+> 适用版本：PyInstaller 6.x ｜ 博客项目：`build.spec` + `D:\blog_pkg\dist\`
 
 ---
 
-# 第 1 章 这个库是什么
+# 第 1 章 认识 PyInstaller
 
 ## 1.1 一句话定位
 
-PyInstaller 把你的 Python 应用 + Python 解释器 + 依赖库 + 静态资源**打包成一个文件夹或单个 exe**，目标机器不需要装 Python。
-
-一句话：**PyInstaller 是博客的"封装车间"**——把代码、解释器、模板、图标全封进一个可分发的包。
-
-## 1.2 打包后是什么
-
-```
-dist/博客/
-  ├─ 博客.exe            ← 双击这个
-  ├─ _internal/          ← Python 解释器 + 依赖 + 模板
-  └─ blog.db             ← 用户数据（首次启动自动建）
-```
-
-## 1.3 一个最小例子
+PyInstaller 把 Python 程序连同解释器、依赖打成一个 exe，用户没装 Python 也能跑：
 
 ```bash
-pyinstaller --noconfirm --windowed --name 博客 main.py
+pyinstaller --noconfirm --windowed --onefile main.py
 ```
 
----
+一句话：**它是博客的打包工**——把代码和运行时塞进一个文件夹。
 
-# 第 2 章 核心概念与原理
+## 1.2 同类对比
 
-## 2.1 打包流程
-
-```
-分析你的 import
-  ↓
-收集 Python 解释器 + 依赖 .pyd/.dll
-  ↓
-把 .py 编译成 .pyc
-  ↓
-按 spec 组装目录
-  ↓
-可选：压缩成单文件 exe
-```
-
-## 2.2 单文件 vs 单目录
-
-| 模式 | 命令 | 特点 |
-|---|---|---|
-| 单目录 | `--onedir`（默认） | 启动快、好调试 |
-| 单文件 | `--onefile` | 分发方便、启动慢（要解压临时目录） |
-
-博客用**单目录**——启动快，朋友解压即用。
-
-## 2.3 --windowed / --noconsole
-
-- `--windowed`：不弹黑色控制台窗口（桌面应用选它）；
-- 不加：会有一个黑窗口显示 print。
-
-## 2.4 DATA_DIR：源码目录 vs 打包目录
-
-```python
-if getattr(sys, 'frozen', False):
-    DATA_DIR = os.path.dirname(sys.executable)   # 打包后：exe 所在目录
-else:
-    DATA_DIR = os.path.dirname(__file__)          # 源码：项目目录
-```
-
-**关键**：模板/静态是"只读资源"放 `_internal`；blog.db 是"用户数据"放 exe 旁边——升级覆盖 exe 不会丢数据。
-
----
-
-# 第 3 章 安装与版本
-
-```bash
-pip install pyinstaller
-pyinstaller --version
-```
-
----
-
-# 第 4 章 API 全面讲解
-
-## 4.1 常用命令
-
-```bash
-pyinstaller \
-  --noconfirm \
-  --windowed \
-  --name 博客 \
-  --icon=app.ico \
-  --add-data "templates;templates" \
-  --add-data "static;static" \
-  --hidden-import=waitress \
-  main.py
-```
-
-| 参数 | 作用 |
+| 工具 | 特点 |
 |---|---|
-| `--noconfirm` | 覆盖旧 dist |
-| `--windowed` | 无控制台 |
-| `--name` | 输出名 |
-| `--icon` | exe 图标 |
-| `--add-data "src;dst"` | 带数据文件（Windows 用分号） |
-| `--hidden-import` | 显式声明动态导入 |
-| `--clean` | 清缓存 |
+| **PyInstaller** | 最成熟、跨平台 |
+| Nuitka | 编译成 C，更快 |
+| cx_Freeze | 跨平台 |
+| py2exe | 老牌 |
 
-## 4.2 spec 文件
+---
 
-复杂项目用 spec 文件代替命令行：
+# 第 2 章 打包模式
+
+## 2.1 单文件 vs 单目录
+
+| 模式 | 命令 | 启动 | 体积 |
+|---|---|---|---|
+| 单目录 | `--onedir` | 快 | 一堆文件 |
+| 单文件 | `--onefile` | 慢（解压） | 一个 exe |
+
+博客用 `--onedir`：启动快，用户接受一个文件夹。
+
+## 2.2 窗口模式
+
+- `--windowed` / `--noconsole`：不弹黑框；
+- 不加：弹命令行。
+
+桌面应用用 `--windowed`。
+
+---
+
+# 第 3 章 spec 文件
+
+## 3.1 为什么需要 spec
+
+命令行参数太多，写在 .spec 里可复现：
 
 ```python
+# blog.spec
 a = Analysis(['main.py'],
              datas=[('templates', 'templates'),
                     ('static', 'static')],
-             hiddenimports=['waitress', 'pywebview'])
+             hiddenimports=['waitress', 'webview'],
+             ...)
 pyz = PYZ(a.pure)
-exe = EXE(pyz, ...)
+exe = EXE(pyz, a.scripts, name='我的博客', console=False)
+coll = COLLECT(exe, a.binaries, a.datas, name='博客')
 ```
 
-`pyinstaller build.spec` 直接读 spec。
+## 3.2 datas：非代码文件
 
-## 4.3 排除不需要的包
+模板、静态、图标、字体必须显式带进去。
 
-```bash
---exclude-module=tkinter --exclude-module=matplotlib
-```
+## 3.3 hiddenimports：PyInstaller 没扫到的
 
-减小体积。
+动态导入的库要手动列：
+- `waitress`、`webview.platforms.edgechromium`、`markdown.extensions.toc`。
 
 ---
 
-# 第 5 章 实战示例
+# 第 4 章 纯净版打包清单（v2.8.3）
 
-## 5.1 项目内示例：博客的 build.bat
+发朋友的包必须**不含个人数据**：
 
-```bat
-pyinstaller --noconfirm --clean ^
-  --windowed ^
-  --name 博客 ^
-  --icon=app.ico ^
-  --add-data "templates;templates" ^
-  --add-data "static;static" ^
-  --add-data "config.py;." ^
-  --hidden-import=waitress ^
-  --hidden-import=webview ^
-  main.py
+| 文件 | 打包？ |
+|---|---|
+| 代码、templates、static | ✅ |
+| `blog.db` | ❌ 删，第一次启动自动建空库 |
+| `data/`、`uploads/` | ❌ 删 |
+| `config.ini` 含 token | ❌ 删，第一次启动让用户填 |
+| `__pycache__` | ❌ 删 |
+| `.git/` | ❌ 不进包 |
+
+## 4.1 标准流程
+
+```powershell
+# 1. 强杀旧进程
+Get-Process | Where-Object {$_.Path -like "*blog*"} | Stop-Process -Force
+
+# 2. 清旧产物
+Remove-Item dist -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item build -Recurse -Force -ErrorAction SilentlyContinue
+
+# 3. 打包
+pyinstaller build.spec
+
+# 4. 清个人数据
+Remove-Item dist\博客\blog.db -ErrorAction SilentlyContinue
+Remove-Item dist\博客\uploads -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item dist\博客\config.ini -ErrorAction SilentlyContinue
 ```
 
-## 5.2 纯净版打包清单（v2.8.3）
+## 4.2 自检
 
-打包后发朋友前，删干净个人数据：
-
-- `blog.db` / `blog.db-wal` / `blog.db-shm`
-- `instance/` 目录（如有）
-- `config.json`（同步配置）
-- `uploads/`（用户上传）
-
-保留：模板、静态、依赖。首次启动让朋友自己初始化。
-
-## 5.3 独立示例：看启动日志排查
-
-```bash
-博客.exe --debug 2>&1 | tee start.log
-```
-
-PyInstaller 启动失败时，先看它打印哪一步找不到模块。
+发布前自己跑一遍：新机器、新目录、第一次启动能跑、不弹配置、能初始化。
 
 ---
 
-# 第 6 章 高频坑与排查
+# 第 5 章 高频坑
 
-| # | 坑 | 症状 | 解决 |
-|---|---|---|---|
-| 1 | 模板/静态没带上 | TemplateNotFound | --add-data 声明 |
-| 2 | 隐藏导入漏 | ModuleNotFoundError | --hidden-import |
-| 3 | db 路径错 | 数据存临时目录 | sys.frozen 判断 |
-| 4 | 图标不显示 | 默认图标 | --icon 路径对 |
-| 5 | 朋友电脑缺 WebView2 | 白屏 | 装 Evergreen Runtime |
-| 6 | 杀毒软件误报 | exe 被删 | 签名或换工具 |
-| 7 | 单文件启动慢 | 5 秒才开 | 改 onedir |
-| 8 | 数据写 exe 旁边 | 升级丢数据 | DATA_DIR 分离 |
-| 9 | 路径用反斜杠 | Linux 炸 | os.path.join |
-| 10 | 打包后 print 看不到 | 黑窗口没了 | 临时去 --windowed 调试 |
-
----
-
-# 第 7 章 学习路径与自测
-
-## 7.1 学习路径
-
-- 第 1 天：第一次打包成功跑起来；
-- 第 2 天：加模板/静态/图标；
-- 第 3 天：理解 DATA_DIR；
-- 第 4 天：spec 文件、隐藏导入；
-- 第 5 天：纯净版打包清单、发给朋友验证。
-
-## 7.2 自测题
-
-1. `--onefile` 和 `--onedir` 区别？
-2. `--windowed` 做什么？
-3. 为什么要 `sys.frozen` 判断路径？
-4. PyInstaller 找不到模板怎么办？
-5. 发朋友前为什么要删 blog.db？
-6. 怎么调试打包后的程序？
-7. 为什么博客选 onedir？
-
-## 7.3 答案
-
-1. onefile 单 exe 启动慢；onedir 文件夹启动快。
-2. 不弹黑色控制台窗口。
-3. 打包后源码目录不可写（只读资源），用户数据要放 exe 旁边。
-4. --add-data 声明 templates 目录。
-5. blog.db 是作者的个人数据，朋友应该用自己的空库。
-6. 临时去掉 --windowed，看控制台报错。
-7. 启动快、调试方便、朋友解压即用。
-
-## 7.4 进一步学习
-
-- 官方文档：https://pyinstaller.org/
-- 常见问题：https://pyinstaller.org/en/stable/where-things-are-broken.html
+| # | 坑 | 解决 |
+|---|---|---|
+| 1 | 模板 404 | datas 带 templates |
+| 2 | 双击闪退 | 不加 --windowed 看报错 |
+| 3 | 杀软误报 | 数字签名 |
+| 4 | WebView2 缺失 | 引导装 Runtime |
+| 5 | 中文路径 | 绝对路径、UTF-8 |
+| 6 | 改代码没重打 | 清 build 再打 |
+| 7 | 把 db 打进去了 | 发布前删 |
+| 8 | 端口占用 | 启动前 kill |
+| 9 | 隐藏导入 | hiddenimports |
+| 10 | 图标不显示 | --icon 绝对路径 |
 
 ---
 
-> 全系列完：这 12 份教程合起来覆盖了个人博客从前端到后端、从开发到分发的全部技术栈。
-> 建议配合 `02` 技术栈总览一起看，建立全局地图后再深挖单个库。
+# 第 6 章 自测
+
+1. --onefile 和 --onedir 区别？
+2. --windowed 做什么？
+3. 为什么要用 spec？
+4. 发朋友的包要删哪些文件？
+5. PyInstaller 找不到动态导入的库怎么办？
+
+**答案**：
+1. 单 exe 启动慢；单目录启动快。
+2. 不弹命令行。
+3. 参数可复现、可版本控制。
+4. blog.db、uploads、config.ini。
+5. hiddenimports 手动列。
+
+---
+
+## 结语
+
+到这里，05~16 十二份第三方库教程全部重写完成。它们构成了你做个人博客所需的完整技术栈：
+
+| 编号 | 库 | 角色 |
+|---|---|---|
+| 05 | Flask | Web 框架 |
+| 06 | Jinja2 | 模板引擎 |
+| 07 | Werkzeug | WSGI 工具箱 |
+| 08 | Flask-SQLAlchemy | ORM |
+| 09 | SQLite | 数据库 |
+| 10 | python-markdown | Markdown 渲染 |
+| 11 | Pygments | 代码高亮 |
+| 12 | PyYAML | 配置解析 |
+| 13 | python-dateutil | 日期处理 |
+| 14 | waitress | WSGI 服务器 |
+| 15 | pywebview | 桌面窗口 |
+| 16 | PyInstaller | 打包 |
+
+**学习建议**：不要一口气全学完。先跑通博客，再按这 12 份逐个对照源码读，每读一份能在博客里找到它的"用武之地"，半年后你就是这个项目的专家。
+
+祝写博客愉快。
