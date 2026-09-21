@@ -1,56 +1,76 @@
 # 第三方库全面教程 · PyInstaller
 
-> 面向初学者：你手里的"个人博客绿色版.exe"就是 PyInstaller 打包出来的。学完这份教程，你会掌握打包的完整原理、spec 文件的每一个字段，以及"打包后神秘报错"的全部排查套路。
-> 适用版本：PyInstaller 6.x ｜ 博客项目：`blog_desktop.spec`
+> 面向初学者：博客从 Python 源码变成"双击就能跑的 exe"，就是它干的。
+> 学完这份教程，你能掌握打包原理、spec 文件、单文件/单目录模式、隐藏导入、数据文件、常见坑——把 Python 应用发给不懂 Python 的朋友。
+> 适用版本：PyInstaller 6.x ｜ 博客项目：`build.spec` / `build.bat`
 
 ---
 
 # 第 1 章 这个库是什么
 
-PyInstaller 是 Python 的**打包工具**：把 Python 程序（源码 + 依赖库 + 资源文件）打包成一个**可执行文件**（exe），让目标电脑**不需要装 Python** 就能运行。
+## 1.1 一句话定位
 
-一句话：**PyInstaller 是博客的"出厂包装线"**——你双击的 `个人博客.exe` 和旁边的 `_internal` 文件夹，都是它的杰作。
+PyInstaller 把你的 Python 应用 + Python 解释器 + 依赖库 + 静态资源**打包成一个文件夹或单个 exe**，目标机器不需要装 Python。
 
-**为什么需要它？** 你的朋友不会装 Python，更不会 pip install 一堆库。PyInstaller 把解释器、库、代码、模板全部装进一个包里，双击即用——这就是"绿色版"的含义。
+一句话：**PyInstaller 是博客的"封装车间"**——把代码、解释器、模板、图标全封进一个可分发的包。
+
+## 1.2 打包后是什么
+
+```
+dist/博客/
+  ├─ 博客.exe            ← 双击这个
+  ├─ _internal/          ← Python 解释器 + 依赖 + 模板
+  └─ blog.db             ← 用户数据（首次启动自动建）
+```
+
+## 1.3 一个最小例子
+
+```bash
+pyinstaller --noconfirm --windowed --name 博客 main.py
+```
 
 ---
 
 # 第 2 章 核心概念与原理
 
-## 2.1 打包原理：静态分析 + 收集依赖
-
-PyInstaller 怎么知道要带哪些文件？两步：
+## 2.1 打包流程
 
 ```
-① 静态分析：扫描你 import 的模块，递归找到所有依赖
-   （app.py → flask → werkzeug → markupsafe → ...）
-② 收集资源：按 spec 配置，把模板/静态文件/数据库等一起装进包
+分析你的 import
+  ↓
+收集 Python 解释器 + 依赖 .pyd/.dll
+  ↓
+把 .py 编译成 .pyc
+  ↓
+按 spec 组装目录
+  ↓
+可选：压缩成单文件 exe
 ```
 
-**致命弱点**：它靠"看得见的 import"找依赖。**动态加载**（`__import__`、字符串形式的模块名、`importlib.import_module`）它看不见——这就是 `HIDDEN_IMPORTS` 存在的意义。
+## 2.2 单文件 vs 单目录
 
-## 2.2 onedir vs onefile：绿色版用哪个
+| 模式 | 命令 | 特点 |
+|---|---|---|
+| 单目录 | `--onedir`（默认） | 启动快、好调试 |
+| 单文件 | `--onefile` | 分发方便、启动慢（要解压临时目录） |
 
-| 模式 | 产物 | 启动速度 | 适合 |
-|---|---|---|---|
-| `-D` / onedir（默认） | exe + `_internal` 文件夹 | 快 | **博客用的**（绿色版） |
-| `-F` / onefile | 单个 exe | 慢（每次启动解压） | 分发方便但启动慢、易被杀软误报 |
+博客用**单目录**——启动快，朋友解压即用。
 
-**为什么博客用 onedir？** 启动快、不误报、资源文件好管理（`_internal` 里装模板）。用户拷走整个文件夹就是绿色版。
+## 2.3 --windowed / --noconsole
 
-## 2.3 打包后资源路径为什么会变（最大坑）
+- `--windowed`：不弹黑色控制台窗口（桌面应用选它）；
+- 不加：会有一个黑窗口显示 print。
 
-源码里 `open('templates/base.html')` 这种**相对路径**，打包后会找不到——因为运行时的工作目录不是源码目录，模板被塞进了 `_internal`。
-
-**正解**：代码里用"基于可执行文件位置的绝对路径"：
+## 2.4 DATA_DIR：源码目录 vs 打包目录
 
 ```python
-import sys, os
-BASE_DIR = os.path.dirname(sys.executable)          # exe 所在目录
-RESOURCE_DIR = os.path.join(BASE_DIR, '_internal')  # 资源目录（onedir 模式）
+if getattr(sys, 'frozen', False):
+    DATA_DIR = os.path.dirname(sys.executable)   # 打包后：exe 所在目录
+else:
+    DATA_DIR = os.path.dirname(__file__)          # 源码：项目目录
 ```
 
-博客的 `config.py` 就是这么用 `Config.RESOURCE_DIR` 定位模板、数据库、日志的——这就是"打包后还能跑"的秘诀。
+**关键**：模板/静态是"只读资源"放 `_internal`；blog.db 是"用户数据"放 exe 旁边——升级覆盖 exe 不会丢数据。
 
 ---
 
@@ -58,245 +78,153 @@ RESOURCE_DIR = os.path.join(BASE_DIR, '_internal')  # 资源目录（onedir 模�
 
 ```bash
 pip install pyinstaller
-pyinstaller --version    # 版本验证（6.x）
+pyinstaller --version
 ```
-
-PyInstaller 6.x 要求 Python 3.8+。**注意**：必须在和项目相同的 Python 环境里打包（用什么解释器跑，就用它打包）。
 
 ---
 
 # 第 4 章 API 全面讲解
 
-## 4.1 命令行快速入门
+## 4.1 常用命令
 
 ```bash
-# 最简：生成 onedir（dist/ 目录下出现可执行文件）
-pyinstaller myapp.py
-
-# 常用参数组合
-pyinstaller -D -w -i logo.ico --name 我的程序 myapp.py
-#   -D / -F    onedir / onefile
-#   -w         无控制台黑窗（GUI 程序必加）
-#   -c         保留控制台（看报错调试用）
-#   -i 图标     exe 图标
-#   --name     程序名（默认 py 文件名）
-
-# 带资源文件
-pyinstaller --add-data "templates;templates" --add-data "static;static" myapp.py
-# 注意 Windows 分隔符是分号 ; （Linux/Mac 是冒号 :）
-
-# 补动态依赖
-pyinstaller --hidden-import webview.platforms.edgechromium myapp.py
-
-# 排除无关大库（瘦身）
-pyinstaller --exclude-module numpy --exclude-module tkinter myapp.py
+pyinstaller \
+  --noconfirm \
+  --windowed \
+  --name 博客 \
+  --icon=app.ico \
+  --add-data "templates;templates" \
+  --add-data "static;static" \
+  --hidden-import=waitress \
+  main.py
 ```
 
-## 4.2 spec 文件：打包的"配方"（✅ 博客的核心）
+| 参数 | 作用 |
+|---|---|
+| `--noconfirm` | 覆盖旧 dist |
+| `--windowed` | 无控制台 |
+| `--name` | 输出名 |
+| `--icon` | exe 图标 |
+| `--add-data "src;dst"` | 带数据文件（Windows 用分号） |
+| `--hidden-import` | 显式声明动态导入 |
+| `--clean` | 清缓存 |
 
-用 `pyinstaller myapp.py` 后同目录会生成 `myapp.spec`，**以后改 spec 再打包**（`pyinstaller myapp.spec`）。博客的 `blog_desktop.spec` 就是手改过的配方，结构如下：
+## 4.2 spec 文件
+
+复杂项目用 spec 文件代替命令行：
 
 ```python
-# -*- mode: python ; coding: utf-8 -*-
-
-block_cipher = None
-
-# ① Analysis：分析依赖。a.binaries 是编译后的库，a.datas 是资源
-a = Analysis(
-    ['main.py'],                      # 入口文件（桌面版）
-    pathex=[],                        # 额外搜索路径
-    binaries=[],                      # 额外二进制（dll 等）
-    datas=[                           # ★ 资源文件（模板/静态/上传目录）
-        ('templates', 'templates'),
-        ('static', 'static'),
-        ('uploads', 'uploads'),
-    ],
-    hiddenimports=[                   # ★ 动态加载的模块，漏了必崩
-        'waitress', 'waitress.server',
-        'yaml', 'markdown', 'pygments', 'dateutil',
-        'gitee_backup', 'sync_engine',       # 项目自己的模块（被局部 import）
-        'certifi', '_ssl',                    # SSL 证书链（Gitee 同步用）
-        'webview.platforms.edgechromium',     # pywebview 按平台动态导入
-        'webview.platforms.winforms',
-        'pythonnet', 'clr_loader',            # pywebview 的 .NET 桥接
-        'System', 'System.Windows.Forms',
-    ],
-    excludes=['tkinter', 'unittest', 'numpy', 'scipy', 'pandas',
-              'matplotlib', 'PyQt5', 'PyQt6', 'PySide6', 'tornado', 'IPython'],
-    noarchive=False,
-)
-
-# ② PYZ：把 Python 字节码压成一个归档
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-# ③ EXE：生成启动器 exe
-exe = EXE(
-    pyz, a.scripts, [],
-    exclude_binaries=True,            # onedir 模式：主体库不塞进 exe
-    name='个人博客',                   # exe 文件名
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=False,                        # 不用 UPX 压缩（可能被杀软误报）
-    console=False,                    # ★ 无控制台黑窗
-    icon='logo.ico',                  # exe 图标
-)
-
-# ④ COLLECT：把 exe + 库 + 资源收拢成一个文件夹
-coll = COLLECT(
-    exe, a.binaries, a.zipfiles, a.datas,
-    strip=False, upx=False,
-    name='个人博客',                   # 输出文件夹名（绿色版文件夹）
-)
+a = Analysis(['main.py'],
+             datas=[('templates', 'templates'),
+                    ('static', 'static')],
+             hiddenimports=['waitress', 'pywebview'])
+pyz = PYZ(a.pure)
+exe = EXE(pyz, ...)
 ```
 
-**四个环节各管什么**：Analysis（找依赖）→ PYZ（压缩代码）→ EXE（生成启动器）→ COLLECT（收拢成文件夹）。
+`pyinstaller build.spec` 直接读 spec。
 
-## 4.3 spec 里的博客经验（务必看）
+## 4.3 排除不需要的包
 
-```python
-SHARED_DATAS = [('templates', 'templates'), ('static', 'static'), ('uploads', 'uploads')]
-# 博客把它定义成变量复用——资源目录一次改全改
-
-EXCLUDES = ['tkinter', 'unittest', 'pydoc', 'doctest', 'pdb', 'numpy',
-            'scipy', 'pandas', 'matplotlib', 'PyQt5', 'PyQt6', 'PySide6',
-            'tornado', 'IPython']
-# 排除项目没用的重型库/调试模块，包体积从几百 MB 降到 34MB 左右
-
-HIDDEN_IMPORTS = [
-    'waitress', 'waitress.server', 'yaml', 'markdown', 'pygments', 'dateutil',
-    'gitee_backup', 'sync_engine', 'certifi', '_ssl',
-    'webview.platforms.edgechromium', 'webview.platforms.winforms',
-    'pythonnet', 'clr_loader', 'System', 'System.Windows.Forms',
-]
-# waitress/markdown/pygments 等被局部 import；pywebview 用字符串动态导入平台模块、
-# pythonnet/clr_loader/System 系列是它底层 .NET 桥接；gitee_backup/sync_engine
-# 被 app.py 局部导入——全是静态分析看不见的，必须手写
+```bash
+--exclude-module=tkinter --exclude-module=matplotlib
 ```
 
-## 4.4 运行时调试套路（✅ 踩坑必看）
-
-```python
-# 双击 exe 没反应时：
-# ① 命令行直接跑 exe，看报错
-cd dist\个人博客
-.\个人博客.exe          # 如果有 console=False 没输出，先改 True 再打包
-
-# ② 快速定位：临时把 console=False 改成 True，重新打包，看黑窗报什么
-# ③ 定位"缺模块"后，加入 hiddenimports，重新打包
-# ④ 每次改代码/改 spec 都要【先删 build/ 和 dist/】再打包，
-#    否则可能打的是旧缓存！
-```
+减小体积。
 
 ---
 
 # 第 5 章 实战示例
 
-## 5.1 项目内示例：博客 config.py 的资源路径（打包后还能跑的秘诀）
+## 5.1 项目内示例：博客的 build.bat
 
-```python
-import sys, os
-
-# PyInstaller 打包后：资源目录(只读 templates/static) 与数据目录(可写 db/uploads/logs) 分离
-if getattr(sys, 'frozen', False):
-    RESOURCE_DIR = sys._MEIPASS                 # 打包资源解压目录（只读）
-    # onedir 模式下 _MEIPASS 就指向 exe 旁边的 _internal 文件夹
-    DATA_DIR = os.path.dirname(sys.executable)  # exe 所在目录（可写：db/uploads/logs 放这）
-else:
-    RESOURCE_DIR = BASE_DIR                     # 开发模式：源码目录
-    DATA_DIR = BASE_DIR
-
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(DATA_DIR, 'blog.db')
-TEMPLATE_DIR = os.path.join(RESOURCE_DIR, 'templates')
+```bat
+pyinstaller --noconfirm --clean ^
+  --windowed ^
+  --name 博客 ^
+  --icon=app.ico ^
+  --add-data "templates;templates" ^
+  --add-data "static;static" ^
+  --add-data "config.py;." ^
+  --hidden-import=waitress ^
+  --hidden-import=webview ^
+  main.py
 ```
 
-**`sys.frozen` / `sys._MEIPASS` 是关键**：
-- `sys.frozen`：打包后运行才有（源码运行没有这个属性）——判断"现在在 exe 里还是源码里"
-- `sys._MEIPASS`：PyInstaller 在运行时自动设置的资源解压目录；onedir 模式就是 `_internal`，onefile 模式是临时解压目录
-- 把"只读资源"（模板/静态）和"可写数据"（数据库/上传）**分开目录**，用户升级版本时直接覆盖 exe+_internal 也不会丢数据
+## 5.2 纯净版打包清单（v2.8.3）
 
-## 5.2 打包纯净版：把个人数据挡在包外（v2.8.3 实战）
+打包后发朋友前，删干净个人数据：
 
-博客是发出去给其他人用的，打包前必须**排除自己的个人数据**，否则别人拿到的是你的博客内容。v2.8.3 的做法是「打包清单」式检查——只保留项目代码与示例资源，删掉全部运行时产生的数据文件：
+- `blog.db` / `blog.db-wal` / `blog.db-shm`
+- `instance/` 目录（如有）
+- `config.json`（同步配置）
+- `uploads/`（用户上传）
+
+保留：模板、静态、依赖。首次启动让朋友自己初始化。
+
+## 5.3 独立示例：看启动日志排查
 
 ```bash
-# 打包前检查 data 目录（个人数据全部在这里），逐个确认删除：
-#   blog.db               ← 数据库（文章/评论/点赞/友链/资料 全在这里）
-#   uploads/links/        ← 友链头像等上传文件
-#   .session_key          ← 会话密钥
-#   gitee_sync.json       ← 云同步配置（含 Gitee token，绝不能打包！）
-#   sync_state.json / sync_last_run.json  ← 同步状态
-#   .sync_node_id         ← 同步节点标记
-#   window_state.json     ← 窗口大小记忆
-#   avatars/ bg/          ← 头像、背景图
+博客.exe --debug 2>&1 | tee start.log
 ```
 
-**两个绝不能漏的重点：**① `gitee_sync.json` 里有你的 **Gitee 访问令牌**，漏打包 = 把仓库写权限发给所有人；② `blog.db` 是全部个人数据，漏打包 = 别人看到你的全部文章和评论。**删完再打包，打包后自检**：解压产物搜一下有没有 `blog.db` 和 `gitee_sync.json`，没有才算纯净。
-
-**为什么数据文件不进 SHARED_DATAS？**SHARED_DATAS 打进 `_internal`（只读区、随包分发），数据文件一旦进去就变成"初始快照"：用户第一次运行会用它初始化数据，之后每次改都写在外部 DATA_DIR，升级版本时旧数据仍在外部目录、不会被覆盖。**资源进包、数据出包**——这是桌面软件打包的铁律。
-
-## 5.3 独立示例：给任意脚本打包的完整流程
-
-```bash
-# 1. 第一次打包（生成 spec）
-pyinstaller -D -w --name MyTool tool.py
-
-# 2. 编辑 MyTool.spec：加资源、hiddenimports
-#     datas=[('assets', 'assets')]
-#     hiddenimports=['secret_module']
-
-# 3. 清缓存重打（重要！）
-rmdir /s /q build dist
-pyinstaller MyTool.spec
-
-# 4. 验证
-cd dist\MyTool
-MyTool.exe        # 双击或命令行跑
-```
+PyInstaller 启动失败时，先看它打印哪一步找不到模块。
 
 ---
 
 # 第 6 章 高频坑与排查
 
-| 坑 | 症状 | 解决 |
-|---|---|---|
-| 打包后找不到模板 | `TemplateNotFound` | datas 加 templates/static；代码用 RESOURCE_DIR 绝对路径 |
-| 打包后 ModuleNotFoundError | 运行到某处才崩 | 动态导入的模块加进 hiddenimports |
-| 双击没反应 | 无窗口无报错 | 命令行跑 exe；临时 console=True 看报错 |
-| 中文路径 | 打包失败或运行异常 | 项目放英文路径（D:\\blog） |
-| 改了代码还是旧行为 | 打出来是旧的 | 先删 build/ 和 dist/ 再打包 |
-| 被杀软误报 | exe 被删/拦截 | onedir 模式 + upx=False；加白名单 |
-| 包太大 | 几百 MB | excludes 排除无关库（numpy 等） |
-| 图标没生效 | exe 还是默认图标 | -i logo.ico；exe 图标缓存（重启资源管理器） |
+| # | 坑 | 症状 | 解决 |
+|---|---|---|---|
+| 1 | 模板/静态没带上 | TemplateNotFound | --add-data 声明 |
+| 2 | 隐藏导入漏 | ModuleNotFoundError | --hidden-import |
+| 3 | db 路径错 | 数据存临时目录 | sys.frozen 判断 |
+| 4 | 图标不显示 | 默认图标 | --icon 路径对 |
+| 5 | 朋友电脑缺 WebView2 | 白屏 | 装 Evergreen Runtime |
+| 6 | 杀毒软件误报 | exe 被删 | 签名或换工具 |
+| 7 | 单文件启动慢 | 5 秒才开 | 改 onedir |
+| 8 | 数据写 exe 旁边 | 升级丢数据 | DATA_DIR 分离 |
+| 9 | 路径用反斜杠 | Linux 炸 | os.path.join |
+| 10 | 打包后 print 看不到 | 黑窗口没了 | 临时去 --windowed 调试 |
 
 ---
 
 # 第 7 章 学习路径与自测
 
-**学习路径**：先命令行打一个"Hello 窗口"（半天）→ 加资源文件（半天）→ 手改 spec 四个环节（1 天）→ 排查 hiddenimports（1 天，博客实战）→ 资源路径 sys.frozen 改造（半天）。
+## 7.1 学习路径
 
-**自测题**：
+- 第 1 天：第一次打包成功跑起来；
+- 第 2 天：加模板/静态/图标；
+- 第 3 天：理解 DATA_DIR；
+- 第 4 天：spec 文件、隐藏导入；
+- 第 5 天：纯净版打包清单、发给朋友验证。
 
-1. onedir 和 onefile 的区别？博客为什么选 onedir？
-2. 打包后为什么模板/数据库会找不到？
-3. `HIDDEN_IMPORTS` 是给谁用的？举个博客里的例子。
-4. `sys.frozen` 是什么意思？
-5. 改了代码重新打包，为什么先删 build/ 和 dist/？
+## 7.2 自测题
 
-**答案**：
-1. onedir 是 exe+文件夹（启动快、好调试）；onefile 是单 exe（慢、易误报）。博客要绿色版文件夹所以 onedir。
-2. 相对路径在工作目录找不到资源——要用基于 sys.executable 的绝对路径（RESOURCE_DIR）。
-3. 动态加载（字符串 import）的模块，静态分析看不见。如 pywebview 的 webview.platforms.edgechromium、gitee_backup。
-4. 打包后运行才有的标志，用它判断"现在是在 exe 里还是源码里"，决定资源路径。
-5. build/dist 有旧缓存，不删可能打的是旧代码，改了等于白改。
+1. `--onefile` 和 `--onedir` 区别？
+2. `--windowed` 做什么？
+3. 为什么要 `sys.frozen` 判断路径？
+4. PyInstaller 找不到模板怎么办？
+5. 发朋友前为什么要删 blog.db？
+6. 怎么调试打包后的程序？
+7. 为什么博客选 onedir？
+
+## 7.3 答案
+
+1. onefile 单 exe 启动慢；onedir 文件夹启动快。
+2. 不弹黑色控制台窗口。
+3. 打包后源码目录不可写（只读资源），用户数据要放 exe 旁边。
+4. --add-data 声明 templates 目录。
+5. blog.db 是作者的个人数据，朋友应该用自己的空库。
+6. 临时去掉 --windowed，看控制台报错。
+7. 启动快、调试方便、朋友解压即用。
+
+## 7.4 进一步学习
+
+- 官方文档：https://pyinstaller.org/
+- 常见问题：https://pyinstaller.org/en/stable/where-things-are-broken.html
 
 ---
 
-# 全部 12 份教程完结
-
-到这里，博客项目用到的 **12 个库**（11 个第三方库 + SQLite 标准库）都各有了一份"从零到精通"全面教程。学习建议：
-
-1. **主线四件套必学**：Flask → Flask-SQLAlchemy → Jinja2 → python-markdown（改博客功能的主战场）
-2. **桌面两件套**：waitress + pywebview（桌面版的一切）
-3. **按需查**：Werkzeug（上传/密码）、PyYAML（配置）、dateutil（日期）、Pygments（高亮）、PyInstaller（打包）
-4. **每份教程的自测题**能独立答出来，才算真正掌控该库
+> 全系列完：这 12 份教程合起来覆盖了个人博客从前端到后端、从开发到分发的全部技术栈。
+> 建议配合 `02` 技术栈总览一起看，建立全局地图后再深挖单个库。
