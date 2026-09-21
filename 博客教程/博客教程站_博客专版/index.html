@@ -104,57 +104,22 @@ body{
     </div>
     <div id="tabs"><button class="tab-btn tab-lib" data-tab="01" onclick="switchTab('01')">零基础全流程</button><button class="tab-btn tab-lib" data-tab="02" onclick="switchTab('02')">第三方库技术栈总目录</button><button class="tab-btn tab-lib" data-tab="03" onclick="switchTab('03')">全代码逐行注释</button><button class="tab-btn tab-lib" data-tab="04" onclick="switchTab('04')">二次开发进阶</button><button class="tab-btn tab-lib" data-tab="05" onclick="switchTab('05')">Flask</button><button class="tab-btn tab-lib" data-tab="06" onclick="switchTab('06')">Jinja2</button><button class="tab-btn tab-lib" data-tab="07" onclick="switchTab('07')">Werkzeug</button><button class="tab-btn tab-lib" data-tab="08" onclick="switchTab('08')">Flask-SQLAlchemy</button><button class="tab-btn tab-lib" data-tab="09" onclick="switchTab('09')">SQLite</button><button class="tab-btn tab-lib" data-tab="10" onclick="switchTab('10')">python-markdown</button><button class="tab-btn tab-lib" data-tab="11" onclick="switchTab('11')">Pygments</button><button class="tab-btn tab-lib" data-tab="12" onclick="switchTab('12')">PyYAML</button><button class="tab-btn tab-lib" data-tab="13" onclick="switchTab('13')">python-dateutil</button><button class="tab-btn tab-lib" data-tab="14" onclick="switchTab('14')">waitress</button><button class="tab-btn tab-lib" data-tab="15" onclick="switchTab('15')">pywebview</button><button class="tab-btn tab-lib" data-tab="16" onclick="switchTab('16')">PyInstaller</button></div>
     <div id="search"><input type="text" id="search-input" placeholder="🔍 搜索当前文档目录…（支持标题关键词）" oninput="doSearch(this.value)"></div>
-    <div id="toc-scroll"><nav class="toc-panel show" id="toc-01"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">个人博客项目 · 零基础全流程开发教程</a></li><li><a href="#_2">写在前面：这份教程怎么用</a></li><li><a href="#_3">项目整体介绍</a><ul><li><a href="#_4">这个博客能做什么</a></li><li><a href="#_5">技术栈：每个词都讲人话</a></li><li><a href="#_6">项目文件结构全览</a></li><li><a href="#_7">v2.8.3 都更新了什么（对照 v2.1）</a></li><li><a href="#_8">两种运行形态：网页版与桌面版</a></li><li><a href="#_9">一次访问发生了什么：数据流向</a></li></ul></li><li><a href="#_10">环境搭建手把手</a><ul><li><a href="#_11">第 1 步：安装 Python</a></li><li><a href="#_12">第 2 步：验证 Python 装好了</a></li><li><a href="#_13">第 3 步：建项目文件夹并放入代码</a></li><li><a href="#_14">第 4 步：创建虚拟环境（venv）</a></li><li><a href="#_15">第 5 步：激活虚拟环境</a></li><li><a href="#_16">第 6 步：安装项目依赖</a></li><li><a href="#_17">第 7 步：认识配置文件与关键配置项</a></li><li><a href="#_18">本章 checkpoint：环境是否就绪</a></li></ul></li><li><a href="#_19">每一个核心模块逐行代码讲解</a><ul><li><a href="#_20">config.py：全局配置模块</a><ul><li><a href="#_21">开头：路径与打包兼容</a></li><li><a href="#_22">SECRET_KEY：会话密钥的持久化</a></li><li><a href="#_23">Config 类：所有可调参数集中地</a></li></ul></li><li><a href="#_24">app.py 第一部分：应用初始化</a><ul><li><a href="#_25">导入与编码兼容</a></li><li><a href="#_26">创建 Flask 应用实例</a></li></ul></li><li><a href="#_27">app.py 第二部分：数据模型（数据库的表）</a><ul><li><a href="#_28">Post 模型逐行看</a></li><li><a href="#_29">Comment 与 Like：两个容易踩坑的模型</a></li></ul></li><li><a href="#_30">app.py 第三部分：工具函数</a><ul><li><a href="#_31">render_markdown：Markdown 转 HTML</a></li><li><a href="#_32">generate_summary：自动摘要</a></li><li><a href="#_33">parse_front_matter：解析文件头部信息</a></li><li><a href="#_34">like_fingerprint：访客指纹</a></li><li><a href="#_35">inject_globals：每个页面都用的公共数据</a></li></ul></li><li><a href="#_36">app.py 第四部分：核心路由逐行讲</a><ul><li><a href="#_37">路由 1：首页 index</a></li><li><a href="#_38">路由 2：文章详情 post_detail</a></li><li><a href="#_39">路由 3：提交评论 post_comment</a></li><li><a href="#_40">路由 4：点赞 post_like</a></li><li><a href="#_41">路由 5：后台首页 admin_dashboard</a></li><li><a href="#_42">路由 6：新建 / 编辑 / 删除文章</a></li></ul></li><li><a href="#_43">templates：模板系统怎么看</a><ul><li><a href="#_44">base.html：全站骨架与继承</a></li><li><a href="#_45">index.html：循环展示文章</a></li></ul></li><li><a href="#_46">main.py：桌面版主程序</a><ul><li><a href="#_47">单实例互斥：防止开两个</a></li><li><a href="#_48">端口选择：固定 18520</a></li><li><a href="#_49">后台启动博客服务</a></li><li><a href="#_50">托盘：桌面右下角的小图标</a></li><li><a href="#_51">main()：把一切串起来</a></li></ul></li><li><a href="#_52">打包相关：怎么变成 exe</a></li></ul></li><li><a href="#_53">本地运行调试全流程</a><ul><li><a href="#_54">跑网页版（适合开发调试）</a></li><li><a href="#_55">跑桌面版（日常使用）</a></li><li><a href="#_56">后台管理：发一篇自己的文章</a></li><li><a href="#_57">文件导入：用 Markdown 批量发文章</a></li><li><a href="#_58">调试三板斧：print、日志、断点</a></li><li><a href="#_59">端口被占用怎么办</a></li><li><a href="#_60">本章 checkpoint：全链路验收</a></li></ul></li><li><a href="#_61">常见踩坑排查清单</a><ul><li><a href="#_62">环境安装类</a></li><li><a href="#_63">运行与界面类</a></li><li><a href="#_64">数据库类</a></li><li><a href="#_65">桌面版与打包类</a></li><li><a href="#_66">通用排查方法论</a></li></ul></li><li><a href="#_67">结语：接下来怎么深入</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-02"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">个人博客项目 · 第三方库技术栈总目录</a></li><li><a href="#_2">写在前面：这份总目录怎么用</a></li><li><a href="#_3">全景总览：14 个库的分工地图</a><ul><li><a href="#_4">分层一览表</a></li><li><a href="#_5">一次请求里，这些库怎么接力</a></li></ul></li><li><a href="#_6">第一层 · Web 框架（Flask / Jinja2 / Werkzeug）</a><ul><li><a href="#_7">Flask：博客的 Web 骨架</a><ul><li><a href="#_8">角色定位</a></li><li><a href="#_9">核心 API 速查</a></li><li><a href="#_10">高频坑速查</a></li></ul></li><li><a href="#_11">Jinja2：模板引擎</a><ul><li><a href="#_12">角色定位</a></li><li><a href="#_13">核心语法速查</a></li><li><a href="#_14">高频坑速查</a></li></ul></li><li><a href="#_15">Werkzeug：Flask 的底层引擎</a><ul><li><a href="#_16">角色定位</a></li><li><a href="#_17">核心 API 速查</a></li><li><a href="#_18">高频坑速查</a></li></ul></li></ul></li><li><a href="#_19">第二层 · 数据层（Flask-SQLAlchemy / SQLite）</a><ul><li><a href="#_20">Flask-SQLAlchemy：数据库 ORM</a><ul><li><a href="#_21">角色定位</a></li><li><a href="#_22">核心 API 速查</a></li><li><a href="#_23">高频坑速查</a></li></ul></li><li><a href="#_24">SQLite：数据库本体</a><ul><li><a href="#_25">角色定位</a></li><li><a href="#_26">关键配置速查</a></li><li><a href="#_27">高频坑速查</a></li></ul></li></ul></li><li><a href="#_28">第三层 · 内容处理层（Markdown / Pygments / PyYAML / dateutil）</a><ul><li><a href="#_29">python-markdown：Markdown 转 HTML</a><ul><li><a href="#_30">角色定位</a></li><li><a href="#_31">核心 API 速查</a></li><li><a href="#_32">高频坑速查</a></li></ul></li><li><a href="#_33">Pygments：代码高亮引擎</a><ul><li><a href="#_34">角色定位</a></li><li><a href="#_35">核心 API 速查</a></li><li><a href="#_36">高频坑速查</a></li></ul></li><li><a href="#_37">PyYAML：YAML 解析</a><ul><li><a href="#_38">角色定位</a></li><li><a href="#_39">核心 API 速查</a></li><li><a href="#_40">高频坑速查</a></li></ul></li><li><a href="#_41">python-dateutil：智能日期解析</a><ul><li><a href="#_42">角色定位</a></li><li><a href="#_43">核心 API 速查</a></li><li><a href="#_44">高频坑速查</a></li></ul></li></ul></li><li><a href="#_45">第四层 · 服务与桌面层（waitress / pywebview）</a><ul><li><a href="#_46">waitress：生产级 WSGI 服务器</a><ul><li><a href="#_47">角色定位</a></li><li><a href="#_48">核心 API 速查</a></li><li><a href="#_49">高频坑速查</a></li></ul></li><li><a href="#_50">pywebview：桌面窗口壳</a><ul><li><a href="#_51">角色定位</a></li><li><a href="#_52">核心 API 速查</a></li><li><a href="#_53">高频坑速查</a></li></ul></li></ul></li><li><a href="#_54">第五层 · 前端层（Tailwind CSS / Vditor）</a><ul><li><a href="#_55">Tailwind CSS：全站样式</a><ul><li><a href="#_56">角色定位</a></li><li><a href="#_57">核心用法速查</a></li><li><a href="#_58">高频坑速查</a></li></ul></li><li><a href="#_59">Vditor：Markdown 编辑器</a><ul><li><a href="#_60">角色定位</a></li><li><a href="#_61">核心 API 速查</a></li><li><a href="#_62">高频坑速查</a></li></ul></li></ul></li><li><a href="#_63">第六层 · 打包层（PyInstaller）</a><ul><li><a href="#_64">PyInstaller：绿色版打包</a><ul><li><a href="#_65">角色定位</a></li><li><a href="#_66">核心配置速查</a></li><li><a href="#_67">高频坑速查</a></li></ul></li></ul></li><li><a href="#_68">学习路线建议：怎么用好这 14 份手册</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-03"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">个人博客项目 · 全代码逐行注释配套文档</a></li><li><a href="#_2">写在前面：这份文档怎么读</a><ul><li><a href="#_3">文件全景表</a></li><li><a href="#_4">项目运行链路一图流</a></li></ul></li><li><a href="#_5">模块一 · 路由模块</a><ul><li><a href="#_6">模块角色</a></li><li><a href="#_7">路由基础设施：app 对象从哪来</a><ul><li><a href="#_8">app.py 顶部：导入与全局准备（第 1\~70 行）</a></li><li><a href="#_9">日志系统 _setup_logging（第 71\~117 行）</a></li><li><a href="#_10">app 对象与初始化（第 122\~189 行）</a></li><li><a href="#_11">Gzip 压缩中间件（第 196\~281 行）</a></li><li><a href="#_12">浏览量计数：内存累计 + 30 秒批量写库（第 288\~363 行）</a></li><li><a href="#_13">请求钩子与异常处理（第 372\~424 行）</a></li><li><a href="#_14">健康检查路由（第 416\~424 行）</a></li></ul></li><li><a href="#_15">数据模型：路由要操作的「表结构」（第 430\~608 行）</a></li><li><a href="#_16">前台路由逐行（第 1013\~1343 行）</a><ul><li><a href="#_17">首页 index（第 1013\~1055 行）</a></li><li><a href="#_18">文章详情 post_detail（第 1057\~1129 行）</a></li><li><a href="#_19">发表评论 post_comment（第 1134\~1179 行）</a></li><li><a href="#_20">点赞 post_like（第 1185\~1205 行）——「切换式」点赞</a></li><li><a href="#_21">其他前台路由速览（第 1211\~1343 行）</a></li><li><a href="#_22">标签、归档、关于、个人主页（第 1211\~1340 行）</a></li></ul></li><li><a href="#_23">管理后台路由逐行（第 1345\~1810 行）</a><ul><li><a href="#_24">后台首页 admin_dashboard（第 1345\~1372 行）</a></li><li><a href="#_25">资料编辑 admin_profile（第 1375\~1471 行）</a></li><li><a href="#_26">友链管理三件套（第 1477\~1565 行）</a></li><li><a href="#_27">文章新建 post_new（第 1568\~1602 行）</a></li><li><a href="#_28">文章编辑 post_edit（第 1605\~1632 行）</a></li><li><a href="#_29">文章删除 post_delete（第 1635\~1646 行）——修复「删除报错」的关键</a></li><li><a href="#_30">发布/下架切换与文件导入（第 1649\~1810 行）</a></li></ul></li><li><a href="#_31">云同步模块：新手向导 4 API + 同步路由（第 1814\~2235 行）</a></li><li><a href="#_32">预览 API 与启动入口（第 2238\~2545 行）</a></li></ul></li><li><a href="#_33">模块二 · 数据库操作模块</a><ul><li><a href="#_34">模块角色</a></li><li><a href="#_35">config.py 逐行：数据库连哪、怎么连</a><ul><li><a href="#_36">路径双轨制（第 14\~28 行）</a></li><li><a href="#_37">SECRET_KEY 持久化（第 31\~86 行）——「为什么每次重启不用重新登录」的答案</a></li><li><a href="#_38">.env 加载（第 89\~128 行）</a></li><li><a href="#_39">Config 类：数据库连接（第 134\~182 行）</a></li></ul></li><li><a href="#_40">数据模型逐行：6 张表 + 1 张关联表（app.py 第 430\~608 行）</a><ul><li><a href="#_41">多对多关联表 post_tags（第 430\~434 行）</a></li><li><a href="#_42">Post 文章模型（第 437\~460 行）</a></li><li><a href="#_43">Tag 标签模型（第 463\~482 行）</a></li><li><a href="#_44">Profile 资料模型（第 485\~526 行）</a></li><li><a href="#_45">Comment 评论模型（第 529\~567 行）</a></li><li><a href="#_46">Like 点赞模型与 FriendLink 友链模型（第 570\~607 行）</a></li></ul></li><li><a href="#_47">init_db 逐行：建表、迁移、索引、种子数据（app.py 第 2248\~2451 行）</a></li><li><a href="#_48">gitee_backup.py 数据层：云同步的「账本」（配置 + 令牌 + 仓库）</a><ul><li><a href="#_49">配置与进度文件读写（第 122\~240 行）</a></li><li><a href="#_50">备份资产清单：sha256 去重（第 242\~390 行）</a></li><li><a href="#_51">上传去重：blob 机制（第 252\~313 行）</a></li><li><a href="#_52">HTTP 请求核心 _json_request（第 559\~607 行）——urllib 版「requests」</a></li></ul></li><li><a href="#_53">sync_engine.py 数据层：多端同步的「增量账本」</a><ul><li><a href="#_54">同步的核心思想（第 830\~877 行）</a></li><li><a href="#_55">记录导出与导入（第 128\~330 行）</a></li><li><a href="#_56">冲突合并：LWW 规则（第 363\~506 行）</a></li><li><a href="#_57">附件同步与状态文件（第 879\~1124 行）</a></li></ul></li></ul></li><li><a href="#_58">模块三 · 页面渲染模块</a><ul><li><a href="#_59">模块角色</a></li><li><a href="#_60">时区显示三件套：Jinja 过滤器（第 801\~840 行）——v2.8.3 新增</a></li><li><a href="#_61">inject_globals 逐行：每个页面都能用的全局数据（第 842\~984 行）</a></li><li><a href="#_62">渲染链路上的两处性能设施</a></li></ul></li><li><a href="#_63">模块四 · 工具函数模块</a><ul><li><a href="#_64">模块角色</a></li><li><a href="#_65">app.py 内容加工工具（第 613\~795 行）</a><ul><li><a href="#_66">render_markdown：Markdown 加工总装线（第 613\~635 行）</a></li><li><a href="#_67">摘要与搜索片段（第 638\~671 行）</a></li><li><a href="#_68">front-matter 解析（第 674\~688 行）</a></li><li><a href="#_69">安全与身份工具（第 691\~724 行）</a></li><li><a href="#_70">单例与标签工具（第 727\~795 行）</a></li></ul></li><li><a href="#_71">main.py 桌面启动器逐行（第 1\~1155 行）</a><ul><li><a href="#_72">角色说明</a></li><li><a href="#_73">窗口居中 _compute_centered_position（第 105\~141 行）——v2.1 新增</a></li><li><a href="#_74">窗口大小记忆：拖拽调整后自动记住（第 144\~324 行）——v2.8.3 新增</a></li><li><a href="#_75">路径兼容（第 24\~46 行）</a></li><li><a href="#_76">单实例互斥（第 486\~518 行）</a></li><li><a href="#_77">端口探测 _try_find_port（第 520\~569 行）</a></li><li><a href="#_78">主流程 main()（第 1047\~1155 行）</a></li><li><a href="#_79">gitee_backup.py 网络工具：SSL 证书与输入解析</a></li><li><a href="#_80">sync_engine.py 工具：时间与状态</a></li></ul></li><li><a href="#_81">check_env.py 逐行：环境自检「体检报告」（第 1\~373 行）</a><ul><li><a href="#_82">角色说明</a></li></ul></li><li><a href="#_83">open_firewall.py 逐行：手机访问的「开门钥匙」（共 100 行）</a><ul><li><a href="#_84">gitee_backup.py 网络工具：SSL 证书与输入解析</a></li></ul></li></ul></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-04"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">个人博客项目 · 二次开发进阶文档</a></li><li><a href="#_2">写在前面</a></li><li><a href="#_3">第一部分 · 先把地图看清楚：技术架构梳理</a><ul><li><a href="#_4">1.1 分层架构：一次请求的完整接力</a></li><li><a href="#_5">1.2 数据模型全家福</a></li><li><a href="#_6">1.3 扩展点地图：改哪里、在哪加</a></li></ul></li><li><a href="#_7">第二部分 · 功能扩展清单总览</a><ul><li><a href="#_8">2.1 八个功能一览表</a></li><li><a href="#_9">2.2 推荐学习路径</a></li></ul></li><li><a href="#_10">第三部分 · L1 热身：两个半小时功能</a><ul><li><a href="#_11">3.1 功能 1：文章阅读时长估算（★）</a><ul><li><a href="#_12">功能与原理</a></li><li><a href="#_13">涉及文件</a></li><li><a href="#_14">分步实现</a></li><li><a href="#_15">验证</a></li><li><a href="#_16">兼容性注意</a></li></ul></li><li><a href="#_17">3.2 功能 2：「随机看看」按钮（★）</a><ul><li><a href="#_18">功能与原理</a></li><li><a href="#_19">涉及文件</a></li><li><a href="#_20">分步实现</a></li><li><a href="#_21">验证</a></li><li><a href="#_22">兼容性注意</a></li></ul></li></ul></li><li><a href="#_23">第四部分 · L2 进阶：两个页面级功能</a><ul><li><a href="#_24">4.1 功能 3：热门文章排行榜（★★）</a><ul><li><a href="#_25">功能与原理</a></li><li><a href="#_26">涉及文件</a></li><li><a href="#_27">分步实现</a></li><li><a href="#_28">验证</a></li><li><a href="#_29">兼容性注意</a></li></ul></li><li><a href="#_30">4.2 功能 4：草稿箱独立管理页（★★）</a><ul><li><a href="#_31">功能与原理</a></li><li><a href="#_32">涉及文件</a></li><li><a href="#_33">分步实现</a></li><li><a href="#_34">验证</a></li><li><a href="#_35">兼容性注意</a></li></ul></li></ul></li><li><a href="#_36">第五部分 · L3 挑战：两个结构性功能</a><ul><li><a href="#_37">5.1 功能 5：文章置顶（★★★）</a><ul><li><a href="#_38">功能与原理</a></li><li><a href="#_39">涉及文件</a></li><li><a href="#_40">分步实现</a></li><li><a href="#_41">验证</a></li><li><a href="#_42">兼容性注意</a></li></ul></li><li><a href="#_43">5.2 功能 6：RSS 订阅（★★★）</a><ul><li><a href="#_44">功能与原理</a></li><li><a href="#_45">涉及文件</a></li><li><a href="#_46">分步实现</a></li><li><a href="#_47">验证</a></li><li><a href="#_48">兼容性注意</a></li></ul></li></ul></li><li><a href="#_49">第六部分 · L4 高手：两个综合功能</a><ul><li><a href="#_50">6.1 功能 7：搜索支持 tag: 标签筛选（★★★★）</a><ul><li><a href="#_51">功能与原理</a></li><li><a href="#_52">涉及文件</a></li><li><a href="#_53">分步实现</a></li><li><a href="#_54">验证</a></li><li><a href="#_55">兼容性注意</a></li></ul></li><li><a href="#_56">6.2 功能 8：友链申请 + 后台审核（★★★★）</a><ul><li><a href="#_57">功能与原理</a></li><li><a href="#_58">涉及文件</a></li><li><a href="#_59">分步实现</a></li><li><a href="#_60">验证</a></li><li><a href="#_61">兼容性注意</a></li></ul></li></ul></li><li><a href="#_62">第七部分 · 升级兼容性总清单</a><ul><li><a href="#_63">7.1 每次改动的安全流程</a></li><li><a href="#_64">7.2 高危区：这些地方碰之前必须想清楚</a></li><li><a href="#_65">7.3 做完这 8 个功能之后：下一步往哪走</a></li></ul></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-05"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · Flask</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 WSGI：Flask 与世界对话的&quot;接口标准&quot;</a></li><li><a href="#_5">2.2 请求-响应循环</a></li><li><a href="#_6">2.3 应用上下文与请求上下文（新手最容易懵的概念）</a></li><li><a href="#_7">2.4 蓝图（Blueprint）——让大项目不变成一坨</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 创建应用：Flask()</a></li><li><a href="#_11">4.2 路由：@app.route</a></li><li><a href="#_12">4.3 读取请求数据：request</a></li><li><a href="#_13">4.4 返回响应</a></li><li><a href="#_14">4.5 请求钩子（before/after_request）</a></li><li><a href="#_15">4.6 会话与一次性提示</a></li><li><a href="#_16">4.7 全局模板变量：context_processor</a></li><li><a href="#_17">4.8 蓝图、应用工厂（进阶但重要）</a></li></ul></li><li><a href="#_18">第 5 章 实战示例</a><ul><li><a href="#_19">5.1 项目内示例：一个完整路由长什么样</a></li><li><a href="#_20">5.2 独立示例：30 行写一个&quot;待办事项&quot;小网站</a></li></ul></li><li><a href="#_21">第 6 章 高频坑与排查</a></li><li><a href="#_22">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-06"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · Jinja2</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 三种定界符</a></li><li><a href="#_5">2.2 渲染流程</a></li><li><a href="#_6">2.3 自动转义（安全的第一道防线）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 变量与属性访问</a></li><li><a href="#_10">4.2 过滤器（Filter）：数据处理的小工具</a></li><li><a href="#_11">4.3 模板继承：extends / block / include</a></li><li><a href="#_12">4.4 循环与判断</a></li><li><a href="#_13">4.5 自定义过滤器与宏（进阶，非常实用）</a></li><li><a href="#_14">4.6 其他常用语法</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客的 base.html 继承链</a></li><li><a href="#_17">5.2 独立示例：给模板加&quot;时间友好化&quot;过滤器</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-07"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · Werkzeug</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 WSGI：Werkzeug 的老本行</a></li><li><a href="#_5">2.2 安全两件套：文件名消毒 + 密码哈希</a></li><li><a href="#_6">2.3 线程局部存储（Local / LocalProxy）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 上传安全：secure_filename（✅ 项目用到）</a></li><li><a href="#_10">4.2 密码哈希：生成与校验（➕ 强烈推荐掌握）</a></li><li><a href="#_11">4.3 Request / Response 对象（了解）</a></li><li><a href="#_12">4.4 MultiDict：一个键可以多个值的神奇字典</a></li><li><a href="#_13">4.5 路由系统：Map / Rule（了解原理）</a></li><li><a href="#_14">4.6 其他常用工具（🧪 了解）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客背景图上传的安全保存（对照真实代码）</a></li><li><a href="#_17">5.2 独立示例：给博客加一个&quot;密码保护&quot;接口（完整可跑）</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-08"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · Flask-SQLAlchemy</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 一条数据的完整旅程（Session 工作单元模式）</a></li><li><a href="#_5">2.2 查询为何用 query</a></li><li><a href="#_6">2.3 关系（relationship）与级联（cascade）</a></li><li><a href="#_7">2.4 多对多（博客的标签就是典型）</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 定义模型（建表）</a></li><li><a href="#_11">4.2 写入：add / commit / delete</a></li><li><a href="#_12">4.3 查询全家桶（✅ 博客大量使用）</a></li><li><a href="#_13">4.4 关系查询与预加载（进阶）</a></li><li><a href="#_14">4.5 建表与轻量迁移（✅ 博客 init_db）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：首页文章的完整查询</a></li><li><a href="#_17">5.2 独立示例：评论+文章的一对多完整演示</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-09"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · SQLite（标准库）</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 数据是怎么存的</a></li><li><a href="#_5">2.2 锁与并发：为什么偶尔 &quot;database is locked&quot;</a></li><li><a href="#_6">2.3 事务（Transaction）：要么全成，要么全不成</a></li><li><a href="#_7">2.4 参数化查询：防 SQL 注入的关键</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 连接与基本操作</a></li><li><a href="#_11">4.2 增删改查完整语法</a></li><li><a href="#_12">4.3 PRAGMA：SQLite 的&quot;系统设置&quot;</a></li><li><a href="#_13">4.4 事务与异常处理</a></li><li><a href="#_14">4.5 WAL 模式：读写互不阻塞（➕ 强烈推荐）</a></li><li><a href="#_15">4.6 FTS5 全文搜索（🧪 进阶宝藏）</a></li><li><a href="#_16">4.7 备份：backup API（✅ 比复制文件靠谱）</a></li></ul></li><li><a href="#_17">第 5 章 实战示例</a><ul><li><a href="#_18">5.1 项目内示例：博客配置的连接参数（对照真实代码）</a></li><li><a href="#_19">5.2 独立示例：纯 sqlite3 写一个&quot;记事本&quot;（完整可跑）</a></li></ul></li><li><a href="#_20">第 6 章 高频坑与排查</a></li><li><a href="#_21">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-10"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · python-markdown</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 渲染流水线：插件往哪塞</a></li><li><a href="#_5">2.2 一次性 vs 可复用实例（性能关键）</a></li><li><a href="#_6">2.3 安全边界：它不做 HTML 过滤</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 两个入口：markdown.markdown() 与 markdown.Markdown()</a></li><li><a href="#_10">4.2 内置扩展大全（✅ 项目用到的 / ➕ 推荐 / 🧪 进阶）</a></li><li><a href="#_11">4.3 extension_configs：给扩展喂配置</a></li><li><a href="#_12">4.4 从 Markdown 实例拿目录：md.toc</a></li><li><a href="#_13">4.5 自定义扩展（🧪 进阶但很酷）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客的 render_markdown（对照真实代码）</a></li><li><a href="#_16">5.2 独立示例：博客文章页&quot;标题自动加锚点&quot;</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-11"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · Pygments</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 三件套架构：Lexer → Token → Formatter</a></li><li><a href="#_5">2.2 HtmlFormatter 和 CSS 分离的奥秘</a></li><li><a href="#_6">2.3 和 python-markdown 的分工</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 两个核心函数：highlight 与 lex</a></li><li><a href="#_10">4.2 自动识别语言：get_lexer_by_name / guess_lexer</a></li><li><a href="#_11">4.3 HtmlFormatter：主题、行号、cssclass</a></li><li><a href="#_12">4.4 命令行工具 pygmentize（零代码高亮）</a></li><li><a href="#_13">4.5 自定义 Lexer 与 Formatter（🧪 进阶）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客代码高亮完整链路</a></li><li><a href="#_16">5.2 独立示例：把整个目录的代码高亮成一个 HTML 文档</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-12"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · PyYAML</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 YAML 的三种基本结构</a></li><li><a href="#_5">2.2 加载器与安全（PyYAML 最核心的坑）</a></li><li><a href="#_6">2.3 为什么博客叫它&quot;front-matter&quot;</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 解析：safe_load 与安全变体</a></li><li><a href="#_10">4.2 生成：dump 与 safe_dump</a></li><li><a href="#_11">4.3 多文档：load_all / dump_all</a></li><li><a href="#_12">4.4 自定义标签与构造器（🧪 进阶）</a></li><li><a href="#_13">4.5 低级 API：compose / parse（了解）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客的 front-matter 解析（对照真实代码）</a></li><li><a href="#_16">5.2 独立示例：用 YAML 存&quot;设置&quot;并安全读写</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-13"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · python-dateutil</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 parser：怎么做到&quot;什么日期都能认&quot;</a></li><li><a href="#_5">2.2 relativedelta 与 timedelta 的本质区别</a></li><li><a href="#_6">2.3 时区：dateutil 的 tz 模块</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 parser.parse：智能日期解析（✅ 项目用到）</a></li><li><a href="#_10">4.2 relativedelta：日历加减（➕ 强烈推荐）</a></li><li><a href="#_11">4.3 rrule：重复规则（🧪 日程神器）</a></li><li><a href="#_12">4.4 tz：时区处理</a></li><li><a href="#_13">4.5 easter（彩蛋）与 parser 的 info 参数（了解）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：批量导入的日期兜底策略</a></li><li><a href="#_16">5.2 独立示例：归档按月分组 + &quot;近 30 天&quot;统计</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-14"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · waitress</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 Flask 自带服务器 vs waitress</a></li><li><a href="#_5">2.2 阻塞 vs 非阻塞：桌面版为什么必须用线程</a></li><li><a href="#_6">2.3 WSGI 一次握手</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 waitress.serve：最简启动（✅ 网页版用）</a></li><li><a href="#_10">4.2 waitress.server.create_server：非阻塞启动（✅ 桌面版用）</a></li><li><a href="#_11">4.3 常用配置参数</a></li><li><a href="#_12">4.4 反向代理（nginx 后面）时的关键配置（🧪 进阶）</a></li></ul></li><li><a href="#_13">第 5 章 实战示例</a><ul><li><a href="#_14">5.1 项目内示例：网页版 run_server（app.py 末尾）</a></li><li><a href="#_15">5.2 独立示例：一个&quot;秒回&quot;的并发压测对比</a></li></ul></li><li><a href="#_16">第 6 章 高频坑与排查</a></li><li><a href="#_17">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-15"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · pywebview</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 生命周期：从创建到退出</a></li><li><a href="#_5">2.2 GUI 后端：Windows 上默认用谁</a></li><li><a href="#_6">2.3 JS ↔ Python 双向通信（pywebview 的灵魂）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 create_window：全部常用参数（✅ 博客用了大半）</a></li><li><a href="#_10">4.2 start：进入事件循环</a></li><li><a href="#_11">4.3 窗口对象方法（✅ 托盘交互的核心）</a></li><li><a href="#_12">4.4 事件（window.events）</a></li><li><a href="#_13">4.5 js_api：JS 调 Python（➕ 强烈推荐掌握）</a></li><li><a href="#_14">4.6 多窗口与对话框（🧪 了解）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客的窗口创建（浓缩版）</a></li><li><a href="#_17">5.2 独立示例：10 行做一个&quot;打开本地文件&quot;桌面工具</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul>
-</div>
-</div></nav><nav class="toc-panel" id="toc-16"><div class="toc"><div class="toc">
-<ul><li><a href="#_1">第三方库全面教程 · PyInstaller</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 打包原理：静态分析 + 收集依赖</a></li><li><a href="#_5">2.2 onedir vs onefile：绿色版用哪个</a></li><li><a href="#_6">2.3 打包后资源路径为什么会变（最大坑）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 命令行快速入门</a></li><li><a href="#_10">4.2 spec 文件：打包的&quot;配方&quot;（✅ 博客的核心）</a></li><li><a href="#_11">4.3 spec 里的博客经验（务必看）</a></li><li><a href="#_12">4.4 运行时调试套路（✅ 踩坑必看）</a></li></ul></li><li><a href="#_13">第 5 章 实战示例</a><ul><li><a href="#_14">5.1 项目内示例：博客 config.py 的资源路径（打包后还能跑的秘诀）</a></li><li><a href="#_15">5.2 独立示例：给任意脚本打包的完整流程</a></li></ul></li><li><a href="#_16">第 6 章 高频坑与排查</a></li><li><a href="#_17">第 7 章 学习路径与自测</a></li><li><a href="#_18">全部 12 份教程完结</a></li></ul>
-</div>
-</div></nav></div>
-  </div>
-  <div id="main"><section class="doc-panel show" id="doc-01"><h1 id="_1">个人博客项目 · 零基础全流程开发教程</h1>
+    <div id="toc-scroll"><nav class="toc-panel show" id="toc-01"><div class="toc"><ul><li><a href="#_1">个人博客项目 · 零基础全流程开发教程</a></li><li><a href="#_2">写在前面：这份教程怎么用</a></li><li><a href="#_3">项目整体介绍</a><ul><li><a href="#_4">这个博客能做什么</a></li><li><a href="#_5">技术栈：每个词都讲人话</a></li><li><a href="#_6">项目文件结构全览</a></li><li><a href="#_7">v2.8.3 都更新了什么（对照 v2.1）</a></li><li><a href="#_8">两种运行形态：网页版与桌面版</a></li><li><a href="#_9">一次访问发生了什么：数据流向</a></li></ul></li><li><a href="#_10">环境搭建手把手</a><ul><li><a href="#_11">第 1 步：安装 Python</a></li><li><a href="#_12">第 2 步：验证 Python 装好了</a></li><li><a href="#_13">第 3 步：建项目文件夹并放入代码</a></li><li><a href="#_14">第 4 步：创建虚拟环境（venv）</a></li><li><a href="#_15">第 5 步：激活虚拟环境</a></li><li><a href="#_16">第 6 步：安装项目依赖</a></li><li><a href="#_17">第 7 步：认识配置文件与关键配置项</a></li><li><a href="#_18">本章 checkpoint：环境是否就绪</a></li></ul></li><li><a href="#_19">每一个核心模块逐行代码讲解</a><ul><li><a href="#_20">config.py：全局配置模块</a><ul><li><a href="#_21">开头：路径与打包兼容</a></li><li><a href="#_22">SECRET_KEY：会话密钥的持久化</a></li><li><a href="#_23">Config 类：所有可调参数集中地</a></li></ul></li><li><a href="#_24">app.py 第一部分：应用初始化</a><ul><li><a href="#_25">导入与编码兼容</a></li><li><a href="#_26">创建 Flask 应用实例</a></li></ul></li><li><a href="#_27">app.py 第二部分：数据模型（数据库的表）</a><ul><li><a href="#_28">Post 模型逐行看</a></li><li><a href="#_29">Comment 与 Like：两个容易踩坑的模型</a></li></ul></li><li><a href="#_30">app.py 第三部分：工具函数</a><ul><li><a href="#_31">render_markdown：Markdown 转 HTML</a></li><li><a href="#_32">generate_summary：自动摘要</a></li><li><a href="#_33">parse_front_matter：解析文件头部信息</a></li><li><a href="#_34">like_fingerprint：访客指纹</a></li><li><a href="#_35">inject_globals：每个页面都用的公共数据</a></li></ul></li><li><a href="#_36">app.py 第四部分：核心路由逐行讲</a><ul><li><a href="#_37">路由 1：首页 index</a></li><li><a href="#_38">路由 2：文章详情 post_detail</a></li><li><a href="#_39">路由 3：提交评论 post_comment</a></li><li><a href="#_40">路由 4：点赞 post_like</a></li><li><a href="#_41">路由 5：后台首页 admin_dashboard</a></li><li><a href="#_42">路由 6：新建 / 编辑 / 删除文章</a></li></ul></li><li><a href="#_43">templates：模板系统怎么看</a><ul><li><a href="#_44">base.html：全站骨架与继承</a></li><li><a href="#_45">index.html：循环展示文章</a></li></ul></li><li><a href="#_46">main.py：桌面版主程序</a><ul><li><a href="#_47">单实例互斥：防止开两个</a></li><li><a href="#_48">端口选择：固定 18520</a></li><li><a href="#_49">后台启动博客服务</a></li><li><a href="#_50">托盘：桌面右下角的小图标</a></li><li><a href="#_51">main()：把一切串起来</a></li></ul></li><li><a href="#_52">打包相关：怎么变成 exe</a></li></ul></li><li><a href="#_53">本地运行调试全流程</a><ul><li><a href="#_54">跑网页版（适合开发调试）</a></li><li><a href="#_55">跑桌面版（日常使用）</a></li><li><a href="#_56">后台管理：发一篇自己的文章</a></li><li><a href="#_57">文件导入：用 Markdown 批量发文章</a></li><li><a href="#_58">调试三板斧：print、日志、断点</a></li><li><a href="#_59">端口被占用怎么办</a></li><li><a href="#_60">本章 checkpoint：全链路验收</a></li></ul></li><li><a href="#_61">常见踩坑排查清单</a><ul><li><a href="#_62">环境安装类</a></li><li><a href="#_63">运行与界面类</a></li><li><a href="#_64">数据库类</a></li><li><a href="#_65">桌面版与打包类</a></li><li><a href="#_66">通用排查方法论</a></li></ul></li><li><a href="#_67">结语：接下来怎么深入</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-02"><div class="toc"><ul><li><a href="#_1">个人博客项目 · 第三方库技术栈总目录</a></li><li><a href="#_2">写在前面：这份总目录怎么用</a></li><li><a href="#_3">全景总览：14 个库的分工地图</a><ul><li><a href="#_4">分层一览表</a></li><li><a href="#_5">一次请求里，这些库怎么接力</a></li></ul></li><li><a href="#_6">第一层 · Web 框架（Flask / Jinja2 / Werkzeug）</a><ul><li><a href="#_7">Flask：博客的 Web 骨架</a><ul><li><a href="#_8">角色定位</a></li><li><a href="#_9">原理大白话</a></li><li><a href="#_10">核心 API 详解</a></li><li><a href="#_11">项目落地代码（真实源码）</a></li><li><a href="#_12">高频坑详解</a></li></ul></li><li><a href="#_13">Jinja2：模板引擎</a><ul><li><a href="#_14">角色定位</a></li><li><a href="#_15">原理大白话</a></li><li><a href="#_16">核心语法详解</a></li><li><a href="#_17">项目落地代码（真实源码）</a></li><li><a href="#_18">高频坑详解</a></li></ul></li><li><a href="#_19">Werkzeug：Flask 的底层引擎</a><ul><li><a href="#_20">角色定位</a></li><li><a href="#_21">原理大白话</a></li><li><a href="#_22">核心 API 详解</a></li><li><a href="#_23">项目落地代码（真实源码）</a></li><li><a href="#_24">高频坑详解</a></li></ul></li></ul></li><li><a href="#_25">第二层 · 数据层（Flask-SQLAlchemy / SQLite）</a><ul><li><a href="#_26">Flask-SQLAlchemy：数据库 ORM</a><ul><li><a href="#_27">角色定位</a></li><li><a href="#_28">原理大白话</a></li><li><a href="#_29">核心 API 详解</a></li><li><a href="#_30">项目落地代码（真实源码）</a></li><li><a href="#_31">高频坑详解</a></li></ul></li><li><a href="#_32">SQLite：数据库本体</a><ul><li><a href="#_33">角色定位</a></li><li><a href="#_34">原理大白话</a></li><li><a href="#_35">关键配置详解</a></li><li><a href="#_36">项目落地代码（真实源码，config.py 第 152 行）</a></li><li><a href="#_37">高频坑详解</a></li></ul></li></ul></li><li><a href="#_38">第三层 · 内容处理层（Markdown / Pygments / PyYAML / dateutil）</a><ul><li><a href="#_39">python-markdown：Markdown 转 HTML</a><ul><li><a href="#_40">角色定位</a></li><li><a href="#_41">原理大白话</a></li><li><a href="#_42">核心 API 详解</a></li><li><a href="#_43">项目落地代码（真实源码，app.py 第 613 行）</a></li><li><a href="#_44">高频坑详解</a></li></ul></li><li><a href="#_45">Pygments：代码高亮引擎</a><ul><li><a href="#_46">角色定位</a></li><li><a href="#_47">原理大白话</a></li><li><a href="#_48">核心 API 详解</a></li><li><a href="#_49">项目落地代码（真实源码，app.py 第 43 行）</a></li><li><a href="#_50">高频坑详解</a></li></ul></li><li><a href="#_51">PyYAML：YAML 解析</a><ul><li><a href="#_52">角色定位</a></li><li><a href="#_53">原理大白话</a></li><li><a href="#_54">核心 API 详解</a></li><li><a href="#_55">项目落地代码（真实源码，app.py 第 674 行）</a></li><li><a href="#_56">高频坑详解</a></li></ul></li><li><a href="#_57">python-dateutil：智能日期解析</a><ul><li><a href="#_58">角色定位</a></li><li><a href="#_59">原理大白话</a></li><li><a href="#_60">核心 API 详解</a></li><li><a href="#_61">项目落地代码（真实源码，app.py 第 1773 行）</a></li><li><a href="#_62">高频坑详解</a></li></ul></li></ul></li><li><a href="#_63">第四层 · 服务与桌面层（waitress / pywebview）</a><ul><li><a href="#_64">waitress：生产级 WSGI 服务器</a><ul><li><a href="#_65">角色定位</a></li><li><a href="#_66">原理大白话</a></li><li><a href="#_67">核心 API 详解</a></li><li><a href="#_68">项目落地代码（真实源码）</a></li><li><a href="#_69">高频坑详解</a></li></ul></li><li><a href="#_70">pywebview：桌面窗口壳</a><ul><li><a href="#_71">角色定位</a></li><li><a href="#_72">原理大白话</a></li><li><a href="#_73">核心 API 详解</a></li><li><a href="#_74">项目落地代码（真实源码，main.py）</a></li><li><a href="#_75">高频坑详解</a></li></ul></li></ul></li><li><a href="#_76">第五层 · 前端层（Tailwind CSS / Vditor）</a><ul><li><a href="#_77">Tailwind CSS：全站样式</a><ul><li><a href="#_78">角色定位</a></li><li><a href="#_79">原理大白话</a></li><li><a href="#_80">核心用法详解</a></li><li><a href="#_81">项目落地代码（真实源码，base.html）</a></li><li><a href="#_82">高频坑详解</a></li></ul></li><li><a href="#_83">Vditor：Markdown 编辑器</a><ul><li><a href="#_84">角色定位</a></li><li><a href="#_85">原理大白话</a></li><li><a href="#_86">核心 API 详解</a></li><li><a href="#_87">项目落地代码（真实源码，post_form.html 简化）</a></li><li><a href="#_88">高频坑详解</a></li></ul></li></ul></li><li><a href="#_89">第六层 · 打包层（PyInstaller）</a><ul><li><a href="#_90">PyInstaller：绿色版打包</a><ul><li><a href="#_91">角色定位</a></li><li><a href="#_92">原理大白话</a></li><li><a href="#_93">核心配置详解</a></li><li><a href="#_94">高频坑详解</a></li></ul></li></ul></li><li><a href="#_95">学习路线建议：怎么用好这 14 份手册</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-03"><div class="toc"><ul><li><a href="#_1">个人博客项目 · 全代码逐行注释配套文档</a></li><li><a href="#_2">写在前面：这份文档怎么读</a><ul><li><a href="#_3">文件全景表</a></li><li><a href="#_4">项目运行链路一图流</a></li></ul></li><li><a href="#_5">模块一 · 路由模块</a><ul><li><a href="#_6">模块角色</a></li><li><a href="#_7">路由基础设施：app 对象从哪来</a><ul><li><a href="#_8">app.py 顶部：导入与全局准备（第 1\~70 行）</a></li><li><a href="#_9">日志系统 _setup_logging（第 71\~117 行）</a></li><li><a href="#_10">app 对象与初始化（第 122\~189 行）</a></li><li><a href="#_11">Gzip 压缩中间件（第 196\~281 行）</a></li><li><a href="#_12">浏览量计数：内存累计 + 30 秒批量写库（第 288\~363 行）</a></li><li><a href="#_13">请求钩子与异常处理（第 372\~424 行）</a></li><li><a href="#_14">健康检查路由（第 416\~424 行）</a></li></ul></li><li><a href="#_15">数据模型：路由要操作的「表结构」（第 430\~608 行）</a></li><li><a href="#_16">前台路由逐行（第 1013\~1343 行）</a><ul><li><a href="#_17">首页 index（第 1013\~1055 行）</a></li><li><a href="#_18">文章详情 post_detail（第 1057\~1129 行）</a></li><li><a href="#_19">发表评论 post_comment（第 1134\~1179 行）</a></li><li><a href="#_20">点赞 post_like（第 1185\~1205 行）——「切换式」点赞</a></li><li><a href="#_21">其他前台路由速览（第 1211\~1343 行）</a></li><li><a href="#_22">标签、归档、关于、个人主页（第 1211\~1340 行）</a></li></ul></li><li><a href="#_23">管理后台路由逐行（第 1345\~1810 行）</a><ul><li><a href="#_24">后台首页 admin_dashboard（第 1345\~1372 行）</a></li><li><a href="#_25">资料编辑 admin_profile（第 1375\~1471 行）</a></li><li><a href="#_26">友链管理三件套（第 1477\~1565 行）</a></li><li><a href="#_27">文章新建 post_new（第 1568\~1602 行）</a></li><li><a href="#_28">文章编辑 post_edit（第 1605\~1632 行）</a></li><li><a href="#_29">文章删除 post_delete（第 1635\~1646 行）——修复「删除报错」的关键</a></li><li><a href="#_30">发布/下架切换与文件导入（第 1649\~1810 行）</a></li></ul></li><li><a href="#_31">云同步模块：新手向导 4 API + 同步路由（第 1814\~2235 行）</a></li><li><a href="#_32">预览 API 与启动入口（第 2238\~2545 行）</a></li></ul></li><li><a href="#_33">模块二 · 数据库操作模块</a><ul><li><a href="#_34">模块角色</a></li><li><a href="#_35">config.py 逐行：数据库连哪、怎么连</a><ul><li><a href="#_36">路径双轨制（第 14\~28 行）</a></li><li><a href="#_37">SECRET_KEY 持久化（第 31\~86 行）——「为什么每次重启不用重新登录」的答案</a></li><li><a href="#_38">.env 加载（第 89\~128 行）</a></li><li><a href="#_39">Config 类：数据库连接（第 134\~182 行）</a></li></ul></li><li><a href="#_40">数据模型逐行：6 张表 + 1 张关联表（app.py 第 430\~608 行）</a><ul><li><a href="#_41">多对多关联表 post_tags（第 430\~434 行）</a></li><li><a href="#_42">Post 文章模型（第 437\~460 行）</a></li><li><a href="#_43">Tag 标签模型（第 463\~482 行）</a></li><li><a href="#_44">Profile 资料模型（第 485\~526 行）</a></li><li><a href="#_45">Comment 评论模型（第 529\~567 行）</a></li><li><a href="#_46">Like 点赞模型与 FriendLink 友链模型（第 570\~607 行）</a></li></ul></li><li><a href="#_47">init_db 逐行：建表、迁移、索引、种子数据（app.py 第 2248\~2451 行）</a></li><li><a href="#_48">gitee_backup.py 数据层：云同步的「账本」（配置 + 令牌 + 仓库）</a><ul><li><a href="#_49">配置与进度文件读写（第 122\~240 行）</a></li><li><a href="#_50">备份资产清单：sha256 去重（第 242\~390 行）</a></li><li><a href="#_51">上传去重：blob 机制（第 252\~313 行）</a></li><li><a href="#_52">HTTP 请求核心 _json_request（第 559\~607 行）——urllib 版「requests」</a></li></ul></li><li><a href="#_53">sync_engine.py 数据层：多端同步的「增量账本」</a><ul><li><a href="#_54">同步的核心思想（第 830\~877 行）</a></li><li><a href="#_55">记录导出与导入（第 128\~330 行）</a></li><li><a href="#_56">冲突合并：LWW 规则（第 363\~506 行）</a></li><li><a href="#_57">附件同步与状态文件（第 879\~1124 行）</a></li></ul></li></ul></li><li><a href="#_58">模块三 · 页面渲染模块</a><ul><li><a href="#_59">模块角色</a></li><li><a href="#_60">时区显示三件套：Jinja 过滤器（第 801\~840 行）——v2.8.3 新增</a></li><li><a href="#_61">inject_globals 逐行：每个页面都能用的全局数据（第 842\~984 行）</a></li><li><a href="#_62">渲染链路上的两处性能设施</a></li></ul></li><li><a href="#_63">模块四 · 工具函数模块</a><ul><li><a href="#_64">模块角色</a></li><li><a href="#_65">app.py 内容加工工具（第 613\~795 行）</a><ul><li><a href="#_66">render_markdown：Markdown 加工总装线（第 613\~635 行）</a></li><li><a href="#_67">摘要与搜索片段（第 638\~671 行）</a></li><li><a href="#_68">front-matter 解析（第 674\~688 行）</a></li><li><a href="#_69">安全与身份工具（第 691\~724 行）</a></li><li><a href="#_70">单例与标签工具（第 727\~795 行）</a></li></ul></li><li><a href="#_71">main.py 桌面启动器逐行（第 1\~1155 行）</a><ul><li><a href="#_72">角色说明</a></li><li><a href="#_73">窗口居中 _compute_centered_position（第 105\~141 行）——v2.1 新增</a></li><li><a href="#_74">窗口大小记忆：拖拽调整后自动记住（第 144\~324 行）——v2.8.3 新增</a></li><li><a href="#_75">路径兼容（第 24\~46 行）</a></li><li><a href="#_76">单实例互斥（第 486\~518 行）</a></li><li><a href="#_77">端口探测 _try_find_port（第 520\~569 行）</a></li><li><a href="#_78">主流程 main()（第 1047\~1155 行）</a></li><li><a href="#_79">gitee_backup.py 网络工具：SSL 证书与输入解析</a></li><li><a href="#_80">sync_engine.py 工具：时间与状态</a></li></ul></li><li><a href="#_81">check_env.py 逐行：环境自检「体检报告」（第 1\~373 行）</a><ul><li><a href="#_82">角色说明</a></li></ul></li><li><a href="#_83">open_firewall.py 逐行：手机访问的「开门钥匙」（共 100 行）</a><ul><li><a href="#_84">gitee_backup.py 网络工具：SSL 证书与输入解析</a></li></ul></li></ul></li></ul></div></nav>
+<nav class="toc-panel" id="toc-04"><div class="toc"><ul><li><a href="#_1">个人博客项目 · 二次开发进阶文档</a></li><li><a href="#_2">写在前面</a></li><li><a href="#_3">第一部分 · 先把地图看清楚：技术架构梳理</a><ul><li><a href="#_4">1.1 分层架构：一次请求的完整接力</a></li><li><a href="#_5">1.2 数据模型全家福</a></li><li><a href="#_6">1.3 扩展点地图：改哪里、在哪加</a></li></ul></li><li><a href="#_7">第二部分 · 功能扩展清单总览</a><ul><li><a href="#_8">2.1 八个功能一览表</a></li><li><a href="#_9">2.2 推荐学习路径</a></li></ul></li><li><a href="#_10">第三部分 · L1 热身：两个半小时功能</a><ul><li><a href="#_11">3.1 功能 1：文章阅读时长估算（★）</a><ul><li><a href="#_12">功能与原理</a></li><li><a href="#_13">涉及文件</a></li><li><a href="#_14">分步实现</a></li><li><a href="#_15">验证</a></li><li><a href="#_16">兼容性注意</a></li></ul></li><li><a href="#_17">3.2 功能 2：「随机看看」按钮（★）</a><ul><li><a href="#_18">功能与原理</a></li><li><a href="#_19">涉及文件</a></li><li><a href="#_20">分步实现</a></li><li><a href="#_21">验证</a></li><li><a href="#_22">兼容性注意</a></li></ul></li></ul></li><li><a href="#_23">第四部分 · L2 进阶：两个页面级功能</a><ul><li><a href="#_24">4.1 功能 3：热门文章排行榜（★★）</a><ul><li><a href="#_25">功能与原理</a></li><li><a href="#_26">涉及文件</a></li><li><a href="#_27">分步实现</a></li><li><a href="#_28">验证</a></li><li><a href="#_29">兼容性注意</a></li></ul></li><li><a href="#_30">4.2 功能 4：草稿箱独立管理页（★★）</a><ul><li><a href="#_31">功能与原理</a></li><li><a href="#_32">涉及文件</a></li><li><a href="#_33">分步实现</a></li><li><a href="#_34">验证</a></li><li><a href="#_35">兼容性注意</a></li></ul></li></ul></li><li><a href="#_36">第五部分 · L3 挑战：两个结构性功能</a><ul><li><a href="#_37">5.1 功能 5：文章置顶（★★★）</a><ul><li><a href="#_38">功能与原理</a></li><li><a href="#_39">涉及文件</a></li><li><a href="#_40">分步实现</a></li><li><a href="#_41">验证</a></li><li><a href="#_42">兼容性注意</a></li></ul></li><li><a href="#_43">5.2 功能 6：RSS 订阅（★★★）</a><ul><li><a href="#_44">功能与原理</a></li><li><a href="#_45">涉及文件</a></li><li><a href="#_46">分步实现</a></li><li><a href="#_47">验证</a></li><li><a href="#_48">兼容性注意</a></li></ul></li></ul></li><li><a href="#_49">第六部分 · L4 高手：两个综合功能</a><ul><li><a href="#_50">6.1 功能 7：搜索支持 tag: 标签筛选（★★★★）</a><ul><li><a href="#_51">功能与原理</a></li><li><a href="#_52">涉及文件</a></li><li><a href="#_53">分步实现</a></li><li><a href="#_54">验证</a></li><li><a href="#_55">兼容性注意</a></li></ul></li><li><a href="#_56">6.2 功能 8：友链申请 + 后台审核（★★★★）</a><ul><li><a href="#_57">功能与原理</a></li><li><a href="#_58">涉及文件</a></li><li><a href="#_59">分步实现</a></li><li><a href="#_60">验证</a></li><li><a href="#_61">兼容性注意</a></li></ul></li></ul></li><li><a href="#_62">第七部分 · 升级兼容性总清单</a><ul><li><a href="#_63">7.1 每次改动的安全流程</a></li><li><a href="#_64">7.2 高危区：这些地方碰之前必须想清楚</a></li><li><a href="#_65">7.3 做完这 8 个功能之后：下一步往哪走</a></li></ul></li></ul></div></nav>
+<nav class="toc-panel" id="toc-05"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · Flask</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 WSGI：Flask 与世界对话的"接口标准"</a></li><li><a href="#_5">2.2 请求-响应循环</a></li><li><a href="#_6">2.3 应用上下文与请求上下文（新手最容易懵的概念）</a></li><li><a href="#_7">2.4 蓝图（Blueprint）——让大项目不变成一坨</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 创建应用：Flask()</a></li><li><a href="#_11">4.2 路由：@app.route</a></li><li><a href="#_12">4.3 读取请求数据：request</a></li><li><a href="#_13">4.4 返回响应</a></li><li><a href="#_14">4.5 请求钩子（before/after_request）</a></li><li><a href="#_15">4.6 会话与一次性提示</a></li><li><a href="#_16">4.7 全局模板变量：context_processor</a></li><li><a href="#_17">4.8 蓝图、应用工厂（进阶但重要）</a></li></ul></li><li><a href="#_18">第 5 章 实战示例</a><ul><li><a href="#_19">5.1 项目内示例：一个完整路由长什么样</a></li><li><a href="#_20">5.2 独立示例：30 行写一个"待办事项"小网站</a></li></ul></li><li><a href="#_21">第 6 章 高频坑与排查</a></li><li><a href="#_22">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-06"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · Jinja2</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 三种定界符</a></li><li><a href="#_5">2.2 渲染流程</a></li><li><a href="#_6">2.3 自动转义（安全的第一道防线）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 变量与属性访问</a></li><li><a href="#_10">4.2 过滤器（Filter）：数据处理的小工具</a></li><li><a href="#_11">4.3 模板继承：extends / block / include</a></li><li><a href="#_12">4.4 循环与判断</a></li><li><a href="#_13">4.5 自定义过滤器与宏（进阶，非常实用）</a></li><li><a href="#_14">4.6 其他常用语法</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客的 base.html 继承链</a></li><li><a href="#_17">5.2 独立示例：给模板加"时间友好化"过滤器</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-07"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · Werkzeug</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 WSGI：Werkzeug 的老本行</a></li><li><a href="#_5">2.2 安全两件套：文件名消毒 + 密码哈希</a></li><li><a href="#_6">2.3 线程局部存储（Local / LocalProxy）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 上传安全：secure_filename（✅ 项目用到）</a></li><li><a href="#_10">4.2 密码哈希：生成与校验（➕ 强烈推荐掌握）</a></li><li><a href="#_11">4.3 Request / Response 对象（了解）</a></li><li><a href="#_12">4.4 MultiDict：一个键可以多个值的神奇字典</a></li><li><a href="#_13">4.5 路由系统：Map / Rule（了解原理）</a></li><li><a href="#_14">4.6 其他常用工具（🧪 了解）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客背景图上传的安全保存（对照真实代码）</a></li><li><a href="#_17">5.2 独立示例：给博客加一个"密码保护"接口（完整可跑）</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-08"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · Flask-SQLAlchemy</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 一条数据的完整旅程（Session 工作单元模式）</a></li><li><a href="#_5">2.2 查询为何用 query</a></li><li><a href="#_6">2.3 关系（relationship）与级联（cascade）</a></li><li><a href="#_7">2.4 多对多（博客的标签就是典型）</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 定义模型（建表）</a></li><li><a href="#_11">4.2 写入：add / commit / delete</a></li><li><a href="#_12">4.3 查询全家桶（✅ 博客大量使用）</a></li><li><a href="#_13">4.4 关系查询与预加载（进阶）</a></li><li><a href="#_14">4.5 建表与轻量迁移（✅ 博客 init_db）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：首页文章的完整查询</a></li><li><a href="#_17">5.2 独立示例：评论+文章的一对多完整演示</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-09"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · SQLite（标准库）</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 数据是怎么存的</a></li><li><a href="#_5">2.2 锁与并发：为什么偶尔 "database is locked"</a></li><li><a href="#_6">2.3 事务（Transaction）：要么全成，要么全不成</a></li><li><a href="#_7">2.4 参数化查询：防 SQL 注入的关键</a></li></ul></li><li><a href="#_8">第 3 章 安装与版本</a></li><li><a href="#_9">第 4 章 API 全面讲解</a><ul><li><a href="#_10">4.1 连接与基本操作</a></li><li><a href="#_11">4.2 增删改查完整语法</a></li><li><a href="#_12">4.3 PRAGMA：SQLite 的"系统设置"</a></li><li><a href="#_13">4.4 事务与异常处理</a></li><li><a href="#_14">4.5 WAL 模式：读写互不阻塞（➕ 强烈推荐）</a></li><li><a href="#_15">4.6 FTS5 全文搜索（🧪 进阶宝藏）</a></li><li><a href="#_16">4.7 备份：backup API（✅ 比复制文件靠谱）</a></li></ul></li><li><a href="#_17">第 5 章 实战示例</a><ul><li><a href="#_18">5.1 项目内示例：博客配置的连接参数（对照真实代码）</a></li><li><a href="#_19">5.2 独立示例：纯 sqlite3 写一个"记事本"（完整可跑）</a></li></ul></li><li><a href="#_20">第 6 章 高频坑与排查</a></li><li><a href="#_21">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-10"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · python-markdown</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 渲染流水线：插件往哪塞</a></li><li><a href="#_5">2.2 一次性 vs 可复用实例（性能关键）</a></li><li><a href="#_6">2.3 安全边界：它不做 HTML 过滤</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 两个入口：markdown.markdown() 与 markdown.Markdown()</a></li><li><a href="#_10">4.2 内置扩展大全（✅ 项目用到的 / ➕ 推荐 / 🧪 进阶）</a></li><li><a href="#_11">4.3 extension_configs：给扩展喂配置</a></li><li><a href="#_12">4.4 从 Markdown 实例拿目录：md.toc</a></li><li><a href="#_13">4.5 自定义扩展（🧪 进阶但很酷）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客的 render_markdown（对照真实代码）</a></li><li><a href="#_16">5.2 独立示例：博客文章页"标题自动加锚点"</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-11"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · Pygments</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 三件套架构：Lexer → Token → Formatter</a></li><li><a href="#_5">2.2 HtmlFormatter 和 CSS 分离的奥秘</a></li><li><a href="#_6">2.3 和 python-markdown 的分工</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 两个核心函数：highlight 与 lex</a></li><li><a href="#_10">4.2 自动识别语言：get_lexer_by_name / guess_lexer</a></li><li><a href="#_11">4.3 HtmlFormatter：主题、行号、cssclass</a></li><li><a href="#_12">4.4 命令行工具 pygmentize（零代码高亮）</a></li><li><a href="#_13">4.5 自定义 Lexer 与 Formatter（🧪 进阶）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客代码高亮完整链路</a></li><li><a href="#_16">5.2 独立示例：把整个目录的代码高亮成一个 HTML 文档</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-12"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · PyYAML</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 YAML 的三种基本结构</a></li><li><a href="#_5">2.2 加载器与安全（PyYAML 最核心的坑）</a></li><li><a href="#_6">2.3 为什么博客叫它"front-matter"</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 解析：safe_load 与安全变体</a></li><li><a href="#_10">4.2 生成：dump 与 safe_dump</a></li><li><a href="#_11">4.3 多文档：load_all / dump_all</a></li><li><a href="#_12">4.4 自定义标签与构造器（🧪 进阶）</a></li><li><a href="#_13">4.5 低级 API：compose / parse（了解）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：博客的 front-matter 解析（对照真实代码）</a></li><li><a href="#_16">5.2 独立示例：用 YAML 存"设置"并安全读写</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-13"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · python-dateutil</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 parser：怎么做到"什么日期都能认"</a></li><li><a href="#_5">2.2 relativedelta 与 timedelta 的本质区别</a></li><li><a href="#_6">2.3 时区：dateutil 的 tz 模块</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 parser.parse：智能日期解析（✅ 项目用到）</a></li><li><a href="#_10">4.2 relativedelta：日历加减（➕ 强烈推荐）</a></li><li><a href="#_11">4.3 rrule：重复规则（🧪 日程神器）</a></li><li><a href="#_12">4.4 tz：时区处理</a></li><li><a href="#_13">4.5 easter（彩蛋）与 parser 的 info 参数（了解）</a></li></ul></li><li><a href="#_14">第 5 章 实战示例</a><ul><li><a href="#_15">5.1 项目内示例：批量导入的日期兜底策略</a></li><li><a href="#_16">5.2 独立示例：归档按月分组 + "近 30 天"统计</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-14"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · waitress</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 Flask 自带服务器 vs waitress</a></li><li><a href="#_5">2.2 阻塞 vs 非阻塞：桌面版为什么必须用线程</a></li><li><a href="#_6">2.3 WSGI 一次握手</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 waitress.serve：最简启动（✅ 网页版用）</a></li><li><a href="#_10">4.2 waitress.server.create_server：非阻塞启动（✅ 桌面版用）</a></li><li><a href="#_11">4.3 常用配置参数</a></li><li><a href="#_12">4.4 反向代理（nginx 后面）时的关键配置（🧪 进阶）</a></li></ul></li><li><a href="#_13">第 5 章 实战示例</a><ul><li><a href="#_14">5.1 项目内示例：网页版 run_server（app.py 末尾）</a></li><li><a href="#_15">5.2 独立示例：一个"秒回"的并发压测对比</a></li></ul></li><li><a href="#_16">第 6 章 高频坑与排查</a></li><li><a href="#_17">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-15"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · pywebview</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 生命周期：从创建到退出</a></li><li><a href="#_5">2.2 GUI 后端：Windows 上默认用谁</a></li><li><a href="#_6">2.3 JS ↔ Python 双向通信（pywebview 的灵魂）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 create_window：全部常用参数（✅ 博客用了大半）</a></li><li><a href="#_10">4.2 start：进入事件循环</a></li><li><a href="#_11">4.3 窗口对象方法（✅ 托盘交互的核心）</a></li><li><a href="#_12">4.4 事件（window.events）</a></li><li><a href="#_13">4.5 js_api：JS 调 Python（➕ 强烈推荐掌握）</a></li><li><a href="#_14">4.6 多窗口与对话框（🧪 了解）</a></li></ul></li><li><a href="#_15">第 5 章 实战示例</a><ul><li><a href="#_16">5.1 项目内示例：博客的窗口创建（浓缩版）</a></li><li><a href="#_17">5.2 独立示例：10 行做一个"打开本地文件"桌面工具</a></li></ul></li><li><a href="#_18">第 6 章 高频坑与排查</a></li><li><a href="#_19">第 7 章 学习路径与自测</a></li></ul></div></nav>
+<nav class="toc-panel" id="toc-16"><div class="toc"><ul><li><a href="#_1">第三方库全面教程 · PyInstaller</a></li><li><a href="#_2">第 1 章 这个库是什么</a></li><li><a href="#_3">第 2 章 核心概念与原理</a><ul><li><a href="#_4">2.1 打包原理：静态分析 + 收集依赖</a></li><li><a href="#_5">2.2 onedir vs onefile：绿色版用哪个</a></li><li><a href="#_6">2.3 打包后资源路径为什么会变（最大坑）</a></li></ul></li><li><a href="#_7">第 3 章 安装与版本</a></li><li><a href="#_8">第 4 章 API 全面讲解</a><ul><li><a href="#_9">4.1 命令行快速入门</a></li><li><a href="#_10">4.2 spec 文件：打包的"配方"（✅ 博客的核心）</a></li><li><a href="#_11">4.3 spec 里的博客经验（务必看）</a></li><li><a href="#_12">4.4 运行时调试套路（✅ 踩坑必看）</a></li></ul></li><li><a href="#_13">第 5 章 实战示例</a><ul><li><a href="#_14">5.1 项目内示例：博客 config.py 的资源路径（打包后还能跑的秘诀）</a></li><li><a href="#_15">5.2 打包纯净版：把个人数据挡在包外（v2.8.3 实战）</a></li><li><a href="#_16">5.3 独立示例：给任意脚本打包的完整流程</a></li></ul></li><li><a href="#_17">第 6 章 高频坑与排查</a></li><li><a href="#_18">第 7 章 学习路径与自测</a></li><li><a href="#_19">全部 12 份教程完结</a></li></ul></div></nav></div></div><div id="main"><section class="doc-panel show" id="doc-01"><h1 id="_1">个人博客项目 · 零基础全流程开发教程</h1>
 <blockquote>
 <p>部分内容由豆包生成</p>
 </blockquote>
@@ -612,7 +577,7 @@ body{
 <h1 id="_19">每一个核心模块逐行代码讲解</h1>
 <p>本章是全文最长的部分。我们会按 <code>config.py → app.py → templates → static → main.py</code> 的顺序，把关键代码一行一行拆开讲。讲解风格统一为：<strong>先看代码 → 逐行解释 → 总结这段在干嘛</strong>。你不用背代码，看懂「每一行为什么存在」就行。</p>
 <h2 id="_20">config.py：全局配置模块</h2>
-<p>这个文件很短（约 180 行），但它是理解整个项目「数据放哪、跑在哪个端口」的钥匙。我们按顺序看它的核心片段。</p>
+<p>这个文件很短（约 185 行），但它是理解整个项目「数据放哪、跑在哪个端口」的钥匙。我们按顺序看它的核心片段。</p>
 <h3 id="_21">开头：路径与打包兼容</h3>
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -704,7 +669,7 @@ body{
 </li>
 </ul>
 <h2 id="_24">app.py 第一部分：应用初始化</h2>
-<p><code>app.py</code> 是 Flask 主程序，约 2400 行。它的结构是：<strong>初始化 → 数据模型 → 工具函数 → 路由（一堆 </strong><strong><code>@app.route</code></strong><strong>）→ 启动入口</strong>。我们按这个顺序讲。</p>
+<p><code>app.py</code> 是 Flask 主程序，约 2545 行。它的结构是：<strong>初始化 → 数据模型 → 工具函数 → 路由（一堆 </strong><strong><code>@app.route</code></strong><strong>）→ 启动入口</strong>。我们按这个顺序讲。</p>
 <h3 id="_25">导入与编码兼容</h3>
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">traceback</span><span class="o">,</span><span class="w"> </span><span class="nn">datetime</span><span class="o">,</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
@@ -1435,7 +1400,6 @@ body{
     <span class="n">_bind_window_size_save</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>    <span class="c1"># v2.8.3：拖拽调整大小后自动记住，下次启动沿用</span>
     <span class="n">_start_tray</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>               <span class="c1"># 挂托盘</span>
     <span class="n">webview</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>                   <span class="c1"># 进入窗口事件循环</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="n">webview</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>                   <span class="c1"># 进入窗口事件循环</span>
     <span class="k">return</span> <span class="mi">0</span>
 </code></pre></div>
 
@@ -1726,12 +1690,14 @@ body{
 <p>你已经走完了「认识项目 → 搭环境 → 读代码 → 跑起来 → 会排查」的完整闭环。下一步建议：① 试着改 <code>POSTS_PER_PAGE</code> 或首页标题，感受「改配置 → 重启 → 看效果」的循环；② 给文章详情页加一个「浏览量显示」，从 <code>view_count</code> 字段入手；③ 把 <code>main.py</code> 的托盘菜单加一个「刷新数据」项练手。改坏了不怕——数据库删掉 <code>blog.db</code> 重启会自动重建，代码改坏了看日志回退即可。祝你在编程路上越走越顺。</p>
 <blockquote>
 <p>（注：部分内容可能由 AI 生成）</p>
-</blockquote></section><section class="doc-panel" id="doc-02"><h1 id="_1">个人博客项目 · 第三方库技术栈总目录</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-02"><h1 id="_1">个人博客项目 · 第三方库技术栈总目录</h1>
 <blockquote>
 <p>部分内容由豆包生成</p>
 </blockquote>
 <h1 id="_2">写在前面：这份总目录怎么用</h1>
 <p>这份文档把博客项目（<code>D:\blog_pkg</code>）用到的 <strong>14 个第三方库/技术栈</strong>合并成一份全景地图。它解决三个问题：<strong>① 这 14 个库谁管什么（分工）；② 每个库的核心用法速查（不用翻整本手册）；③ 每个库最容易踩的坑（避雷清单）</strong>。每个库都配了对应详细手册的链接，需要逐行精读时直接跳转。</p>
+<p><strong>v2.8.3 升级说明：</strong>本版在 v2.1 基础上做了大幅扩充——每个库从原来的「角色定位 + API 速查 + 坑速查」三件套，升级为「角色定位 + 原理大白话 + 核心 API 详解（含参数与示例）+ 项目落地代码（真实源码片段）+ 高频坑详解 + 详细手册链接」六件套。<strong>原理部分</strong>解决「为什么这么设计」，<strong>落地代码</strong>解决「项目里到底怎么写的」，这两块是 v2.1 版缺失、也是初学者最需要的内容。</p>
 <p>建议用法：先看「全景总览」建立整体认知 → 按需跳到某一层某一库的速查节 → 遇到具体 API 或坑想深挖时，点「详细手册」链接看逐行讲解。</p>
 <h1 id="_3">全景总览：14 个库的分工地图</h1>
 <h2 id="_4">分层一览表</h2>
@@ -1802,230 +1768,627 @@ body{
 <h1 id="_6">第一层 · Web 框架（Flask / Jinja2 / Werkzeug）</h1>
 <h2 id="_7">Flask：博客的 Web 骨架</h2>
 <h3 id="_8">角色定位</h3>
-<p>所有网址路由、请求读取、页面渲染、接口返回都由它驱动。核心文件 <code>app.py</code> 的全部路由都是 <code>@app.route</code> 登记的。</p>
-<h3 id="_9">核心 API 速查</h3>
+<p>所有网址路由、请求读取、页面渲染、接口返回都由它驱动。核心文件 <code>app.py</code> 的全部路由都是 <code>@app.route</code> 登记的。它是你以后改博客 90% 动作的主战场——加一个页面、改一个接口，本质都是「写一个 Flask 路由函数」。</p>
+<h3 id="_9">原理大白话</h3>
+<p><strong>Flask 解决什么问题？</strong>浏览器访问 <code>http://127.0.0.1:5000/post/3/</code> 时，服务器收到一个 HTTP 请求。如果不用框架，你要自己解析请求文本、自己判断「这个网址该干什么」、自己拼 HTML 字符串返回——极其痛苦。Flask 替你做了三件事：</p>
+<ol>
+<li><strong>路由匹配</strong>：用 <code>@app.route('/post/&lt;int:post_id&gt;/')</code> 这种「装饰器」把「网址长什么样」和「该调用哪个函数」绑定起来。请求一到，Flask 自动按规则找函数。</li>
+<li><strong>请求封装</strong>：把「网址参数、表单数据、请求头、客户端 IP」全部装进 <code>request</code> 对象，你直接读属性就行，不用自己解析。</li>
+<li><strong>响应生成</strong>：你返回字符串/模板/JSON，Flask 自动包装成标准的 HTTP 响应（带正确的状态码和 Content-Type）。</li>
+</ol>
+<p><strong>为什么叫「微框架」？</strong>核心只做上面三件事，数据库、登录、表单校验都不内置，要用时自己装扩展（项目就装了 Flask-SQLAlchemy 管数据库）。好处是轻、灵活、学起来快；代价是「全家桶」功能要自己拼。</p>
+<p><strong>Flask 和 WSGI 什么关系？</strong>Flask 是一个 WSGI 应用——它不直接监听端口、不直接收网络字节流，而是「等别人把请求解析好递给它」。这个「别人」就是 WSGI 服务器：开发时是 Flask 自带的开发服务器，生产时是 waitress（第四层会讲）。正因为遵守 WSGI 约定，两者才能无缝切换。<strong>一句话：WSGI 是 Flask 和服务器之间的「接口标准」，Flask 是「业务处理者」。</strong></p>
+<h3 id="_10">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
 <th>API</th>
+<th>签名要点</th>
 <th>项目中的用途</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>Flask(__name__, template_folder=, static_folder=)</code></td>
-<td>创建应用，指定模板/静态目录（用 Config.RESOURCE_DIR 保证打包后可用）</td>
+<td>第一个参数是模块名，用于定位资源；后两个指定模板/静态目录</td>
+<td>app.py 第 122 行：目录用 <code>Config.RESOURCE_DIR</code> 拼接，保证打包后也能找到资源</td>
 </tr>
 <tr>
-<td><code>@app.route('/post/&lt;int:post_id&gt;/', methods=['POST'])</code></td>
-<td>登记路由；<code>&lt;int:xxx&gt;</code> 动态参数；methods 限制请求类型</td>
+<td><code>@app.route(rule, methods=[...])</code></td>
+<td><code>rule</code> 支持动态参数 <code>&lt;int:xxx&gt;</code>；<code>methods</code> 限制请求方法</td>
+<td>首页 <code>/</code>、文章详情 <code>/post/&lt;int:post_id&gt;/</code>、点赞接口 <code>methods=['POST']</code></td>
 </tr>
 <tr>
-<td><code>request.args.get / request.form.get / request.headers.get</code></td>
-<td>读网址参数 / 表单字段 / 请求头（点赞指纹靠它）</td>
+<td><code>request.args.get(name, default, type)</code></td>
+<td>读网址问号参数；<code>type</code> 参数做类型转换（如 <code>type=int</code>）</td>
+<td>首页 <code>request.args.get('page', 1, type=int)</code> 读页码</td>
 </tr>
 <tr>
-<td><code>render_template / redirect / url_for / flash</code></td>
-<td>渲染页面 / 跳转 / 反推网址 / 一次性提示</td>
+<td><code>request.form.get(name)</code></td>
+<td>读表单 POST 字段</td>
+<td>发文章表单的标题、正文、标签</td>
 </tr>
 <tr>
-<td><code>abort(404) / @app.errorhandler</code></td>
-<td>中断返回 404 / 自定义错误页</td>
+<td><code>request.headers.get(name)</code></td>
+<td>读请求头</td>
+<td>点赞指纹的一部分（User-Agent）</td>
 </tr>
 <tr>
-<td><code>jsonify / @app.context_processor / app.run</code></td>
-<td>返回 JSON（点赞接口）/ 注入全局模板变量 / 开发服务器启动</td>
+<td><code>request.get_json()</code></td>
+<td>读 AJAX 的 JSON 请求体</td>
+<td>新手向导 4 个 JSON API</td>
+</tr>
+<tr>
+<td><code>render_template(name, **kw)</code></td>
+<td>渲染模板并返回；所有模板要用的变量都要传</td>
+<td>每个页面路由的结尾</td>
+</tr>
+<tr>
+<td><code>redirect(url_for('函数名'))</code></td>
+<td>302 跳转；<code>url_for</code> 按路由函数名反推网址</td>
+<td>保存文章后跳回列表</td>
+</tr>
+<tr>
+<td><code>flash(msg, category)</code></td>
+<td>存一条一次性提示（配合模板里 <code>get_flashed_messages</code>）</td>
+<td>保存/删除成功提示</td>
+</tr>
+<tr>
+<td><code>jsonify(dict)</code></td>
+<td>返回 JSON 响应（状态码 200 + <code>application/json</code>）</td>
+<td>点赞接口、同步 API</td>
+</tr>
+<tr>
+<td><code>abort(404)</code> / <code>@app.errorhandler(404)</code></td>
+<td>中断请求返回 404 / 自定义错误页</td>
+<td>文章不存在时 <code>get_or_404</code> 内部用它</td>
+</tr>
+<tr>
+<td><code>@app.context_processor</code></td>
+<td>注册「全局模板变量注入器」，返回的 dict 每个模板都能用</td>
+<td><code>inject_globals()</code>（第 843 行）：站点名、导航、分类等全站变量</td>
+</tr>
+<tr>
+<td><code>@app.template_filter('名字')</code></td>
+<td>注册自定义模板过滤器，模板里 <code>{{ 值 | 过滤器 }}</code> 调用</td>
+<td><code>_tpl_strftime</code>（第 814 行）格式化日期、<code>_tpl_localtime</code>（第 802 行）转本地时区</td>
+</tr>
+<tr>
+<td><code>app.config.from_object(Config)</code></td>
+<td>把配置类的类属性全部读进 <code>app.config</code></td>
+<td>第 125 行：端口、数据库 URI、上传限制等都从 config.py 来</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_10">高频坑速查</h3>
+<h3 id="_11">项目落地代码（真实源码）</h3>
+<p><strong>应用创建（app.py 第 122~124 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">template_folder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">RESOURCE_DIR</span><span class="p">,</span> <span class="s1">'templates'</span><span class="p">),</span>
+            <span class="n">static_folder</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">RESOURCE_DIR</span><span class="p">,</span> <span class="s1">'static'</span><span class="p">))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">Config</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>逐行解释：</strong>① <code>__name__</code> 是 Python 的「当前模块名」，Flask 靠它定位资源，固定写法；② <code>Config.RESOURCE_DIR</code> 是项目自己定义的「资源根目录」——源码运行时指向项目目录，打包后指向 PyInstaller 的 <code>_internal</code> 目录（第六层详解），这样模板和静态文件两种环境下都能找到；③ <code>from_object(Config)</code> 把 config.py 里 Config 类的所有大写属性读进 <code>app.config</code>，之后代码里用 <code>app.config['POSTS_PER_PAGE']</code> 就能取到配置。</p>
+<p><strong>一个完整路由（文章详情，第 1058 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/post/&lt;int:post_id&gt;/'</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">post_detail</span><span class="p">(</span><span class="n">post_id</span><span class="p">):</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">post_id</span><span class="p">)</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'post_detail.html'</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="n">post</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>三个要点：</strong>① <code>&lt;int:post_id&gt;</code> 是动态参数——<code>/post/3/</code>、<code>/post/99/</code> 都进这个函数，<code>3</code>、<code>99</code> 会被转成整数传给 <code>post_id</code>；② <code>get_or_404</code> 查不到自动 404（不用自己写 if）；③ <code>render_template</code> 第一个参数是模板名，后面是「模板里要用的变量」。</p>
+<p><strong>全局变量注入（第 843 行，性能优化版）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">context_processor</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inject_globals</span><span class="p">():</span>
+    <span class="o">...</span>  <span class="c1"># 静态路径直接短路，动态路径查 5 秒 TTL 缓存</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">'site_name'</span><span class="p">:</span> <span class="s1">'个人博客'</span><span class="p">,</span> <span class="s1">'profile'</span><span class="p">:</span> <span class="n">profile</span><span class="p">,</span> <span class="s1">'tags'</span><span class="p">:</span> <span class="n">tags</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+</code></pre></div>
+
+<p><strong>为什么需要它？</strong>导航栏、站点名、分类列表这些「每个页面都有」的数据，如果每个路由都手动查一遍再传模板，会写 30 遍重复代码。<code>context_processor</code> 让这些变量<strong>自动</strong>出现在所有模板里。项目还做了性能优化：静态资源请求（CSS/JS/图片）完全不查数据库直接短路，普通页面 5 秒内复用同一份缓存——这是 v2.8.3 针对「一次页面加载触发 120 条 SQL」的优化。</p>
+<h3 id="_12">高频坑详解</h3>
 <ul>
 <li>
-<p>两个函数共用一个路由名 → <code>AssertionError: View function mapping is overwriting...</code>，换函数名或网址</p>
+<p><strong>两个函数共用一个路由名</strong> → <code>AssertionError: View function mapping is overwriting...</code>。Flask 默认用函数名当路由别名，重名会覆盖。<strong>解法</strong>：换函数名，或 <code>@app.route(..., endpoint='别的名字')</code> 显式起别名。</p>
 </li>
 <li>
-<p>表单页只写了 <code>methods=['POST']</code> → 直接打开页面 405，要用 <code>['GET', 'POST']</code></p>
+<p><strong>表单页只写了 <code>methods=['POST']</code></strong> → 直接打开页面 405。<strong>解法</strong>：新建/编辑页是「GET 显示表单 + POST 提交数据」两个动作，必须写 <code>methods=['GET', 'POST']</code>；纯操作类路由（删除、点赞）才只写 POST。</p>
 </li>
 <li>
-<p><code>request.form</code> 取不到值 → 检查 HTML 的 <code>name</code> 属性与代码字段名一致</p>
+<p><strong><code>request.form</code> 取不到值</strong> → 十有八九是 HTML 里 <code>name="xxx"</code> 和代码 <code>request.form.get('xxx')</code> 名字对不上。<strong>排查</strong>：右键页面看源码，核对 name 属性。</p>
 </li>
 <li>
-<p>生产环境开 debug → 堆栈泄露、可被远程接管；正式运行走 waitress</p>
+<p><strong>生产环境开 debug</strong> → 出错页泄露堆栈和源码，且 debug 模式带调试器可能被远程执行代码。<strong>解法</strong>：正式运行走 waitress，<code>debug</code> 永远 False。</p>
 </li>
 <li>
-<p>SECRET_KEY 缺失 → session/flash 全崩；项目用 config.py 自动持久化解决</p>
+<p><strong>SECRET_KEY 缺失</strong> → session/flash 全崩（报 <code>RuntimeError: The session is unavailable</code> 或提示需设置 secret_key）。<strong>解法</strong>：项目在 config.py 里自动生成并持久化 SECRET_KEY，重启不丢。</p>
+</li>
+<li>
+<p><strong>模板变量没传</strong> → Jinja2 把未定义变量渲染成空字符串，页面不报错但内容消失。<strong>排查</strong>：用 <code>{{ 变量 | default('缺失') }}</code> 快速定位。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/XgF7da1zGoxuTJxGkLVcb1nOnPg">Flask · 博客项目实战手册</a></p>
-<h2 id="_11">Jinja2：模板引擎</h2>
-<h3 id="_12">角色定位</h3>
-<p>把「HTML 骨架 + 数据」拼成网页。{{ }} 输出值，{% %} 写逻辑。所有 templates/ 页面都靠它。</p>
-<h3 id="_13">核心语法速查</h3>
+<h2 id="_13">Jinja2：模板引擎</h2>
+<h3 id="_14">角色定位</h3>
+<p>把「HTML 骨架 + 数据」拼成网页。<code>{{ }}</code> 输出值，<code>{% %}</code> 写逻辑。所有 templates/ 页面都靠它。<strong>理解 Jinja2 的关键一句话：模板是「带洞的 HTML」，洞由路由函数传进来的数据填上。</strong></p>
+<h3 id="_15">原理大白话</h3>
+<p><strong>Jinja2 解决什么问题？</strong>页面 90% 是重复的：每个文章卡片都长一样，只是标题/日期/链接不同。如果每个页面手写 HTML，改个导航栏要改 30 个文件。Jinja2 的方案是<strong>模板继承 + 循环 + 条件</strong>：</p>
+<ol>
+<li><strong>继承</strong>：<code>base.html</code> 定义全站骨架（导航、页脚、CSS 引入），用 <code>{% block %}</code> 开「插槽」；子页面 <code>{% extends "base.html" %}</code> 只填自己的插槽。改导航 = 只改 base.html 一个文件。</li>
+<li><strong>循环</strong>：<code>{% for post in posts %}</code> 把一篇文章的 HTML 模板重复渲染 N 遍——数据库返回多少篇，页面就生成多少个卡片。</li>
+<li><strong>条件</strong>：<code>{% if post.published %}</code> 按数据决定显示什么。</li>
+<li><strong>自动转义</strong>：<code>{{ post.title }}</code> 输出的内容中，<code>&lt;</code>、<code>&gt;</code>、<code>&amp;</code> 等字符会被自动转义成安全实体——<strong>这是防 XSS（跨站脚本攻击）的第一道防线</strong>。只有你确认内容是可信 HTML 时，才用 <code>|safe</code> 关掉转义。</li>
+</ol>
+<p><strong>模板渲染流程：</strong>路由函数 <code>render_template('index.html', posts=posts)</code> → Jinja2 加载模板文件 → 解析 <code>{% %}</code> 和 <code>{{ }}</code> → 用传入数据替换 → 输出纯 HTML 字符串 → Flask 返回给浏览器。<strong>注意：Jinja2 渲染发生在服务器端</strong>，浏览器拿到的是最终 HTML，看不到模板语法。</p>
+<h3 id="_16">核心语法详解</h3>
 <table>
 <thead>
 <tr>
 <th>语法</th>
 <th>用途</th>
+<th>项目例子</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>{{ 变量 }}</code></td>
-<td>输出数据，默认自动转义（防 XSS）；可信 HTML 加 <code>|safe</code></td>
+<td>输出值，默认自动转义</td>
+<td><code>{{ post.title }}</code> 文章标题</td>
 </tr>
 <tr>
-<td><code>{% extends / block / include %}</code></td>
-<td>模板继承三件套：base.html 开插槽，子页填内容，nav/footer 直接嵌入</td>
+<td><code>{{ 变量 | safe }}</code></td>
+<td>输出原始 HTML（不转义）</td>
+<td><code>{{ post.rendered_html | safe }}</code> 文章正文——这是 Markdown 渲染好的 HTML，必须 safe 否则显示成源码</td>
 </tr>
 <tr>
-<td><code>{% for %}{% endfor %} / {% if %}{% endif %}</code></td>
-<td>循环渲染文章卡片、条件输出</td>
+<td><code>{{ 变量 | 过滤器(参数) }}</code></td>
+<td>管道语法：值经过函数加工再输出</td>
+<td><code>{{ post.created_at | strftime('%Y-%m-%d') }}</code> 格式化日期；<code>{{ 值 | default('缺失') }}</code> 给默认值</td>
 </tr>
 <tr>
-<td><code>url_for('static', filename=...)</code></td>
-<td>生成静态资源网址（tailwind/vditor 引入）</td>
+<td><code>{% extends 'base.html' %}</code></td>
+<td>模板继承：子页声明「我是 base 的孩子」</td>
+<td>每个前台页面第一行都是它</td>
+</tr>
+<tr>
+<td><code>{% block 名字 %}{% endblock %}</code></td>
+<td>定义/填充插槽</td>
+<td>base.html 里 <code>{% block content %}</code>，子页填内容</td>
+</tr>
+<tr>
+<td><code>{% include 'xxx.html' %}</code></td>
+<td>把另一个模板原样嵌入</td>
+<td>导航、页脚等公共片段</td>
+</tr>
+<tr>
+<td><code>{% for x in 列表 %}{% endfor %}</code></td>
+<td>循环渲染</td>
+<td>首页文章卡片、标签云、评论列表</td>
+</tr>
+<tr>
+<td><code>{% if 条件 %}{% else %}{% endif %}</code></td>
+<td>条件分支</td>
+<td><code>{% if profile %}</code> 有资料才显示「关于我」区块</td>
+</tr>
+<tr>
+<td><code>{% for ... %}{% else %}{% endfor %}</code></td>
+<td>空列表时执行 else</td>
+<td>草稿箱空时显示「没有草稿」</td>
+</tr>
+<tr>
+<td><code>url_for('函数名', 参数=值)</code></td>
+<td>按路由反推网址（模板里也能用）</td>
+<td><code>url_for('post_detail', post_id=post.id)</code> 生成 <code>/post/7/</code></td>
+</tr>
+<tr>
+<td><code>get_flashed_messages()</code></td>
+<td>读取一次性提示</td>
+<td>保存成功后的绿色提示条</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_14">高频坑速查</h3>
+<h3 id="_17">项目落地代码（真实源码）</h3>
+<p><strong>base.html 骨架（所有页面的母版）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"zh-CN"</span> <span class="na">class</span><span class="o">=</span><span class="s">"{% if dark_mode %}dark{% endif %}"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  ...（CSS 引入、网站标题）
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">class</span><span class="o">=</span><span class="s">"bg-gray-50 ..."</span><span class="p">&gt;</span>
+  {% include 'nav.html' %}            {# 导航栏：所有页面共享 #}
+  <span class="p">&lt;</span><span class="nt">main</span> <span class="na">class</span><span class="o">=</span><span class="s">"..."</span><span class="p">&gt;</span>
+    {% block content %}{% endblock %} {# 插槽：子页面填这里 #}
+  <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+  {% include 'footer.html' %}         {# 页脚 #}
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p><strong>子页面填充（index.html 开头）：</strong></p>
+<div class="codehilite"><pre><span></span><code>{% extends 'base.html' %}
+{% block content %}
+  {% for post in pagination.items %}
+  <span class="p">&lt;</span><span class="nt">article</span> <span class="na">class</span><span class="o">=</span><span class="s">"..."</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"{{ url_for('post_detail', post_id=post.id) }}"</span><span class="p">&gt;</span>{{ post.title }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"text-gray-500"</span><span class="p">&gt;</span>
+      {{ post.created_at | strftime('%Y-%m-%d') }} · {{ post.view_count }} 次浏览
+    <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+  {% endfor %}
+{% endblock %}
+</code></pre></div>
+
+<p><strong>v2.8.3 的时区过滤器（app.py 第 802 行）：</strong>项目新增了三个自定义过滤器，解决「数据库存的是 UTC 时间，显示比北京时间慢 8 小时」的问题：</p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">template_filter</span><span class="p">(</span><span class="s1">'localtime'</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_tpl_localtime</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""naive UTC datetime -&gt; 本地时间（模板显示用，避免 8 小时时差）"""</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="n">dt</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="s1">'tzinfo'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>   <span class="c1"># 先声明它是 UTC</span>
+    <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span>                               <span class="c1"># 再转本地时区</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">template_filter</span><span class="p">(</span><span class="s1">'strftime'</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_tpl_strftime</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Jinja 无内置 strftime 过滤器；本地化后按格式输出"""</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="s1">''</span>
+    <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>为什么要自己写？</strong>Jinja2 没有内置的 <code>strftime</code>（格式化日期）过滤器，且数据库存的 <code>created_at</code> 是「无时区标记的 UTC 时间」，直接显示会差 8 小时。这两个过滤器配合使用：先 <code>|localtime</code> 转成北京时间，再 <code>|strftime('%Y-%m-%d %H:%M')</code> 按格式输出。<strong>这是 v2.8.3 修复「同步后时间异常」的核心补丁。</strong></p>
+<h3 id="_18">高频坑详解</h3>
 <ul>
 <li>
-<p>忘记 endfor/endif → TemplateSyntaxError</p>
+<p><strong>忘记 endfor/endif</strong> → <code>TemplateSyntaxError: tag name expected</code>。<strong>解法</strong>：<code>{% for %}</code> 必须以 <code>{% endfor %}</code> 收尾，<code>{% if %}</code> 必须以 <code>{% endif %}</code> 收尾；缩进好看但不强制，<strong>闭合标签才是语法</strong>。</p>
 </li>
 <li>
-<p>该加 <code>|safe</code> 没加 → HTML 变文字；用户输入加了 safe → XSS</p>
+<p><strong>该加 <code>|safe</code> 没加</strong> → HTML 变文字（用户看到 <code>&amp;lt;h1&amp;gt;</code> 而不是标题）。正文、CSS 常量这类「可信 HTML」都要 <code>|safe</code>。</p>
 </li>
 <li>
-<p>变量缺失不报错 → 排查时用 <code>|default('缺失')</code></p>
+<p><strong>用户输入加了 <code>|safe</code></strong> → <strong>XSS 漏洞</strong>！用户能往你的页面注入脚本。<strong>铁律</strong>：只有你自己生成的、或经过白名单过滤的内容才 safe；用户提交的评论、昵称永远不要 safe（评论模板里昵称、内容都是 <code>{{ }}</code> 直接输出，靠自动转义防护）。</p>
 </li>
 <li>
-<p>打包版模板改不动 → 模板在 _internal 只读区，改源码目录无效</p>
+<p><strong>变量缺失不报错</strong> → 渲染成空。<strong>排查</strong>：模板里临时加 <code>|default('缺失')</code>，刷新看哪个变量是「缺失」——对照路由的 render_template 参数列表补传。</p>
+</li>
+<li>
+<p><strong>打包版模板改不动</strong> → 打包后模板在 <code>_internal</code> 只读区，改源码目录无效。<strong>解法</strong>：改 <code>D:\blog_pkg\templates\</code> 下的源文件后重新打包。</p>
+</li>
+<li>
+<p><strong><code>{% if 变量 %}</code> 判断失灵</strong> → 空列表 <code>[]</code>、空字符串 <code>''</code>、<code>0</code>、<code>None</code> 在 Jinja2 里都是假值。判断「列表是否为空」建议用 <code>{% if not posts %}</code>，判断「是否指定了某字段」注意空字符串也是假。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/JzEwdK8lDoWOHax4LA4cjny2nDg">Jinja2 · 博客项目实战手册</a></p>
-<h2 id="_15">Werkzeug：Flask 的底层引擎</h2>
-<h3 id="_16">角色定位</h3>
-<p>Flask 的依赖，负责请求解析/路由匹配/调试器。项目直接调用它的只有一处：<code>secure_filename()</code>——上传文件名的安全消毒（防路径穿越）。</p>
-<h3 id="_17">核心 API 速查</h3>
+<h2 id="_19">Werkzeug：Flask 的底层引擎</h2>
+<h3 id="_20">角色定位</h3>
+<p>Flask 的依赖，负责请求解析/路由匹配/调试器。项目直接调用它的只有一处：<code>secure_filename()</code>——上传文件名的安全消毒（防路径穿越）。<strong>平时你几乎感觉不到它，但它是 Flask 能跑起来的地基。</strong></p>
+<h3 id="_21">原理大白话</h3>
+<p><strong>Werkzeug 是什么？</strong>「Werkzeug」是德语「工具」的意思。它是 Flask 的底层 WSGI 工具库——Flask 的路由匹配、请求解析、响应生成，底层都是 Werkzeug 在做。你可以把 Flask 想成「餐厅经理」（定菜谱、管流程），Werkzeug 是「后厨设备」（锅碗瓢盆）。<strong>你装 Flask 时它自动装好，不用单独装，但它的 <code>secure_filename</code> 你必须会——这是上传功能的安全底线。</strong></p>
+<p><strong>路径穿越漏洞是什么？</strong>用户上传文件名如果是 <code>../../etc/passwd</code> 或 <code>..\..\evil.md</code>，直接拼路径保存就会把文件写到项目目录之外，攻击者可能覆盖你的系统文件。<code>secure_filename()</code> 把这类危险字符全部处理掉，只保留安全的 ASCII 字符。</p>
+<h3 id="_22">核心 API 详解</h3>
 <ul>
 <li>
-<p><code>secure_filename(文件名)</code>：把中文/空格/<code>..</code> 等危险字符处理成安全 ASCII 名，保存上传文件前必用</p>
+<p><strong><code>secure_filename(文件名)</code></strong>：把中文/空格/<code>..</code>/<code>/</code> 等危险字符处理成安全 ASCII 名。<strong>注意：中文会被替换成下划线或空</strong>——这是安全设计，不是 bug。保存上传文件前必用。</p>
 </li>
 <li>
-<p>配合写法：<code>save_name = 时间戳 + '_' + secure_filename(file.filename)</code>，防同名覆盖</p>
+<p><strong>配合写法</strong>：<code>save_name = 时间戳 + '_' + secure_filename(file.filename)</code>——时间戳防同名覆盖，secure_filename 防路径穿越，双保险。</p>
 </li>
 <li>
-<p><code>file.seek(0)</code>：读过内容后写盘前先倒回指针，否则文件 0 字节</p>
+<p><strong><code>file.seek(0)</code></strong>：文件对象读过内容（如验证图片）后，指针到了文件末尾；写盘前必须倒回开头，否则保存的文件是 0 字节。<strong>这是上传功能最常见的隐性 bug。</strong></p>
 </li>
 </ul>
-<h3 id="_18">高频坑速查</h3>
+<h3 id="_23">项目落地代码（真实源码）</h3>
+<p>项目里 <code>secure_filename</code> 用在文章图片/头像上传（可搜索 <code>secure_filename</code> 定位）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">werkzeug.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">secure_filename</span>
+<span class="o">...</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>      <span class="c1"># 消毒：防路径穿越</span>
+<span class="n">save_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>   <span class="c1"># 加时间戳防同名覆盖</span>
+<span class="n">file</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="n">save_name</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>三步缺一不可：</strong>① <code>secure_filename</code> 把 <code>../../evil.md</code> 变成 <code>evil.md</code>（<code>..</code> 和斜杠全没了）；② 时间戳前缀保证两个用户传同名文件互不覆盖；③ <code>file.save(绝对路径)</code> 落盘。</p>
+<h3 id="_24">高频坑详解</h3>
 <ul>
 <li>
-<p>中文文件名被改成下划线——这是安全设计，要保原名自己写规则</p>
+<p><strong>中文文件名被改成下划线</strong> → 这是安全设计。<strong>解法</strong>：要保原名自己写规则（比如只过滤 <code>..</code> 和路径分隔符，保留中文），但<strong>不建议</strong>——保留中文会引入编码和路径兼容问题，加时间戳前缀已经能避免重名。</p>
 </li>
 <li>
-<p>不消毒直接拼路径 → 路径穿越漏洞（<code>../../evil.md</code>）</p>
+<p><strong>不消毒直接拼路径</strong> → <strong>路径穿越漏洞</strong>（<code>../../evil.md</code>）。<strong>铁律</strong>：任何用户提供的文件名，落盘前必须过 <code>secure_filename</code>。</p>
 </li>
 <li>
-<p>文件名消毒后再拼时间戳，双重保险</p>
+<p><strong>保存后文件 0 字节</strong> → 读文件内容后忘了 <code>file.seek(0)</code>。<strong>解法</strong>：<code>file.stream.seek(0)</code> 后再 <code>file.save(...)</code>。</p>
+</li>
+<li>
+<p><strong>打包后上传报错</strong> → 上传目录写死了相对路径。<strong>解法</strong>：上传目录要用 <code>Config.UPLOAD_FOLDER</code>（基于 DATA_DIR，打包后指向用户数据目录而非 <code>_internal</code>）。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/VautdXxfgoM9dWxpKSicmXcHnyc">Werkzeug · 博客项目实战手册</a></p>
-<h1 id="_19">第二层 · 数据层（Flask-SQLAlchemy / SQLite）</h1>
-<h2 id="_20">Flask-SQLAlchemy：数据库 ORM</h2>
-<h3 id="_21">角色定位</h3>
-<p>用 Python 代码操作数据库，管着 Post/Tag/Comment/Like/Profile/FriendLink 6 张表。增删改查、级联删除、分页、统计全是它。</p>
-<h3 id="_22">核心 API 速查</h3>
+<h1 id="_25">第二层 · 数据层（Flask-SQLAlchemy / SQLite）</h1>
+<h2 id="_26">Flask-SQLAlchemy：数据库 ORM</h2>
+<h3 id="_27">角色定位</h3>
+<p>用 Python 代码操作数据库，管着 Post/Tag/Comment/Like/Profile/FriendLink 6 张表。增删改查、级联删除、分页、统计全是它。<strong>它是你改博客第二高频的库——加字段、改查询、做统计都靠它。</strong></p>
+<h3 id="_28">原理大白话</h3>
+<p><strong>ORM 是什么？</strong>ORM（Object-Relational Mapping，对象关系映射）把「数据库的行」映射成「Python 对象」。没有 ORM 时你要写 SQL：<code>SELECT * FROM post WHERE id=3</code>；有 ORM 后你写 Python：<code>Post.query.get(3)</code>。<strong>好处</strong>：① 不用记 SQL 语法，用 Python 链式调用；② 数据库从 SQLite 换成 MySQL 代码不用改；③ 列名错误、类型错误在写代码时就能发现。</p>
+<p><strong>Flask-SQLAlchemy 和 SQLAlchemy 什么关系？</strong>SQLAlchemy 是通用的 Python ORM 库（不依赖 Flask）；Flask-SQLAlchemy 是它的 Flask 封装——把 <code>db</code> 对象和 Flask 应用绑定，让你在路由里直接用 <code>db.session</code> 操作，还自动处理「请求结束关闭连接」等琐事。<strong>项目用的是 Flask-SQLAlchemy 3.x 风格（<code>db = SQLAlchemy(app)</code>）。</strong></p>
+<p><strong>查询链是怎么回事？</strong><code>Post.query.filter_by(...).order_by(...).limit(...).all()</code> 是「懒加载」——每个方法只返回一个「查询对象」，不真正执行 SQL；只有最后的 <code>.all()</code> / <code>.first()</code> / <code>.count()</code> 才真正访问数据库。<strong>这让你能按条件逐步拼查询</strong>（项目首页搜索就是这么做的：先过滤发布状态，有搜索词再加模糊条件，有分类再加分类条件，最后统一排序分页）。</p>
+<p><strong>级联删除为什么必须配置？</strong>删除文章时，它的评论怎么办？SQLAlchemy 默认行为是「把评论的 post_id 置为 NULL」——但评论表 post_id 是 NOT NULL（非空约束），于是报 <code>NOT NULL constraint failed: comment.post_id</code>。项目在 Comment 模型的 relationship 上配置了 <code>cascade='all, delete-orphan'</code>，删文章时<strong>先自动删光它的评论</strong>，再删文章本身。</p>
+<h3 id="_29">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
 <th>API</th>
+<th>签名/说明</th>
 <th>项目中的用途</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>db = SQLAlchemy(app)</code></td>
-<td>创建数据库操作对象</td>
+<td><code>SQLAlchemy(app)</code></td>
+<td>创建数据库操作对象，绑定 Flask 应用</td>
+<td>app.py 第 126 行 <code>db = SQLAlchemy(app)</code></td>
 </tr>
 <tr>
 <td><code>db.Column(类型, 约束)</code></td>
-<td>定义列：Integer/String/Text/Boolean/DateTime；primary_key / nullable / default</td>
+<td>定义列。类型：Integer/String(长度)/Text/Boolean/DateTime；约束：primary_key / nullable / default / unique</td>
+<td>Post 模型 12 个字段全是它</td>
 </tr>
 <tr>
-<td><code>db.relationship / db.backref</code></td>
-<td>多对多标签、评论级联（<code>cascade='all, delete-orphan'</code>）</td>
+<td><code>db.relationship('目标类', backref=, cascade=)</code></td>
+<td>定义表间关系。backref 反向访问名；cascade 控制级联</td>
+<td><code>db.relationship('Post', backref=db.backref('comments', cascade='all, delete-orphan'))</code></td>
 </tr>
 <tr>
 <td><code>db.ForeignKey('post.id', ondelete='CASCADE')</code></td>
-<td>外键 + 数据库级联删除（评论属于文章）</td>
+<td>外键：这列引用另一张表的主键</td>
+<td>Comment.post_id 引用 post.id</td>
 </tr>
 <tr>
-<td><code>Model.query.get_or_404 / filter_by / filter / order_by / paginate / count / first / all</code></td>
-<td>查询全家桶：按 id 查、等值过滤、模糊搜索（ilike）、排序、分页、计数</td>
+<td><code>Model.query.get_or_404(id)</code></td>
+<td>按主键查，查不到自动 404</td>
+<td>文章详情、编辑、删除都先它取对象</td>
 </tr>
 <tr>
-<td><code>db.session.add / commit / delete / rollback</code></td>
-<td>写入三步（add→commit）、删除、出错回滚</td>
+<td><code>Model.query.filter_by(列=值)</code></td>
+<td>等值过滤（= 条件）</td>
+<td><code>filter_by(published=True, is_deleted=False)</code> 只查已发布未删除</td>
 </tr>
 <tr>
-<td><code>db.create_all() + inspect + text("ALTER TABLE...")</code></td>
-<td>建表 + 轻量迁移补列（init_db）</td>
+<td><code>Model.query.filter(表达式)</code></td>
+<td>复杂过滤（<code>==</code>、<code>ilike</code>、<code>db.or_</code>、<code>.is_()</code>）</td>
+<td>搜索的 <code>db.or_(Post.title.ilike(...), ...)</code></td>
+</tr>
+<tr>
+<td><code>.order_by(列.desc() / .asc())</code></td>
+<td>排序；desc 倒序、asc 正序；可传多个键</td>
+<td><code>order_by(Post.created_at.desc())</code> 最新在前</td>
+</tr>
+<tr>
+<td><code>.paginate(page, per_page, error_out)</code></td>
+<td>分页：返回 Pagination 对象（.items 当前页数据、.pages 总页数、.has_prev/.has_next 有无上下页）</td>
+<td>首页、归档、后台文章列表</td>
+</tr>
+<tr>
+<td><code>.limit(N) / .offset(N)</code></td>
+<td>限量 / 跳过前 N 条</td>
+<td>排行榜前 10（配合排序）</td>
+</tr>
+<tr>
+<td><code>.count()</code></td>
+<td>计数（返回整数）</td>
+<td>文章总数、分类数、点赞数</td>
+</tr>
+<tr>
+<td><code>.first() / .all()</code></td>
+<td>取第一行 / 取全部（<strong>真正执行查询的触发点</strong>）</td>
+<td><code>random_post = ...order_by(db.func.random()).first()</code></td>
+</tr>
+<tr>
+<td><code>db.session.add(obj) / commit()</code></td>
+<td>写入两步：把对象加进会话 → 提交（<strong>忘 commit 数据不落库</strong>）</td>
+<td>新建文章、加评论、点赞</td>
+</tr>
+<tr>
+<td><code>db.session.delete(obj) / commit()</code></td>
+<td>删除两步：标记删除 → 提交</td>
+<td>删文章、删评论</td>
+</tr>
+<tr>
+<td><code>db.session.rollback()</code></td>
+<td>出错回滚（撤销本次未提交的改动）</td>
+<td>ALTER 补列失败时回滚</td>
+</tr>
+<tr>
+<td><code>db.create_all()</code></td>
+<td>按模型建表（已存在的表不动）</td>
+<td>init_db 里建 7 张表</td>
+</tr>
+<tr>
+<td><code>db.session.execute(db.text('ALTER TABLE ...'))</code></td>
+<td>执行原生 SQL</td>
+<td>init_db 的轻量迁移补列</td>
+</tr>
+<tr>
+<td><code>inspect(db.engine)</code></td>
+<td>反射数据库结构，查列是否已存在</td>
+<td>init_db 判断「这列加了没」</td>
+</tr>
+<tr>
+<td><code>db.func.random()</code></td>
+<td>SQLite 的随机函数</td>
+<td>「随机看看」功能</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_23">高频坑速查</h3>
+<h3 id="_30">项目落地代码（真实源码）</h3>
+<p><strong>Post 模型（第 437 行，完整版）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Post</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""博客文章"""</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">500</span><span class="p">))</span>              <span class="c1"># 摘要（可选，自动生成）</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>     <span class="c1"># Markdown 原文</span>
+    <span class="n">rendered_html</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">)</span>               <span class="c1"># 渲染结果缓存（性能优化）</span>
+    <span class="n">is_deleted</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># 软删墓碑（云同步基石）</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">updated_at</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span>
+                           <span class="n">onupdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">published</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">view_count</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="s1">'Tag'</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">post_tags</span><span class="p">,</span>
+                           <span class="n">backref</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">backref</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="s1">'dynamic'</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>为什么这么设计（每条都是经验）：</strong>① <code>rendered_html</code> 缓存列——Markdown 渲染一次要几十毫秒，存起来详情页直接读，不用每次重渲染（v2.8.3 性能优化核心）；② <code>is_deleted</code> 软删——删除不打 <code>DELETE</code> 而是打标记，这样云同步才能把「删除」这个动作同步到其他机器；③ <code>onupdate</code> 让 <code>updated_at</code> 每次修改自动刷新；④ <code>tags</code> 多对多关系通过中间表 <code>post_tags</code> 关联。</p>
+<p><strong>查询链（首页搜索，第 1014 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">q</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">published</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_deleted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">query</span><span class="p">:</span>                                    <span class="c1"># 有搜索词才加模糊条件</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">or_</span><span class="p">(</span>
+        <span class="n">Post</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="sa">f</span><span class="s1">'%</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">%'</span><span class="p">),</span>
+        <span class="n">Post</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="sa">f</span><span class="s1">'%</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">%'</span><span class="p">),</span>
+        <span class="n">Post</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="sa">f</span><span class="s1">'%</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1">%'</span><span class="p">)</span>
+    <span class="p">))</span>
+<span class="k">if</span> <span class="n">category</span><span class="p">:</span>                                 <span class="c1"># 有分类才加分类条件</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Post</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">category</span><span class="p">)</span>
+<span class="n">pagination</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Post</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
+    <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">'POSTS_PER_PAGE'</span><span class="p">],</span> <span class="n">error_out</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p><strong>这是「查询链」的最佳示范：</strong>先过滤（已发布未删除）→ 可选叠加条件（搜索/分类，<code>if</code> 判断）→ 排序 → 分页。<code>.paginate()</code> 返回的对象自带 <code>.items</code>（当前页数据）、<code>.pages</code>（总页数）、<code>.has_prev</code>/<code>.has_next</code>（翻页判断），模板里直接循环 <code>.items</code> 就是文章列表。</p>
+<p><strong>级联删除（第 548 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># cascade='all, delete-orphan'：删除文章时级联删除其全部评论，</span>
+<span class="c1"># 避免 SQLAlchemy 默认把评论 post_id 置 NULL 而违反 NOT NULL 约束</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="s1">'Post'</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">backref</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="s1">'dynamic'</span><span class="p">,</span>
+                                                  <span class="n">cascade</span><span class="o">=</span><span class="s1">'all, delete-orphan'</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>轻量迁移补列（init_db 第 2248 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+    <span class="c1"># 自动为旧数据库补充新增列（无迁移框架时的轻量方案）</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">inspect</span><span class="p">,</span> <span class="n">text</span>
+    <span class="n">insp</span> <span class="o">=</span> <span class="n">inspect</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">insp</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="s1">'post'</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="s1">'is_deleted'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">text</span><span class="p">(</span><span class="s1">'ALTER TABLE post ADD COLUMN is_deleted BOOLEAN DEFAULT 0'</span><span class="p">))</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</code></pre></div>
+
+<p><strong>为什么必须 ALTER 而不是删库重建？</strong>你的 <code>blog.db</code> 里已有文章数据，删库重建全没了。ALTER TABLE 只加一列、不动旧数据；<code>inspect</code> 先查列是否存在，存在就跳过——脚本幂等，启动 100 次也安全。</p>
+<h3 id="_31">高频坑详解</h3>
 <ul>
 <li>
-<p>忘了 <code>commit()</code> → 数据没保存，重启就丢</p>
+<p><strong>忘了 <code>commit()</code></strong> → 数据没保存，重启就丢。<strong>铁律</strong>：<code>add</code>/<code>delete</code> 之后必须 <code>db.session.commit()</code>。调试时多写一句 <code>print</code> 确认走到了 commit。</p>
 </li>
 <li>
-<p>删文章报 <code>NOT NULL constraint failed: comment.post_id</code> → 按「先删点赞 → 再删评论 → 最后删文章」显式顺序</p>
+<p><strong>删文章报 <code>NOT NULL constraint failed: comment.post_id</code></strong> → 评论外键非空，删除顺序不对。<strong>解法</strong>：项目已用 <code>cascade='all, delete-orphan'</code> 修复；如果你自己加表，注意「先删子表（点赞/评论）→ 再删主表（文章）」。</p>
 </li>
 <li>
-<p>报 <code>database is locked</code> → 配置 timeout=30、别开双实例</p>
+<p><strong>报 <code>database is locked</code></strong> → SQLite 同时被多个连接写。<strong>解法</strong>：连接串配 <code>timeout=30</code>（写锁等待 30 秒）；避免同时开两个实例（项目单实例锁会拦）；关掉占用数据库的其他程序。</p>
 </li>
 <li>
-<p>脚本里用 db 报 Working outside of application context → 包 <code>with app.app_context():</code></p>
+<p><strong>脚本里用 db 报 <code>Working outside of application context</code></strong> → 在后台脚本/线程里用 db 必须包 <code>with app.app_context():</code>。<strong>原因</strong>：db 依赖「当前应用上下文」，脚本入口没有这个上下文。项目同步线程、init_db 都包了。</p>
+</li>
+<li>
+<p><strong>模型加列后查询报 <code>no such column</code></strong> → <code>create_all()</code> 只建新表，<strong>不改旧表</strong>。<strong>解法</strong>：用 init_db 里的 ALTER 补列模式（见上）。</p>
+</li>
+<li>
+<p><strong><code>.first()</code> 返回 None 导致 <code>xxx.id</code> 报错</strong> → 查询结果可能为空。<strong>解法</strong>：<code>if xxx:</code> 判空再取属性，或直接用 <code>get_or_404</code>。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/ZFLLdwaZ6oI58Jx6QQ2cAlVtnDd">Flask-SQLAlchemy · 博客项目实战手册</a></p>
-<h2 id="_24">SQLite：数据库本体</h2>
-<h3 id="_25">角色定位</h3>
-<p>所有数据的家：<code>blog.db</code> 单文件数据库，零配置。项目通过 SQLAlchemy 操作它。</p>
-<h3 id="_26">关键配置速查</h3>
+<h2 id="_32">SQLite：数据库本体</h2>
+<h3 id="_33">角色定位</h3>
+<p>所有数据的家：<code>blog.db</code> 单文件数据库，零配置。项目通过 SQLAlchemy 操作它。<strong>它是博客的「记忆」——文章、评论、点赞、友链、资料全在这一个文件里。</strong></p>
+<h3 id="_34">原理大白话</h3>
+<p><strong>SQLite 是什么？</strong>一个「把整个数据库装进一个文件」的关系型数据库。不像 MySQL 要装服务器、开端口、管账号，SQLite 就是<strong>一个 .db 文件</strong>，Python 内置支持，读写全在文件层面完成。<strong>好处</strong>：零配置、单文件易备份、个人项目性能完全够；<strong>代价</strong>：同一时刻只有一个进程能写（所以有 <code>database is locked</code> 的坑），不适合高并发。</p>
+<p><strong>项目数据存在哪？</strong><code>data/blog.db</code>（数据目录）。<strong>备份 = 复制这一个文件</strong>；删掉它重启会自动重建（init_db 会建表 + 插入示例数据）——这就是「纯净版」的原理：把 blog.db 删了，打包出来的就是不带个人数据的全新博客。</p>
+<p><strong>连接串 <code>sqlite:///路径/blog.db</code> 是什么？</strong>SQLAlchemy 统一用 URL 描述数据库：<code>sqlite:///</code> 是 SQLite 协议头，后面跟文件路径。项目通过环境变量 <code>DATABASE_URL</code> 可覆盖，不设就用默认路径。</p>
+<h3 id="_35">关键配置详解</h3>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>值</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SQLALCHEMY_DATABASE_URI</code></td>
+<td><code>sqlite:///</code> + DATA_DIR + <code>blog.db</code></td>
+<td>数据库位置；可用环境变量 DATABASE_URL 覆盖</td>
+</tr>
+<tr>
+<td><code>check_same_thread=False</code></td>
+<td>连接参数</td>
+<td>允许不同线程共用连接（Flask 多线程必需，否则报 <code>SQLite objects created in a thread can only be used in that same thread</code>）</td>
+</tr>
+<tr>
+<td><code>timeout=30</code></td>
+<td>连接参数</td>
+<td>写锁等待上限（秒），防 <code>database is locked</code></td>
+</tr>
+<tr>
+<td><code>pool_recycle=1800</code></td>
+<td>连接池参数</td>
+<td>连接 30 分钟自动回收重建，防长连接假死</td>
+</tr>
+<tr>
+<td><code>pool_pre_ping=True</code></td>
+<td>连接池参数</td>
+<td>每次取连接先 ping 一下，连接断了自动重连</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么这些配置缺一不可？</strong>① Flask 默认多线程处理请求，SQLite 默认「一个连接只能在一个线程用」，不关检查直接崩；② SQLite 写操作要拿锁，两个进程同时写会立刻报错，<code>timeout=30</code> 让第二个写者等 30 秒而不是立刻失败；③ 长连接闲置久了会被系统回收，<code>pool_recycle</code> 定期重建避免「连接已死但程序不知道」。</p>
+<h3 id="_36">项目落地代码（真实源码，config.py 第 152 行）</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">SQLALCHEMY_DATABASE_URI</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s1">'DATABASE_URL'</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">'sqlite:///'</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">'blog.db'</span><span class="p">)</span>
+<span class="n">SQLALCHEMY_TRACK_MODIFICATIONS</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">SQLALCHEMY_ENGINE_OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'pool_pre_ping'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">'pool_recycle'</span><span class="p">:</span> <span class="mi">1800</span><span class="p">,</span>      <span class="c1"># 连接 30 分钟自动回收</span>
+    <span class="s1">'connect_args'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'check_same_thread'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'timeout'</span><span class="p">:</span> <span class="mi">30</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong><code>os.environ.get('DATABASE_URL') or 默认值</code></strong> 是「环境变量优先」的标准写法——想换数据库位置就在启动前设 <code>DATABASE_URL</code>，不设就用默认。</p>
+<h3 id="_37">高频坑详解</h3>
 <ul>
 <li>
-<p>连接串：<code>sqlite:///路径/blog.db</code>（config.py 的 SQLALCHEMY_DATABASE_URI）</p>
+<p><strong>模型加列查询报 <code>no such column</code></strong> → <code>create_all()</code> 不改旧表。<strong>解法</strong>：用 init_db 的 ALTER 补列（见 Flask-SQLAlchemy 落地代码）。</p>
 </li>
 <li>
-<p><code>check_same_thread=False</code>：Flask 多线程必需，否则跨线程报错</p>
+<p><strong>db 文件损坏报 <code>file is not a database</code></strong> → 文件被写坏（断电、磁盘满、或复制了正在写入的文件）。<strong>解法</strong>：定期复制 blog.db 备份；复制前先关博客；用 DB Browser for SQLite 的「完整性检查」验证。</p>
 </li>
 <li>
-<p><code>timeout=30</code>：写锁等待上限，防 database is locked</p>
+<p><strong>数据备份 = 复制一个文件</strong> → 就这么简单。同步功能（云备份）本质也是把这个文件按块上传到 Gitee。</p>
 </li>
 <li>
-<p><code>pool_recycle=1800</code>：连接 30 分钟回收，防长连接假死</p>
-</li>
-</ul>
-<h3 id="_27">高频坑速查</h3>
-<ul>
-<li>
-<p>模型加列查询报 no such column → create_all 不改旧表，用 ALTER TABLE 补列（项目 init_db 已内置）</p>
+<p><strong>删除 blog.db 后文章全没了</strong> → 正常现象，init_db 会重建空库 + 示例文章。<strong>想找回</strong>：从备份/云同步恢复。</p>
 </li>
 <li>
-<p>db 文件损坏报 file is not a database → 定期复制 blog.db 备份，别用同步中的文件</p>
-</li>
-<li>
-<p>数据备份 = 复制 blog.db 一个文件；删掉它重启自动重建</p>
+<p><strong><code>database is locked</code> 持续出现</strong> → 有程序长期占着写锁。<strong>排查</strong>：关掉所有博客实例和 DB Browser；确认没有后台同步进程在写。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/OEhqdRlRioSByUx7t2rcbqo7nfh">SQLite · 博客项目实战手册</a></p>
-<h1 id="_28">第三层 · 内容处理层（Markdown / Pygments / PyYAML / dateutil）</h1>
-<h2 id="_29">python-markdown：Markdown 转 HTML</h2>
-<h3 id="_30">角色定位</h3>
-<p>文章正文的加工核心：Markdown 原文 → HTML。带目录、代码高亮、表格等插件，结果缓存进 <code>rendered_html</code> 列避免重复渲染。</p>
-<h3 id="_31">核心 API 速查</h3>
+<h1 id="_38">第三层 · 内容处理层（Markdown / Pygments / PyYAML / dateutil）</h1>
+<h2 id="_39">python-markdown：Markdown 转 HTML</h2>
+<h3 id="_40">角色定位</h3>
+<p>文章正文的加工核心：Markdown 原文 → HTML。带目录、代码高亮、表格等插件，结果缓存进 <code>rendered_html</code> 列避免重复渲染。<strong>博客的「文章加工厂」——你写 <code># 标题</code>、<code>**加粗**</code>、<code>```代码 ```</code>，它负责变成浏览器能显示的 <code>&lt;h1&gt;</code>、<code>&lt;strong&gt;</code>、<code>&lt;pre&gt;</code>。</strong></p>
+<h3 id="_41">原理大白话</h3>
+<p><strong>为什么需要它？</strong>浏览器不认识 Markdown——它只认 HTML。你在编辑器里写 <code>## 副标题</code>，浏览器要看到的是 <code>&lt;h2&gt;副标题&lt;/h2&gt;</code>。python-markdown 就是做这个转换的库：读入 Markdown 字符串，输出 HTML 字符串。</p>
+<p><strong>插件（extensions）是什么？</strong>Markdown 核心语法只有标题、列表、加粗等基础能力。插件在核心之上加功能：</p>
+<ul>
+<li><strong>FencedCodeExtension</strong>：支持 <code>```python</code> 这种「围栏代码块」（核心语法只有缩进 4 空格那种老式写法，很难用）。</li>
+<li><strong>tables</strong>：支持 <code>| 列1 | 列2 |</code> 这种管道表格。</li>
+<li><strong>sane_lists</strong>：列表嵌套更符合直觉。</li>
+<li><strong>nl2br</strong>：普通换行转 <code>&lt;br&gt;</code>（否则 Markdown 里换行不生效，要空一行才是新段落）。</li>
+<li><strong>TocExtension</strong>：自动给标题生成锚点 id + 目录（<code>permalink=True</code> 每个标题挂一个 ¶ 链接）。</li>
+<li><strong>codehilite</strong>：代码块输出带高亮 class 的 HTML（配合 Pygments 的 CSS 才上色）。</li>
+</ul>
+<p><strong>渲染结果为什么缓存？</strong>一次 Markdown 渲染约几十毫秒，文章详情页每次访问都重渲染太浪费。项目把结果存进 <code>rendered_html</code> 列：写文章时自动渲染存入；编辑后清空；详情页读到空才渲染一次（懒回填）。</p>
+<h3 id="_42">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
@@ -2036,134 +2399,234 @@ body{
 <tbody>
 <tr>
 <td><code>markdown.Markdown(extensions=[...], extension_configs={...})</code></td>
-<td>创建渲染器，一次性配好插件</td>
-</tr>
-<tr>
-<td><code>FencedCodeExtension() / 'tables' / 'sane_lists' / 'nl2br'</code></td>
-<td>围栏代码块 / 表格 / 列表嵌套 / 换行转 \&lt;br&gt;</td>
-</tr>
-<tr>
-<td><code>TocExtension(permalink=True, toc_depth='2-4')</code></td>
-<td>自动目录锚点（只给 2\~4 级标题加）</td>
-</tr>
-<tr>
-<td><code>'codehilite'</code></td>
-<td>代码高亮插件（配 Pygments 的 CSS 才上色）</td>
+<td>创建渲染器，一次性配好插件（创建一次可反复 convert，别每次访问都 new）</td>
 </tr>
 <tr>
 <td><code>md.convert(text)</code></td>
 <td>渲染：Markdown 字符串 → HTML 字符串</td>
 </tr>
+<tr>
+<td><code>extension_configs={'codehilite': {'css_class': 'codehilite', ...}}</code></td>
+<td>给插件传配置：高亮 CSS 类名、是否行号、是否猜语言</td>
+</tr>
+<tr>
+<td><code>output_format='html5'</code></td>
+<td>输出 HTML5（默认已是，显式写更明确）</td>
+</tr>
+<tr>
+<td><code>TocExtension(permalink=True, toc_depth='2-4')</code></td>
+<td>目录插件：标题锚点 + 只给 2~4 级标题加</td>
+</tr>
 </tbody>
 </table>
-<h3 id="_32">高频坑速查</h3>
+<h3 id="_43">项目落地代码（真实源码，app.py 第 613 行）</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">render_markdown</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Markdown -&gt; HTML，带目录、代码高亮、表格等"""</span>
+    <span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">FencedCodeExtension</span><span class="p">(),</span>
+        <span class="s1">'tables'</span><span class="p">,</span>
+        <span class="s1">'sane_lists'</span><span class="p">,</span>
+        <span class="n">TocExtension</span><span class="p">(</span><span class="n">permalink</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toc_depth</span><span class="o">=</span><span class="s1">'2-4'</span><span class="p">),</span>
+        <span class="s1">'codehilite'</span><span class="p">,</span>
+        <span class="s1">'nl2br'</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">extension_configs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'codehilite'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">'css_class'</span><span class="p">:</span> <span class="s1">'codehilite'</span><span class="p">,</span>
+            <span class="s1">'linenums'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">'guess_lang'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span>
+        <span class="n">extensions</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
+        <span class="n">extension_configs</span><span class="o">=</span><span class="n">extension_configs</span><span class="p">,</span>
+        <span class="n">output_format</span><span class="o">=</span><span class="s1">'html5'</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">md</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>逐行解释：</strong>① <code>extensions</code> 列表一口气声明 6 个插件——这就是博客 Markdown 的全部能力边界；② <code>TocExtension(toc_depth='2-4')</code> 只给 2/3/4 级标题生成目录锚点（1 级标题是文章标题本身，不占目录）；③ <code>codehilite</code> 配 <code>css_class='codehilite'</code>——这个类名必须和 Pygments 生成 CSS 时用的前缀一致（下一节讲）；④ <code>md.convert(text)</code> 输出最终 HTML，存进 <code>rendered_html</code> 缓存列。</p>
+<h3 id="_44">高频坑详解</h3>
 <ul>
 <li>
-<p>代码块里还渲染 Markdown → 必须开 FencedCodeExtension</p>
+<p><strong>代码块里还渲染 Markdown</strong> → 没开 FencedCodeExtension，<code>```</code> 围栏不被识别，内容被当普通段落继续解析。<strong>解法</strong>：<code>extensions</code> 必须含 <code>FencedCodeExtension()</code>。</p>
 </li>
 <li>
-<p>换行消失 → 开 nl2br</p>
+<p><strong>换行消失</strong> → 没开 nl2br，Markdown 里换行不生效（要空一行才分段）。<strong>解法</strong>：加 <code>'nl2br'</code> 到 extensions。</p>
 </li>
 <li>
-<p>代码没颜色 → codehilite 只贴 class，还需 Pygments 的 CSS</p>
+<p><strong>代码没颜色</strong> → codehilite 只负责「贴高亮 class」，<strong>上色靠 CSS</strong>——而 CSS 是 Pygments 生成的（下一节）。两库必须配合。</p>
 </li>
 <li>
-<p>每次访问都重渲染 → 用 rendered_html 缓存 + 懒回填</p>
+<p><strong>每次访问都重渲染（慢）</strong> → 没用缓存。<strong>解法</strong>：用 <code>rendered_html</code> 列 + 懒回填（详情页读到空才渲染，写文章时预渲染）。</p>
 </li>
 <li>
-<p>用户写 <code>&lt;script&gt;</code> 被执行 → 多人投稿需过滤 HTML（bleach 等）</p>
+<p><strong>用户写 <code>&lt;script&gt;</code> 被执行</strong> → <strong>XSS</strong>。python-markdown 默认不清理 HTML（它会原样输出用户写的 <code>&lt;script&gt;</code>）。<strong>解法</strong>：个人自用没问题；多人投稿需先过滤（用 bleach 库白名单清洗）再渲染。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/CK2UdljCfodjWvx3llccr0r6nhb">python-markdown · 博客项目实战手册</a></p>
-<h2 id="_33">Pygments：代码高亮引擎</h2>
-<h3 id="_34">角色定位</h3>
-<p>给文章里的代码块「上色」：<code>HtmlFormatter(style='monokai').get_style_defs('.codehilite')</code> 生成高亮 CSS，挂到 .codehilite 类名下，正好匹配 codehilite 插件输出的代码块。</p>
-<h3 id="_35">核心 API 速查</h3>
+<h2 id="_45">Pygments：代码高亮引擎</h2>
+<h3 id="_46">角色定位</h3>
+<p>给文章里的代码块「上色」：<code>HtmlFormatter(style='monokai').get_style_defs('.codehilite')</code> 生成高亮 CSS，挂到 <code>.codehilite</code> 类名下，正好匹配 codehilite 插件输出的代码块。<strong>它是 python-markdown 的「上色搭档」——一个负责贴 class，一个负责给 class 定义颜色。</strong></p>
+<h3 id="_47">原理大白话</h3>
+<p><strong>代码高亮分两步，缺一不可：</strong></p>
+<ol>
+<li><strong>标记（python-markdown 的 codehilite 插件做）</strong>：分析代码块属于什么语言（<code>```python</code> 声明），把每个 token 包上 <code>&lt;span class="k"&gt;</code>、<code>&lt;span class="s"&gt;</code> 这类 class——<code>k</code> 是关键字（keyword）、<code>s</code> 是字符串（string）、<code>c</code> 是注释（comment）等。</li>
+<li><strong>上色（Pygments 做）</strong>：生成一段 CSS，规定 <code>.codehilite .k { color: #f92672 }</code>（关键字紫色）、<code>.codehilite .s { color: #e6db74 }</code>（字符串黄色）……浏览器读到这段 CSS 就给代码上色了。</li>
+</ol>
+<p><strong>为什么不用现成 CSS 文件？</strong>Pygments 的 <code>HtmlFormatter(style='monokai')</code> 支持几十种配色主题（github/friendly/vim/monokai……），项目选 monokai（深色主题）。生成 CSS 是一次性操作（结果不会变），所以项目把它缓存成模块级常量——避免每次请求都重新生成（每次约 20ms）。</p>
+<h3 id="_48">核心 API 详解</h3>
 <ul>
 <li>
-<p><code>HtmlFormatter(style='monokai')</code>：选配色主题（github/friendly/vim 等可换）</p>
+<p><strong><code>HtmlFormatter(style='monokai')</code></strong>：选配色主题。<code>style</code> 可换：<code>'github'</code>（浅色）、<code>'friendly'</code>、<code>'vim'</code>、<code>'monokai'</code>（深色）等。</p>
 </li>
 <li>
-<p><code>.get_style_defs('.codehilite')</code>：生成 CSS；前缀必须与 codehilite 插件 css_class 一致</p>
+<p><strong><code>.get_style_defs('.codehilite')</code></strong>：生成 CSS 字符串。参数是 CSS 前缀——<strong>必须与 codehilite 插件的 <code>css_class</code> 完全一致</strong>（项目两边都是 <code>'codehilite'</code>），否则类名对不上、不上色。</p>
 </li>
 <li>
-<p>模块加载时生成一次即可（约 20ms 开销，别放路由里）</p>
+<p><strong>模块加载时生成一次即可</strong>（约 20ms 开销，别放路由里）——项目在文件顶部生成 <code>_CODEHILITE_CSS</code> 常量。</p>
 </li>
 <li>
-<p>模板输出时加 <code>|safe</code>，否则 CSS 被转义</p>
+<p><strong>模板输出时加 <code>|safe</code></strong>：CSS 字符串里有 <code>{</code>、<code>}</code>、<code>#</code> 等字符，Jinja2 自动转义会把 CSS 变源码。输出必须 <code>{{ codehilite_css | safe }}</code>。</p>
 </li>
 </ul>
-<h3 id="_36">高频坑速查</h3>
+<h3 id="_49">项目落地代码（真实源码，app.py 第 43 行）</h3>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pygments.formatters</span><span class="w"> </span><span class="kn">import</span> <span class="n">HtmlFormatter</span>
+<span class="c1"># 【PP2 · 性能】HtmlFormatter 只实例化一次（pygments monokai 规则是纯常量），</span>
+<span class="c1">#              避免每次 inject_globals 都做 20ms 量级的 CSS 规则扫描。</span>
+<span class="n">_CODEHILITE_CSS</span> <span class="o">=</span> <span class="n">HtmlFormatter</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">'monokai'</span><span class="p">)</span><span class="o">.</span><span class="n">get_style_defs</span><span class="p">(</span><span class="s1">'.codehilite'</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>为什么放模块顶部？</strong><code>HtmlFormatter(...)</code> 创建 + <code>get_style_defs(...)</code> 生成 CSS 是<strong>纯计算</strong>（同样的输入永远同样的输出）。放模块顶部只在启动时算一次，之后整个进程复用 <code>_CODEHILITE_CSS</code>。如果放路由里，每次请求都重算，白白浪费 20ms——这就是注释里说的 PP2 性能优化。</p>
+<p><strong>模板里怎么用（base.html）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;{</span><span class="err">{</span><span class="w"> </span><span class="err">codehilite_css</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="err">safe</span><span class="w"> </span><span class="p">}</span><span class="err">}</span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p><strong><code>| safe</code> 为什么必须？</strong>CSS 里的 <code>#f92672</code> 如果被 Jinja2 转义，<code>#</code> 会变成 <code>&amp;#35;</code>，颜色值失效。</p>
+<h3 id="_50">高频坑详解</h3>
 <ul>
 <li>
-<p>CSS 类名对不上 → 不上色</p>
+<p><strong>CSS 类名对不上 → 不上色</strong> → codehilite 插件 <code>css_class='codehilite'</code> 和 <code>get_style_defs('.codehilite')</code> 必须一致。<strong>排查</strong>：浏览器 F12 看代码块的 class 是什么，再看 CSS 选择器前缀。</p>
 </li>
 <li>
-<p>CSS 显示成源码 → 没加 |safe</p>
+<p><strong>CSS 显示成源码 → 没加 |safe</strong> → 模板里 <code>&lt;style&gt;</code> 内容必须 <code>{{ codehilite_css | safe }}</code>。</p>
 </li>
 <li>
-<p>高亮全一色 → 代码块没写语言标记（```python）</p>
+<p><strong>高亮全一色 → 代码块没写语言标记</strong> → <code>```python</code> 没写或写错语言名，codehilite 无法识别（<code>guess_lang=False</code> 时不猜，按无语言处理）。<strong>解法</strong>：代码块必须带语言标记。</p>
+</li>
+<li>
+<p><strong>想换配色</strong> → 改 <code>style='monokai'</code> 为其他值（如 <code>'github'</code>、<code>'friendly'</code>），重新打包即可。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/AwopdeNJ9o9y8VxtjGpcYlIhnVc">Pygments · 博客项目实战手册</a></p>
-<h2 id="_37">PyYAML：YAML 解析</h2>
-<h3 id="_38">角色定位</h3>
-<p>解析 Markdown 文件头部的 front-matter（--- 包裹的 YAML）和批量导入文件（uploads/sample_batch.yaml）。</p>
-<h3 id="_39">核心 API 速查</h3>
+<h2 id="_51">PyYAML：YAML 解析</h2>
+<h3 id="_52">角色定位</h3>
+<p>解析 Markdown 文件头部的 front-matter（<code>---</code> 包裹的 YAML）和批量导入文件（uploads/sample_batch.yaml）。<strong>它是「文件导入文章」功能的解析器——把 YAML 文本变成 Python 字典。</strong></p>
+<h3 id="_53">原理大白话</h3>
+<p><strong>YAML 是什么？</strong>一种「给人看的配置文件」格式，靠缩进表达层级：</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">我的第一篇博客</span>
+<span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-09-07</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Python</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">教程</span><span class="p p-Indicator">]</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">技术</span>
+</code></pre></div>
+
+<p><strong>front-matter 是什么？</strong>Markdown 文件最开头的 <code>---</code> 包裹区域，用来声明文章的元信息（标题、日期、标签）——不是正文的一部分。博客支持把带 front-matter 的 <code>.md</code> 文件直接导入成文章。</p>
+<p><strong>为什么用 <code>safe_load</code> 而不是 <code>load</code>？</strong><code>yaml.load()</code> 可以执行 YAML 里的 Python 对象标签（<code>!!python/object</code>），攻击者能借此执行任意代码——这就是著名的「YAML 反序列化漏洞」。<code>yaml.safe_load()</code> 只解析纯数据，拒绝对象标签，<strong>安全</strong>。项目所有解析都用 safe_load。</p>
+<h3 id="_54">核心 API 详解</h3>
 <ul>
 <li>
-<p><code>yaml.safe_load(文本)</code>：YAML → Python 字典/列表（必用 safe_load，load 有代码执行风险）</p>
+<p><strong><code>yaml.safe_load(文本)</code></strong>：YAML 字符串 → Python 字典/列表。<strong>必用 safe_load，永远不用 load</strong>。</p>
 </li>
 <li>
-<p><code>parse_front_matter()</code>：项目封装——正则切出头部 + safe_load + 失败兜底</p>
+<p><strong><code>yaml.YAMLError</code></strong>：解析失败统一异常（缩进错、冒号后没空格都会抛）。项目捕获后兜底：front-matter 解析失败就当没有元信息，正文照常导入，不中断。</p>
 </li>
 <li>
-<p><code>yaml.YAMLError</code>：解析失败统一异常，转成页面红色提示</p>
+<p><strong><code>parse_front_matter()</code></strong>：项目封装的函数——先用正则切出 <code>---</code> 之间的头部，再 safe_load，失败兜底返回 <code>({}, 全文)</code>。</p>
 </li>
 </ul>
-<h3 id="_40">高频坑速查</h3>
+<h3 id="_55">项目落地代码（真实源码，app.py 第 674 行）</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_front_matter</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""解析 Markdown 头部 front-matter，返回 (meta_dict, body_text)"""</span>
+    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'---'</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^---\s*\n(.*?)\n---\s*\n?(.*)'</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="ow">or</span> <span class="p">{}</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">meta</span><span class="p">,</span> <span class="n">body</span>
+            <span class="k">except</span> <span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">:</span>
+                <span class="k">pass</span>
+    <span class="k">return</span> <span class="p">{},</span> <span class="n">text</span>
+</code></pre></div>
+
+<p><strong>逐行解释：</strong>① <code>re.match(r'^---\s*\n(.*?)\n---\s*\n?(.*)', text, flags=re.S)</code>——正则切三段：开头的 <code>---</code>、中间的 YAML 内容（非贪婪 <code>.*?</code>）、结尾的 <code>---</code> + 正文（<code>re.S</code> 让 <code>.</code> 匹配换行）；② <code>yaml.safe_load(...) or {}</code>——空内容解析返回 None，<code>or {}</code> 兜底成空字典；③ <code>except yaml.YAMLError: pass</code>——解析失败直接放弃元信息，正文照常返回，导入不中断。</p>
+<h3 id="_56">高频坑详解</h3>
 <ul>
 <li>
-<p>缩进错（Tab/冒号后没空格）→ ScannerError</p>
+<p><strong>缩进错（Tab/冒号后没空格）→ ScannerError</strong> → YAML 严格要求缩进：<strong>不要用 Tab，统一空格</strong>；冒号后面必须有空格（<code>title: xxx</code> 而不是 <code>title:xxx</code>）。</p>
 </li>
 <li>
-<p>空内容解析返回 None → 先 <code>or {}</code> 再取字段</p>
+<p><strong>空内容解析返回 None → 取字段报错</strong> → <code>yaml.safe_load('')</code> 返回 None。<strong>解法</strong>：<code>... or {}</code> 兜底再取字段。</p>
 </li>
 <li>
-<p>中文乱码 → 文件必须 UTF-8，读取 <code>.decode('utf-8')</code></p>
+<p><strong>中文乱码</strong> → 文件必须 UTF-8 编码，读取时 <code>open(path, encoding='utf-8')</code> 或 <code>.decode('utf-8')</code>。</p>
+</li>
+<li>
+<p><strong>标签字段拼错</strong> → 导入后文章没标题/没日期。<strong>排查</strong>：对照 <code>uploads/sample_post.md</code> 的 front-matter 格式照抄。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/UAavd2GwdorQ8WxrkAmckuVynMe">PyYAML · 博客项目实战手册</a></p>
-<h2 id="_41">python-dateutil：智能日期解析</h2>
-<h3 id="_42">角色定位</h3>
-<p>导入文章时把各种格式的日期字符串（<code>2026-09-07</code>、<code>Sep 7, 2026</code>）转成标准时间对象存进 created_at。</p>
-<h3 id="_43">核心 API 速查</h3>
+<h2 id="_57">python-dateutil：智能日期解析</h2>
+<h3 id="_58">角色定位</h3>
+<p>导入文章时把各种格式的日期字符串（<code>2026-09-07</code>、<code>Sep 7, 2026</code>）转成标准时间对象存进 created_at。<strong>它是「日期格式自由」的保障——用户怎么写日期，它都尽量认出来。</strong></p>
+<h3 id="_59">原理大白话</h3>
+<p><strong>问题：</strong>Python 标准库的 <code>datetime.strptime()</code> 解析日期必须给定格式：<code>'2026-09-07'</code> 要写 <code>'%Y-%m-%d'</code>，<code>'Sep 7, 2026'</code> 要写 <code>'%b %d, %Y'</code>——换一种写法就崩。<strong>dateutil 的 <code>parser.parse()</code> 不需要格式</strong>：它内部做了大量日期格式的智能匹配，绝大多数常见写法都能认出来。</p>
+<p><strong>为什么只在导入时用？</strong>正常发文章的日期是程序自己生成的（<code>datetime.datetime.utcnow()</code>），格式固定，不需要解析器。只有「导入别人的 Markdown 文件」时，文件里的 date 字段是用户手写的、格式不确定，才需要 dateutil 兜底。</p>
+<h3 id="_60">核心 API 详解</h3>
 <ul>
 <li>
-<p><code>dateutil.parser.parse('2026-09-07')</code>：智能识别常见日期写法，返回 datetime 对象</p>
+<p><strong><code>dateutil.parser.parse('2026-09-07')</code></strong>：智能识别常见日期写法，返回 datetime 对象。支持 <code>2026-09-07</code>、<code>Sep 7, 2026</code>、<code>2026/09/07</code>、<code>07-09-2026</code> 等大量格式。</p>
 </li>
 <li>
-<p>项目写法：<code>try: post.created_at = date_parser.parse(str(date_str)) except Exception: pass</code>——解析失败静默回退，不打断导入</p>
+<p><strong>项目写法</strong>：<code>try: post.created_at = date_parser.parse(str(date_str)) except Exception: pass</code>——解析失败静默回退（不改日期，用默认值），不打断导入。</p>
 </li>
 </ul>
-<h3 id="_44">高频坑速查</h3>
+<h3 id="_61">项目落地代码（真实源码，app.py 第 1773 行）</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 处理指定日期</span>
+<span class="k">if</span> <span class="n">date_str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dateutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">parser</span> <span class="k">as</span> <span class="n">date_parser</span>
+        <span class="n">post</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">date_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">date_str</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+</code></pre></div>
+
+<p><strong>为什么 try/except 全包住？</strong>导入是批量操作，一个文件日期写错不该中断整批。解析失败就保持默认日期（当前时间），文件照样导入成功——「静默容错」是批量导入的正确姿势。</p>
+<h3 id="_62">高频坑详解</h3>
 <ul>
 <li>
-<p>纯数字串易误解析 → 先判断类型再 parse</p>
+<p><strong>纯数字串易误解析</strong> → <code>parse('2026')</code> 可能被当成某个日期而不是年份。<strong>解法</strong>：先判断类型再 parse；导入代码里 <code>if date_str:</code> 确保空值不解析。</p>
 </li>
 <li>
-<p>带时区字符串归档差 8 小时 → <code>.replace(tzinfo=None)</code> 或统一本地时区</p>
+<p><strong>带时区字符串归档差 8 小时</strong> → <code>parse('2026-09-07 12:00:00+08:00')</code> 返回带时区时间，转本地时区再存。<strong>解法</strong>：项目 v2.8.3 统一在模板显示层做时区转换（见 Jinja2 落地代码），入库统一存 UTC。</p>
 </li>
 <li>
-<p>想「减一个月」用 timedelta 报错 → 用 relativedelta</p>
+<p><strong>想「减一个月」用 timedelta 报错</strong> → <code>timedelta</code> 不支持按月运算（<code>timedelta(days=30)</code> 是 30 天不是 1 个月）。<strong>解法</strong>：用 <code>dateutil.relativedelta.relativedelta(months=-1)</code>。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/D9p8dpo2WouJktxe7q1c1vI7nwb">python-dateutil · 博客项目实战手册</a></p>
-<h1 id="_45">第四层 · 服务与桌面层（waitress / pywebview）</h1>
-<h2 id="_46">waitress：生产级 WSGI 服务器</h2>
-<h3 id="_47">角色定位</h3>
-<p>网页版生产模式（app.py run_server）和桌面版后台线程（main.py）的服务器。比 Flask 内置稳定、多线程、可配。</p>
-<h3 id="_48">核心 API 速查</h3>
+<h1 id="_63">第四层 · 服务与桌面层（waitress / pywebview）</h1>
+<h2 id="_64">waitress：生产级 WSGI 服务器</h2>
+<h3 id="_65">角色定位</h3>
+<p>网页版生产模式（app.py run_server）和桌面版后台线程（main.py）的服务器。比 Flask 内置稳定、多线程、可配。<strong>它是「博客真正跑起来的引擎」——Flask 负责业务逻辑，waitress 负责稳定地接收和返回请求。</strong></p>
+<h3 id="_66">原理大白话</h3>
+<p><strong>为什么不用 Flask 自带的服务器？</strong>Flask 内置的开发服务器（<code>app.run()</code>）为开发设计：单线程为主、有调试器、性能弱、不建议生产用。<strong>waitress</strong> 是纯 Python 写的生产级 WSGI 服务器：多线程并发、连接管理、超时控制都比内置服务器稳。<strong>同一个 Flask 应用，开发时用内置服务器，生产/桌面版用 waitress——这正是 WSGI 标准带来的「换服务器不用改业务代码」。</strong></p>
+<p><strong>两种启动方式的区别（关键）：</strong></p>
+<ul>
+<li><strong><code>waitress.serve(app, ...)</code></strong>：<strong>阻塞式</strong>——调用后这个函数一直运行，后面代码永远不执行。适合「网页版」：脚本最后一行调它，程序就挂在这等请求。</li>
+<li><strong><code>waitress.server.create_server(app, ...)</code> + <code>threading.Thread(server.run)</code></strong>：<strong>非阻塞式</strong>——create_server 只创建服务器对象不运行，把 <code>server.run</code> 丢进后台线程跑，主线程继续干别的（开窗口、挂托盘）。适合「桌面版」：窗口要显示，服务器要在后台跑，两个线程并行。</li>
+</ul>
+<h3 id="_67">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
@@ -2174,39 +2637,76 @@ body{
 <tbody>
 <tr>
 <td><code>waitress.serve(app, host=, port=, threads=8, ...)</code></td>
-<td>阻塞式启动（网页版放脚本末尾）；threads 并发线程数</td>
+<td>阻塞式启动（网页版放脚本末尾）；<code>threads</code> 并发线程数</td>
 </tr>
 <tr>
-<td><code>waitress.server.create_server(app, ...)</code> + <code>threading.Thread(target=server.run, daemon=True)</code></td>
-<td>非阻塞创建 + 后台线程运行（桌面版窗口加载用）</td>
+<td><code>waitress.server.create_server(app, ...)</code></td>
+<td>非阻塞创建服务器对象（不运行）</td>
+</tr>
+<tr>
+<td><code>threading.Thread(target=server.run, daemon=True)</code></td>
+<td>把服务器跑进后台线程（桌面版窗口加载用）；<code>daemon=True</code> 主程序退出它跟着退出</td>
 </tr>
 <tr>
 <td><code>server.close()</code></td>
-<td>优雅关闭：停监听、等现有请求完成</td>
+<td>优雅关闭：停监听、等现有请求完成（托盘退出流程用）</td>
 </tr>
 <tr>
-<td>ImportError 回退</td>
-<td>未装 waitress 时退回 <code>app.run(threaded=True)</code></td>
+<td><code>connection_limit</code></td>
+<td>最大并发连接数（防连接风暴）</td>
+</tr>
+<tr>
+<td><code>channel_timeout</code></td>
+<td>空闲连接超时（秒），超时断开防占用</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_49">高频坑速查</h3>
+<h3 id="_68">项目落地代码（真实源码）</h3>
+<p><strong>网页版（app.py 第 2516 行）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">waitress</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span> <span class="k">as</span> <span class="n">waitress_serve</span>
+    <span class="n">waitress_serve</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+                   <span class="n">threads</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>            <span class="c1"># 并发线程数（个人博客足够）</span>
+                   <span class="n">connection_limit</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">threaded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># 未装 waitress 时退回</span>
+</code></pre></div>
+
+<p><strong><code>try/except ImportError</code> 回退</strong>：没装 waitress 也能跑（退回 Flask 内置 + threaded 多线程）——这是依赖降级的优雅写法。</p>
+<p><strong>桌面版（main.py）：</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">server</span> <span class="o">=</span> <span class="n">waitress</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">create_server</span><span class="p">(</span>
+    <span class="n">_app_mod</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">'127.0.0.1'</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+    <span class="n">threads</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">channel_timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">connection_limit</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="k">return</span> <span class="n">t</span>
+</code></pre></div>
+
+<p><strong>为什么桌面版用 create_server + 线程？</strong>桌面版流程是「起服务 → 等就绪 → 开窗口 → 挂托盘」——如果直接用阻塞的 <code>serve()</code>，程序会永远卡在起服务那行，窗口永远弹不出来。必须非阻塞。</p>
+<h3 id="_69">高频坑详解</h3>
 <ul>
 <li>
-<p>serve() 阻塞 → 后面代码不执行；桌面版必须用 create_server + 线程</p>
+<p><strong>serve() 阻塞 → 后面代码不执行</strong> → 桌面版误用阻塞式 serve。<strong>解法</strong>：桌面版必须 <code>create_server</code> + <code>threading.Thread</code>。</p>
 </li>
 <li>
-<p>端口占用 → netstat 查杀，或 BLOG_PORT 换端口</p>
+<p><strong>端口占用 → 启动报错或白屏</strong> → 之前有没退干净的进程。<strong>解法</strong>：<code>netstat -ano | findstr 端口</code> 找 PID，<code>taskkill /PID 数字 /F</code>；或 <code>BLOG_PORT</code> 换端口。</p>
 </li>
 <li>
-<p>开发时想要热重载 → 用 FLASK_DEBUG=1，waitress 没有调试器</p>
+<p><strong>开发时想要热重载</strong> → waitress 没有调试器和热重载。<strong>解法</strong>：开发用 <code>FLASK_DEBUG=1</code> + <code>python app.py</code>（内置服务器），发布/日常用 waitress。</p>
+</li>
+<li>
+<p><strong>日志里 <code>[博客服务] exited</code></strong> → waitress 线程异常退出。<strong>排查</strong>：看退出前最后几条日志，常见是端口被占或数据库文件损坏。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/PQcddkHzNo9c88xofX9cZKGPnFd">waitress · 博客项目实战手册</a></p>
-<h2 id="_50">pywebview：桌面窗口壳</h2>
-<h3 id="_51">角色定位</h3>
-<p>把博客网页装进 Windows 桌面窗口（WebView2 内核渲染），桌面版的「门面」。main.py 用它开 1280×800 窗口 + 配合托盘。</p>
-<h3 id="_52">核心 API 速查</h3>
+<h2 id="_70">pywebview：桌面窗口壳</h2>
+<h3 id="_71">角色定位</h3>
+<p>把博客网页装进 Windows 桌面窗口（WebView2 内核渲染），桌面版的「门面」。main.py 用它开 1280×820 窗口 + 配合托盘。<strong>它是「桌面版」和「网页版」的唯一区别——同一个博客网页，浏览器里开是网页版，pywebview 窗口里开就是桌面版。</strong></p>
+<h3 id="_72">原理大白话</h3>
+<p><strong>pywebview 是什么？</strong>一个 Python 库：创建本地窗口，窗口里嵌一个系统浏览器内核（Windows 上默认用 WebView2，即 Chromium 内核）渲染你指定的 URL。<strong>本质上它就是一个「没有地址栏、没有工具栏的迷你浏览器」</strong>，而且这个窗口完全由 Python 控制（位置、大小、关闭行为、托盘联动）。</p>
+<p><strong>为什么博客用 pywebview 而不是让用户开浏览器？</strong>① 体验像「原生软件」：有自己的图标、托盘、窗口记忆；② 固定窗口尺寸和居中位置，界面整洁；③ 配合单实例锁、托盘，实现「关窗口程序还在后台跑」的桌面软件体验。</p>
+<p><strong>v2.8.3 的窗口大小记忆</strong>：<code>_build_create_window_kwargs</code> 先读 <code>window_state.json</code>（存在 data/ 目录），有记录就用上次调整的尺寸，没有才用默认 1280×820；<code>_bind_window_size_save</code> 监听窗口 <code>resized</code> 事件，<strong>拖拽结束 0.8 秒后</strong>（防抖）把最新大小写回文件——每次调整都会覆盖记忆，下次打开永远是你最近一次调好的大小；关闭窗口时还会强制 flush 一次，防止「刚调完就关」丢失记录。</p>
+<h3 id="_73">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
@@ -2217,67 +2717,103 @@ body{
 <tbody>
 <tr>
 <td><code>webview.create_window(标题, url, width=, height=, ...)</code></td>
-<td>创建窗口：min_size 最小尺寸、background_color 加载底色、confirm_close 关窗确认</td>
+<td>创建窗口。<code>min_size=(w,h)</code> 最小尺寸；<code>background_color</code> 加载底色；<code>confirm_close</code> 关窗确认；<code>x/y</code> 窗口位置</td>
 </tr>
 <tr>
 <td><code>webview.start(gui='edgechromium')</code></td>
-<td>进入事件循环（阻塞）；指定 WebView2 后端</td>
+<td>进入事件循环（<strong>阻塞</strong>）；指定 WebView2 后端</td>
 </tr>
 <tr>
 <td><code>window.show() / hide() / destroy() / restore()</code></td>
 <td>托盘交互核心：关窗转隐藏、点图标恢复、退出时销毁</td>
 </tr>
+<tr>
+<td><code>window.events.resized += 回调</code></td>
+<td>监听窗口尺寸变化（v2.8.3 窗口记忆的触发点）</td>
+</tr>
 </tbody>
 </table>
-<h3 id="_53">高频坑速查</h3>
+<h3 id="_74">项目落地代码（真实源码，main.py）</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># v2.8.3：窗口大小记忆优先——读取 window_state.json，有记忆用记忆尺寸，无则 1280x820</span>
+<span class="n">cw_kwargs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_build_create_window_kwargs</span><span class="p">(</span><span class="s1">'个人博客'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">/'</span><span class="p">)</span>
+<span class="n">window</span> <span class="o">=</span> <span class="n">webview</span><span class="o">.</span><span class="n">create_window</span><span class="p">(</span><span class="o">**</span><span class="n">cw_kwargs</span><span class="p">)</span>   <span class="c1"># 记忆尺寸（默认 1280x820），屏幕正中央</span>
+<span class="n">_bind_window_size_save</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>    <span class="c1"># v2.8.3：拖拽调整大小后自动记住，下次启动沿用</span>
+<span class="n">_start_tray</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>               <span class="c1"># 挂托盘</span>
+<span class="n">webview</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>                   <span class="c1"># 进入窗口事件循环</span>
+</code></pre></div>
+
+<p><strong>启动顺序为什么必须这样？</strong><code>webview.start()</code> 是<strong>阻塞</strong>的——调用后代码停在这行，直到窗口关闭才继续。所以「挂托盘」「绑定事件」这些准备工作必须放在 start <strong>之前</strong>；start 之后只剩退出清理逻辑。</p>
+<h3 id="_75">高频坑详解</h3>
 <ul>
 <li>
-<p>白屏 → WebView2 Runtime 缺失 / 后台服务没起 / 端口拼错</p>
+<p><strong>白屏</strong> → 三选一：WebView2 Runtime 缺失（Win10/11 一般自带，装一下即可）；后台服务没起（看终端报错）；端口拼错（URL 与 waitress 实际端口不一致）。</p>
 </li>
 <li>
-<p>start() 后的代码不执行 → 托盘等服务要放 start 之前</p>
+<p><strong>start() 后的代码不执行</strong> → start 是阻塞的。<strong>解法</strong>：所有窗口初始化、托盘绑定放 start 之前。</p>
 </li>
 <li>
-<p>退出不干净 → destroy → start 返回 → server.close() → 释放互斥锁 全流程</p>
+<p><strong>退出不干净（托盘图标残留/进程残留）</strong> → 完整退出链：<code>window.destroy()</code> → <code>webview.start()</code> 返回 → <code>server.close()</code> → 释放互斥锁。缺一步都会留尾巴。</p>
+</li>
+<li>
+<p><strong>窗口大小记不住</strong> → 旧版没有窗口记忆。<strong>解法</strong>：v2.8.3 已实现（见上）；如果手动调完没生效，确认用的是最新版且 data/ 目录可写。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/FQSCdBO5qoAQS7xwA5wcUFMQnpd">pywebview · 博客项目实战手册</a></p>
-<h1 id="_54">第五层 · 前端层（Tailwind CSS / Vditor）</h1>
-<h2 id="_55">Tailwind CSS：全站样式</h2>
-<h3 id="_56">角色定位</h3>
-<p>原子化 CSS 框架：在 HTML class 里堆工具类名（text-3xl、bg-cyan-500、rounded-[28px]）控制排版与配色。项目用 tailwind.min.js 运行时模式，零构建。</p>
-<h3 id="_57">核心用法速查</h3>
+<h1 id="_76">第五层 · 前端层（Tailwind CSS / Vditor）</h1>
+<h2 id="_77">Tailwind CSS：全站样式</h2>
+<h3 id="_78">角色定位</h3>
+<p>原子化 CSS 框架：在 HTML class 里堆工具类名（text-3xl、bg-cyan-500、rounded-[28px]）控制排版与配色。项目用 tailwind.min.js 运行时模式，零构建。<strong>它是博客的「装修队」——所有页面的外观都靠 class 名堆出来。</strong></p>
+<h3 id="_79">原理大白话</h3>
+<p><strong>传统 CSS 怎么写？</strong>给元素起类名（<code>.card</code>、<code>.btn-primary</code>），再去 CSS 文件里定义 <code>.card { ... }</code> 的样式。项目大了 CSS 文件越来越长，类名越来越多，改样式要来回跳文件。</p>
+<p><strong>Tailwind 的思路反过来：</strong>不写自定义类名，直接用<strong>原子工具类</strong>——<code>text-3xl</code> 就是 <code>font-size: 1.875rem</code>，<code>bg-cyan-500</code> 就是 <code>background-color: #06b6d4</code>，<code>rounded-[28px]</code> 就是 <code>border-radius: 28px</code>。<strong>你像搭积木一样在 HTML 里拼 class，基本不用写 CSS 文件。</strong>好处：样式和结构在一起（改样式=改 HTML 里的 class），全站风格统一（都用同一套工具类）。</p>
+<p><strong>运行时模式（项目用法）是什么？</strong>Tailwind 通常要「构建」——扫描 HTML 生成 CSS 文件。项目用的是 tailwind.min.js <strong>运行时版</strong>：浏览器加载时动态扫描并生成样式，<strong>零构建步骤</strong>，改 class 刷新即生效。代价是首次加载稍慢，个人博客完全可接受。</p>
+<h3 id="_80">核心用法详解</h3>
 <ul>
 <li>
-<p>引入：base.html 里 <code>&lt;script src=".../tailwind.min.js"&gt;&lt;/script&gt;</code> + <code>tailwind.config = { darkMode: 'class' }</code></p>
+<p><strong>引入</strong>：base.html 里 <code>&lt;script src=".../tailwind.min.js"&gt;&lt;/script&gt;</code> + <code>tailwind.config = { darkMode: 'class' }</code>（class 模式：html 标签有 <code>dark</code> class 就切深色主题）。</p>
 </li>
 <li>
-<p>响应式前缀：sm:/md:/lg:/xl:（手机优先写基础样式）</p>
+<p><strong>响应式前缀</strong>：<code>sm:</code>/<code>md:</code>/<code>lg:</code>/<code>xl:</code> 按屏幕宽度生效——手机优先写基础样式，大屏用前缀覆盖：<code>class="text-sm md:text-lg"</code>（手机上小字，平板以上大字）。</p>
 </li>
 <li>
-<p>任意值语法：<code>rounded-[28px]</code> 方括号写自定义值</p>
+<p><strong>任意值语法</strong>：<code>rounded-[28px]</code>、<code>w-[calc(100%-2rem)]</code>——方括号里写任意 CSS 值，不用去 config 注册。</p>
 </li>
 <li>
-<p>项目色板：cyan/blue 主色 + purple/red 强调，新页面沿用保持统一</p>
+<p><strong>项目色板</strong>：cyan/blue 主色 + purple/red 强调。新页面沿用同色系保持全站统一。</p>
 </li>
 </ul>
-<h3 id="_58">高频坑速查</h3>
+<h3 id="_81">项目落地代码（真实源码，base.html）</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"zh-CN"</span> <span class="na">class</span><span class="o">=</span><span class="s">"{% if dark_mode %}dark{% endif %}"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">class</span><span class="o">=</span><span class="s">"bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">nav</span> <span class="na">class</span><span class="o">=</span><span class="s">"bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50"</span><span class="p">&gt;</span>
+    ...
+  <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p><strong>读法：</strong><code>bg-white/80</code> = 白色 80% 透明；<code>backdrop-blur</code> = 背景模糊（毛玻璃）；<code>sticky top-0 z-50</code> = 吸顶导航（滚动时停在顶部）；<code>dark:bg-gray-900</code> = 深色模式下用深灰背景。<strong>一个 class 一个效果，组合起来就是完整布局。</strong></p>
+<h3 id="_82">高频坑详解</h3>
 <ul>
 <li>
-<p>类名没效果 → 拼写/前缀顺序错，或自定义值忘写方括号</p>
+<p><strong>类名没效果</strong> → 三选一：拼写错（<code>text-3xl</code> 不是 <code>text-3xl</code> 多空格）；前缀顺序错（<code>hover:text-blue-600</code> 不是 <code>text-blue-600 hover:</code>）；任意值忘写方括号（<code>rounded-28px</code> 无效，必须 <code>rounded-[28px]</code>）。</p>
 </li>
 <li>
-<p>深色模式不切换 → darkMode 配 'class'，html 标签增删 dark class</p>
+<p><strong>深色模式不切换</strong> → <code>darkMode</code> 没配 <code>'class'</code>（默认是 <code>'media'</code> 跟随系统）。<strong>解法</strong>：<code>tailwind.config = { darkMode: 'class' }</code>，且 html 标签要能增删 <code>dark</code> class。</p>
 </li>
 <li>
-<p>运行时版 404 → static/tailwind 目录缺失或打包没含 static</p>
+<p><strong>运行时版 404 / 样式全没</strong> → static/tailwind 目录缺失，或打包时没含 static。<strong>解法</strong>：确认 <code>static/tailwind/tailwind.min.js</code> 存在；打包 spec 的 SHARED_DATAS 必须含 static。</p>
+</li>
+<li>
+<p><strong>改样式不生效</strong> → 浏览器缓存了旧 CSS/JS。<strong>解法</strong>：Ctrl+F5 强刷。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/EBJWdqDsGoTOsOxkuvhcNcv5n5d">Tailwind CSS · 博客项目实战手册</a></p>
-<h2 id="_59">Vditor：Markdown 编辑器</h2>
-<h3 id="_60">角色定位</h3>
-<p>后台写文章页的编辑器：<code>templates/admin/post_form.html</code> 里 <code>new Vditor('vditor', {...})</code> 初始化，所见即所得，最后把 Markdown 原文提交后端。</p>
-<h3 id="_61">核心 API 速查</h3>
+<h2 id="_83">Vditor：Markdown 编辑器</h2>
+<h3 id="_84">角色定位</h3>
+<p>后台写文章页的编辑器：<code>templates/admin/post_form.html</code> 里 <code>new Vditor('vditor', {...})</code> 初始化，所见即所得，最后把 Markdown 原文提交后端。<strong>它是博客的「文具」——你写文章时的打字界面。</strong></p>
+<h3 id="_85">原理大白话</h3>
+<p><strong>为什么需要专门的编辑器？</strong>写 Markdown 文章时，<code>&lt;textarea&gt;</code> 太简陋（看不到渲染效果），直接用 markdown-it 之类太重。<strong>Vditor</strong> 是一个国产 Markdown 编辑器：三种模式（所见即所得 wysiwyg / 分屏预览 / 源码）、工具栏（加粗、标题、代码、图片上传）、本地资源可部署（不依赖 CDN，打包版也能用）。</p>
+<p><strong>关键机制：隐藏域提交。</strong>Vditor 渲染的内容在它自己的内部区域，<strong>不在表单里</strong>。提交表单时浏览器只会提交表单内元素——所以必须在提交前把 Vditor 的 Markdown 原文写进一个隐藏的 <code>&lt;input&gt;</code>，后端从隐藏域取值。<strong>忘了这步，保存后后端收到空内容。</strong></p>
+<h3 id="_86">核心 API 详解</h3>
 <table>
 <thead>
 <tr>
@@ -2287,44 +2823,74 @@ body{
 </thead>
 <tbody>
 <tr>
-<td><code>new Vditor('元素id', {cdn: '/static/vditor', lang: 'zh_CN', mode: 'wysiwyg'})</code></td>
-<td>初始化：本地资源、中文、所见即所得</td>
+<td><code>new Vditor('元素id', {...})</code></td>
+<td>初始化编辑器。<code>cdn: '/static/vditor'</code> 本地资源（打包版不依赖外网）；<code>lang: 'zh_CN'</code> 中文；<code>mode: 'wysiwyg'</code> 所见即所得</td>
 </tr>
 <tr>
-<td><code>vditor.getValue() / vditor.setValue(文本)</code></td>
-<td>取 Markdown 原文（提交用）/ 编辑时回填</td>
+<td><code>vditor.getValue()</code></td>
+<td>取 Markdown 原文（提交前塞进隐藏域用）</td>
+</tr>
+<tr>
+<td><code>vditor.setValue(文本)</code></td>
+<td>设置内容（编辑文章时回填初始内容）</td>
+</tr>
+<tr>
+<td><code>after: () =&gt; {...}</code></td>
+<td>初始化完成回调（编辑模式在这里 setValue）</td>
 </tr>
 <tr>
 <td><code>cache: { enable: false }</code></td>
-<td>关掉浏览器草稿缓存，防旧内容串台</td>
+<td>关掉浏览器草稿缓存（防旧内容串台）</td>
 </tr>
 <tr>
-<td>隐藏域提交</td>
-<td>submit 前 <code>隐藏域.value = vditor.getValue()</code>，随表单 POST 给后端</td>
+<td><code>upload: { url, fieldName }</code></td>
+<td>图片上传配置（可接后端上传接口）</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_62">高频坑速查</h3>
+<h3 id="_87">项目落地代码（真实源码，post_form.html 简化）</h3>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">vditor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Vditor</span><span class="p">(</span><span class="s1">'vditor'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">cdn</span><span class="o">:</span><span class="w"> </span><span class="s1">'/static/vditor'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">lang</span><span class="o">:</span><span class="w"> </span><span class="s1">'zh_CN'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">mode</span><span class="o">:</span><span class="w"> </span><span class="s1">'wysiwyg'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">cache</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">enable</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">vditor</span><span class="p">.</span><span class="nx">setValue</span><span class="p">(</span><span class="nx">initialContent</span><span class="p">);</span><span class="w">   </span><span class="c1">// 编辑时回填</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">});</span>
+
+<span class="c1">// 提交前：把 Markdown 原文写进隐藏域</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'post-form'</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'submit'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'content-hidden'</span><span class="p">).</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">vditor</span><span class="p">.</span><span class="nx">getValue</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p><strong>后端接收：</strong><code>content = request.form.get('content')</code>——content 就是隐藏域 <code>content-hidden</code> 的值，即 Markdown 原文。</p>
+<h3 id="_88">高频坑详解</h3>
 <ul>
 <li>
-<p>编辑器空白 → index.min.js 404 或引入顺序错（先 css 后 js）</p>
+<p><strong>编辑器空白</strong> → index.min.js 404 或引入顺序错。<strong>解法</strong>：先引 CSS 后引 JS；确认 <code>static/vditor/</code> 目录完整；打包版确认 SHARED_DATAS 含 static。</p>
 </li>
 <li>
-<p>保存后后端收空 content → 隐藏域没赋值/JS 没绑定</p>
+<p><strong>保存后后端收空 content</strong> → 隐藏域没赋值或 JS 没绑定 submit。<strong>解法</strong>：核对隐藏域 <code>name="content"</code> 和 <code>vditor.getValue()</code> 赋值代码；F12 看提交的 Form Data。</p>
 </li>
 <li>
-<p>编辑文章没回填 → after 回调里 setValue(初始内容)</p>
+<p><strong>编辑文章没回填</strong> → 没在 <code>after</code> 回调里 <code>setValue</code>。<strong>解法</strong>：编辑模式在 after 里 setValue(初始内容)；注意 setValue 要在 Vditor 初始化完成后调用。</p>
 </li>
 <li>
-<p>预览和发布样式不一致 → 后端渲染与编辑器渲染不同，可做 /api/preview 联调</p>
+<p><strong>预览和发布样式不一致</strong> → 编辑器预览是 Vditor 自己渲染的，发布后是后端 python-markdown 渲染的，两者实现不同。<strong>解法</strong>：以发布效果为准；可在后台做 /api/preview 联调。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/NGlAd3E3koVLmvxrDYacYM9Bn3d">Vditor · 博客项目实战手册</a></p>
-<h1 id="_63">第六层 · 打包层（PyInstaller）</h1>
-<h2 id="_64">PyInstaller：绿色版打包</h2>
-<h3 id="_65">角色定位</h3>
-<p>把项目打包成「个人博客绿色版」：exe + 配套文件文件夹（onedir），目标机无需装 Python。配置在 <code>blog_desktop.spec</code>。</p>
-<h3 id="_66">核心配置速查</h3>
+<h1 id="_89">第六层 · 打包层（PyInstaller）</h1>
+<h2 id="_90">PyInstaller：绿色版打包</h2>
+<h3 id="_91">角色定位</h3>
+<p>把项目打包成「个人博客绿色版」：exe + 配套文件文件夹（onedir），目标机无需装 Python。配置在 <code>blog_desktop.spec</code>。<strong>它是博客的「出厂包装」——把一个 Python 项目变成普通人双击就能用的软件。</strong></p>
+<h3 id="_92">原理大白话</h3>
+<p><strong>PyInstaller 做什么？</strong>Python 程序要跑必须有 Python 解释器 + 依赖库。目标用户电脑上不一定有。PyInstaller 把<strong>解释器 + 你的代码 + 所有依赖库</strong>打包在一起：onedir 模式生成一个文件夹，里面 <code>个人博客.exe</code> 双击就运行，目标机零安装。</p>
+<p><strong>打包后的资源目录（重要概念）：</strong>打包后，你的 templates/static 等<strong>只读资源</strong>被打进 <code>_internal</code> 目录，Python 代码里 <code>os.path.join('templates')</code> 这种相对路径会失效——必须用 <code>sys._MEIPASS</code>（PyInstaller 提供的打包资源根目录）。项目用 <code>Config.RESOURCE_DIR</code> 封装了这一点：源码运行时指向项目目录，打包后指向 <code>_internal</code>。</p>
+<p><strong>数据目录为什么不能打进去？</strong>blog.db（你的文章数据）、uploads（图片）、window_state.json（窗口记忆）是<strong>用户数据</strong>，必须留在打包文件夹外面（DATA_DIR）——否则升级版本时用户数据全丢。<strong>这就是「纯净版」的原理：打包时不带 blog.db，用户拿到的是全新博客。</strong></p>
+<h3 id="_93">核心配置详解</h3>
 <table>
 <thead>
 <tr>
@@ -2335,7 +2901,7 @@ body{
 <tbody>
 <tr>
 <td><code>SHARED_DATAS</code></td>
-<td>把 templates/static/uploads 等只读资源打进包（_internal）</td>
+<td>把 templates/static/uploads 等只读资源打进包（_internal）；<strong>漏了打包后找不到模板</strong></td>
 </tr>
 <tr>
 <td><code>EXCLUDES</code></td>
@@ -2343,41 +2909,45 @@ body{
 </tr>
 <tr>
 <td><code>HIDDEN_IMPORTS</code></td>
-<td>补动态加载模块：webview.platforms.*、waitress、pythonnet、clr_loader、gitee_backup 等（漏了必崩）</td>
+<td>补动态加载模块：webview.platforms.<em>、waitress、pythonnet、clr_loader、gitee_backup 等（</em><em>漏了必崩</em>*）</td>
 </tr>
 <tr>
 <td><code>EXE(..., console=False, icon=logo.ico)</code></td>
 <td>无控制台黑窗 + exe 图标</td>
 </tr>
 <tr>
-<td>COLLECT 钩子</td>
+<td><code>COLLECT 钩子</code></td>
 <td>把 logo.ico 外置到 exe 同级，用户可自行替换图标</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_67">高频坑速查</h3>
+<p><strong>为什么有 HIDDEN_IMPORTS？</strong>PyInstaller 靠「静态分析」找依赖——但有些模块是<strong>运行时动态导入</strong>的（<code>importlib</code> 或字符串名字导入），静态分析看不到。webview 的平台模块、gitee_backup 等必须在 HIDDEN_IMPORTS 里显式声明，否则运行时报 <code>ModuleNotFoundError</code>。</p>
+<h3 id="_94">高频坑详解</h3>
 <ul>
 <li>
-<p>打包后找不到模板 → SHARED_DATAS 缺 templates/static；代码用 Config.RESOURCE_DIR</p>
+<p><strong>打包后找不到模板/静态文件</strong> → SHARED_DATAS 缺 templates/static，或代码用相对路径。<strong>解法</strong>：spec 的 SHARED_DATAS 补全；代码必须用 <code>Config.RESOURCE_DIR</code>。</p>
 </li>
 <li>
-<p>打包后 ModuleNotFoundError → 动态模块要进 HIDDEN_IMPORTS</p>
+<p><strong>打包后 ModuleNotFoundError</strong> → 动态导入模块没进 HIDDEN_IMPORTS。<strong>解法</strong>：报错说缺哪个，就把哪个加进 HIDDEN_IMPORTS 重新打包。</p>
 </li>
 <li>
-<p>双击没反应 → 命令行跑 exe 看报错，或临时 console=True 排查</p>
+<p><strong>双击 exe 没反应</strong> → 命令行跑 exe 看报错（会显示在终端）；或临时 <code>console=True</code> 打包排查。</p>
 </li>
 <li>
-<p>中文路径打包失败 → 项目放英文路径（D:\blog）</p>
+<p><strong>中文路径打包失败</strong> → 部分库不支持中文路径。<strong>解法</strong>：项目放英文路径（<code>D:\blog</code>），打包命令也在英文路径下执行。</p>
 </li>
 <li>
-<p>改了代码还是旧行为 → 先删 build/ 和 dist/ 再打包</p>
+<p><strong>改了代码还是旧行为</strong> → PyInstaller 缓存了旧构建。<strong>解法</strong>：先删 <code>build/</code> 和 <code>dist/</code> 再打包。</p>
+</li>
+<li>
+<p><strong>打包把个人数据带进去了</strong> → 打包前必须删 blog.db 等数据文件（纯净版）。<strong>解法</strong>：按「打包清单」检查 data/ 目录，只保留必须的资源文件。</p>
 </li>
 </ul>
 <p>详细手册：<a href="https://my.feishu.cn/docx/QO4edvLxmo98POxKcYlcqdCunTe">PyInstaller · 博客项目打包手册</a></p>
-<h1 id="_68">学习路线建议：怎么用好这 14 份手册</h1>
+<h1 id="_95">学习路线建议：怎么用好这 14 份手册</h1>
 <ol>
 <li>
-<p><strong>第一遍按层通读本总目录</strong>：只求知道「谁管什么、坑在哪」，建立全景图（约 30 分钟）</p>
+<p><strong>第一遍按层通读本总目录</strong>：只求知道「谁管什么、坑在哪」，建立全景图（约 1 小时，比 v2.1 版更细，重点看每库的「原理大白话」和「项目落地代码」两节）</p>
 </li>
 <li>
 <p><strong>第二遍深入主线四件套</strong>：Flask → Flask-SQLAlchemy → Jinja2 → python-markdown。这四个是你改博客功能的主战场，值得读完全部逐行讲解</p>
@@ -2389,10 +2959,12 @@ body{
 <p><strong>动手验证</strong>：每读一个库，就在项目里做它「实战示例」小节里的扩展练习——改完跑起来看到效果，才算真掌握</p>
 </li>
 </ol>
-<p>核心逻辑自测：① 一次请求从 waitress 到 Jinja2 经过哪些库？② 删文章为什么必须「点赞→评论→文章」的顺序？③ 代码高亮为什么需要 python-markdown 和 Pygments 两个库配合？④ 桌面版窗口关了为什么程序还在？四个都答得上来，这 14 份手册你就真正吃透了。</p>
+<p><strong>给零基础读者的建议：</strong>这份总目录的「原理大白话」每节都值得先读——它用比喻和类比解释「这个库为什么存在、解决什么问题」，是建立编程直觉最快的方式。读完后挑 Flask 的落地代码逐行对照源码读一遍，你就完成了从「看教程」到「读代码」的第一次跨越。</p>
+<p><strong>核心逻辑自测：</strong>① 一次请求从 waitress 到 Jinja2 经过哪些库？② 删文章为什么必须「点赞→评论→文章」的顺序？③ 代码高亮为什么需要 python-markdown 和 Pygments 两个库配合？④ 桌面版窗口关了为什么程序还在？⑤ 打包版和源码版的模板路径为什么不一样？⑥ 数据库存的 UTC 时间为什么显示会差 8 小时？六个都答得上来，这 14 份手册你就真正吃透了。</p>
 <blockquote>
 <p>（注：部分内容可能由 AI 生成）</p>
-</blockquote></section><section class="doc-panel" id="doc-03"><h1 id="_1">个人博客项目 · 全代码逐行注释配套文档</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-03"><h1 id="_1">个人博客项目 · 全代码逐行注释配套文档</h1>
 <blockquote>
 <p>部分内容由豆包生成</p>
 </blockquote>
@@ -5001,7 +5573,8 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 <h3 id="_84">gitee_backup.py 网络工具：SSL 证书与输入解析</h3>
 <blockquote>
 <p>（注：部分内容可能由 AI 生成）</p>
-</blockquote></section><section class="doc-panel" id="doc-04"><h1 id="_1">个人博客项目 · 二次开发进阶文档</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-04"><h1 id="_1">个人博客项目 · 二次开发进阶文档</h1>
 <blockquote>
 <p>部分内容由豆包生成</p>
 </blockquote>
@@ -5055,9 +5628,9 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tr>
 </tbody>
 </table>
-<p><strong>一次请求的接力（以打开文章详情为例）：</strong>浏览器请求 <code>/post/5/</code> → 路由层 <code>post_detail(5)</code> 被调用（app.py 第 984\~985 行）→ 数据层查 <code>Post</code> 表拿到文章 → 模板层 <code>post_detail.html</code> 把标题、正文、评论填进页面 → 返回 HTML。你加功能的本质就是：<strong>加一条新路线 + 加一个新页面，或者改现有路线/页面的内容</strong>。</p>
+<p><strong>一次请求的接力（以打开文章详情为例）：</strong>浏览器请求 <code>/post/5/</code> → 路由层 <code>post_detail(5)</code> 被调用（app.py 第1058~1059行）→ 数据层查 <code>Post</code> 表拿到文章 → 模板层 <code>post_detail.html</code> 把标题、正文、评论填进页面 → 返回 HTML。你加功能的本质就是：<strong>加一条新路线 + 加一个新页面，或者改现有路线/页面的内容</strong>。</p>
 <h2 id="_5">1.2 数据模型全家福</h2>
-<p>数据库是 <code>blog.db</code>（SQLite 单文件），目前有 6 张业务表 + 1 张关联表（均在 app.py 第 434\~591 行定义）：</p>
+<p>数据库是 <code>blog.db</code>（SQLite 单文件），目前有 6 张业务表 + 1 张关联表（均在 app.py 第437~607行定义）：</p>
 <table>
 <thead>
 <tr>
@@ -5099,7 +5672,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tr>
 <tr>
 <td><code>FriendLink</code>（友链）</td>
-<td>id、name、url、description、is_deleted（第 578 行起）</td>
+<td>id、name、url、description、is_deleted（第590行起）</td>
 <td>友情链接列表</td>
 </tr>
 </tbody>
@@ -5121,15 +5694,15 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tr>
 <tr>
 <td>加一个字段（存新数据）</td>
-<td>① 模型类加一行 <code>xxx = db.Column(...)</code>（如 Post 类里）；② <code>init_db()</code> 的「补列」段加 ALTER（第 2131 行后）；③ 新建/编辑文章的表单和页面加输入框</td>
+<td>① 模型类加一行 <code>xxx = db.Column(...)</code>（如 Post 类里）；② <code>init_db()</code> 的「补列」段加 ALTER（第2248行后）；③ 新建/编辑文章的表单和页面加输入框</td>
 </tr>
 <tr>
 <td>改首页/详情页显示什么</td>
-<td><code>index()</code>（app.py 第 941 行）/ <code>post_detail()</code>（第 985 行）的查询，加 <code>templates/index.html</code> / <code>post_detail.html</code> 的显示</td>
+<td><code>index()</code>（app.py 第1014行）/ <code>post_detail()</code>（第1058行）的查询，加 <code>templates/index.html</code> / <code>post_detail.html</code> 的显示</td>
 </tr>
 <tr>
 <td>加导航入口（页面顶栏菜单）</td>
-<td><code>templates/base.html</code>（全站母版，导航在这里定义）；注意 <code>inject_globals()</code>（app.py 第 782 行）注入全站变量</td>
+<td><code>templates/base.html</code>（全站母版，导航在这里定义）；注意 <code>inject_globals()</code>（app.py 第843行）注入全站变量</td>
 </tr>
 <tr>
 <td>加后台管理功能</td>
@@ -5137,7 +5710,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tr>
 <tr>
 <td>样式不生效（改了 tailwind 类没反应）</td>
-<td>静态文件有浏览器缓存（<code>_static_cache_control</code>，app.py 第 370 行），改样式后强刷浏览器（Ctrl+F5）</td>
+<td>静态文件有浏览器缓存（<code>_static_cache_control</code>，app.py 第373行），改样式后强刷浏览器（Ctrl+F5）</td>
 </tr>
 <tr>
 <td>动了表结构后 Gitee 同步报错</td>
@@ -5237,7 +5810,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>第 707 行附近（工具函数区）</td>
+<td>第722行附近（工具函数区）</td>
 <td>加一个计算函数（见下）</td>
 </tr>
 <tr>
@@ -5248,7 +5821,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tbody>
 </table>
 <h3 id="_14">分步实现</h3>
-<p><strong>第 1 步</strong>：在 <code>app.py</code> 的 <code>allowed_avatar</code> 函数（第 707 行）后面，新加一个纯函数：</p>
+<p><strong>第 1 步</strong>：在 <code>app.py</code> 的 <code>allowed_avatar</code> 函数（第722行）后面，新加一个纯函数：</p>
 <div class="codehilite"><pre><span></span><code>def reading_minutes(content):
     """估算阅读时长：按 400 字/分钟，不足 1 分钟按 1 分钟算"""
     if not content:
@@ -5288,7 +5861,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>第 941 行 <code>index()</code> 函数内</td>
+<td>第1014行 <code>index()</code> 函数内</td>
 <td>查询里加随机取一篇（见下）</td>
 </tr>
 <tr>
@@ -5299,7 +5872,7 @@ IDM_TRAY_QUIT = 40003           # 菜单项 ID：退出
 </tbody>
 </table>
 <h3 id="_20">分步实现</h3>
-<p><strong>第 1 步</strong>：在 <code>index()</code>（app.py 第 941 行）函数体里，找到它 return 之前的查询部分，加一段「随机文章」查询。你可以把随机文章作为变量传给模板：</p>
+<p><strong>第 1 步</strong>：在 <code>index()</code>（app.py 第1014行）函数体里，找到它 return 之前的查询部分，加一段「随机文章」查询。你可以把随机文章作为变量传给模板：</p>
 <div class="codehilite"><pre><span></span><code><span class="gh">#</span> 在 index() 里，return render_template 之前加：
 random_post = Post.query.filter_by(published=True, is_deleted=False) \
                         .order_by(db.func.random()).first()
@@ -5327,7 +5900,7 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 <h1 id="_23">第四部分 · L2 进阶：两个页面级功能</h1>
 <h2 id="_24">4.1 功能 3：热门文章排行榜（★★）</h2>
 <h3 id="_25">功能与原理</h3>
-<p>新增一个 <code>/popular/</code> 页面，按浏览量从高到低列出前 10 篇文章。浏览量数据项目里<strong>早就有了</strong>：<code>Post.view_count</code> 字段（app.py 第 449 行），后台每 30 秒把内存计数批量写进数据库（配套文档讲过的 <code>_vc_flusher</code>）。你只是把它「展示出来」。这是你第一次<strong>完整开发一个全新页面</strong>：新路由 + 新模板 + 导航入口三件套。</p>
+<p>新增一个 <code>/popular/</code> 页面，按浏览量从高到低列出前 10 篇文章。浏览量数据项目里<strong>早就有了</strong>：<code>Post.view_count</code> 字段（app.py 第452行），后台每 30 秒把内存计数批量写进数据库（配套文档讲过的 <code>_vc_flusher</code>）。你只是把它「展示出来」。这是你第一次<strong>完整开发一个全新页面</strong>：新路由 + 新模板 + 导航入口三件套。</p>
 <h3 id="_26">涉及文件</h3>
 <table>
 <thead>
@@ -5340,7 +5913,7 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>第 1189 行 <code>archive_index()</code> 附近</td>
+<td>第1267行 <code>archive_index()</code> 附近</td>
 <td>新增 <code>/popular/</code> 路由函数</td>
 </tr>
 <tr>
@@ -5356,7 +5929,7 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 </tbody>
 </table>
 <h3 id="_27">分步实现</h3>
-<p><strong>第 1 步</strong>：在 <code>archive_index()</code>（app.py 第 1189 行）函数<strong>后面</strong>（注意函数之间空两行），新写一个路由：</p>
+<p><strong>第 1 步</strong>：在 <code>archive_index()</code>（app.py 第1267行）函数<strong>后面</strong>（注意函数之间空两行），新写一个路由：</p>
 <div class="codehilite"><pre><span></span><code><span class="sx">@app.route('/popular/')</span>
 <span class="sx">def</span><span class="w"> </span><span class="nl">popular()</span><span class="p">:</span>
 <span class="w">    </span><span class="s2">"""热门文章：按浏览量倒序取前 10 篇"""</span>
@@ -5411,7 +5984,7 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>第 1266 行 <code>admin_dashboard()</code> 附近</td>
+<td>第1347行 <code>admin_dashboard()</code> 附近</td>
 <td>新增 <code>/admin/drafts/</code> 路由</td>
 </tr>
 <tr>
@@ -5427,7 +6000,7 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 </tbody>
 </table>
 <h3 id="_33">分步实现</h3>
-<p><strong>第 1 步</strong>：在 <code>admin_dashboard()</code>（app.py 第 1266 行）后面加路由。发布/取消发布已经有现成路由 <code>post_toggle_publish</code>（app.py 第 1538 行，POST 方法），草稿箱直接链接过去即可：</p>
+<p><strong>第 1 步</strong>：在 <code>admin_dashboard()</code>（app.py 第1347行）后面加路由。发布/取消发布已经有现成路由 <code>post_toggle_publish</code>（app.py 第1651行，POST 方法），草稿箱直接链接过去即可：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/admin/drafts/'</span><span class="p">)</span>
 <span class="n">def</span><span class="w"> </span><span class="n">admin_drafts</span><span class="p">()</span><span class="err">:</span>
 <span class="w">    </span><span class="ss">"""草稿箱：列出所有未发布的文章"""</span>
@@ -5481,17 +6054,17 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>Post 模型（第 434 行）</td>
+<td>Post 模型（第437行）</td>
 <td>加 <code>is_pinned</code> 列</td>
 </tr>
 <tr>
 <td><code>app.py</code></td>
-<td><code>init_db()</code>（第 2131 行）</td>
+<td><code>init_db()</code>（第2248行）</td>
 <td>加 ALTER 补列</td>
 </tr>
 <tr>
 <td><code>app.py</code></td>
-<td><code>index()</code>（第 941 行）</td>
+<td><code>index()</code>（第1014行）</td>
 <td>查询排序加置顶优先</td>
 </tr>
 <tr>
@@ -5502,11 +6075,11 @@ random_post = Post.query.filter_by(published=True, is_deleted=False) \
 </tbody>
 </table>
 <h3 id="_40">分步实现</h3>
-<p><strong>第 1 步：模型加列。</strong>在 <code>Post</code> 类里 <code>published</code> 字段（第 448 行）下面加一行：</p>
+<p><strong>第 1 步：模型加列。</strong>在 <code>Post</code> 类里 <code>published</code> 字段（第451行）下面加一行：</p>
 <div class="codehilite"><pre><span></span><code>is_pinned = db.Column(db.Boolean, default=False)   # 置顶标记：True=排最前
 </code></pre></div>
 
-<p><strong>第 2 步：迁移补列（关键！）。</strong>打开 <code>init_db()</code>（第 2131 行），找到里面已有的「ALTER 补列」代码段（配套文档讲过：用 try/except 捕获「列已存在」报错，幂等补列）。照抄那个模式，加一段：</p>
+<p><strong>第 2 步：迁移补列（关键！）。</strong>打开 <code>init_db()</code>（第2248行），找到里面已有的「ALTER 补列」代码段（配套文档讲过：用 try/except 捕获「列已存在」报错，幂等补列）。照抄那个模式，加一段：</p>
 <div class="codehilite"><pre><span></span><code><span class="gh">#</span> 新增：文章置顶字段（旧库自动补列，重复执行不报错）
 try:
     db.session.execute(db.text('ALTER TABLE post ADD COLUMN is_pinned BOOLEAN DEFAULT 0'))
@@ -5516,7 +6089,7 @@ except Exception:
 </code></pre></div>
 
 <p><strong>为什么必须走 ALTER 而不是删库重建：</strong>你的 <code>blog.db</code> 里已有文章、评论、点赞数据，删库重建数据全没了。ALTER TABLE 只加一列、不动旧数据；「先试执行、报错就回滚」让脚本幂等——启动 100 次也只会成功补一次列。</p>
-<p><strong>第 3 步：首页排序。</strong>找到 <code>index()</code>（第 941 行）里首页文章的查询，在 <code>order_by</code> 处让置顶排最前。先看现有排序，再改成：</p>
+<p><strong>第 3 步：首页排序。</strong>找到 <code>index()</code>（第1014行）里首页文章的查询，在 <code>order_by</code> 处让置顶排最前。先看现有排序，再改成：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 现有排序类似：.order_by(Post.created_at.desc())</span>
 <span class="c1"># 改成：</span>
 <span class="na">.order_by</span><span class="p">(</span><span class="no">Post.is_pinned.desc</span><span class="p">(),</span><span class="w"> </span><span class="no">Post.created_at.desc</span><span class="p">())</span>
@@ -5556,7 +6129,7 @@ except Exception:
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td>第 1189 行附近</td>
+<td>第1267行附近</td>
 <td>新增 <code>/feed/</code> 路由</td>
 </tr>
 <tr>
@@ -5571,7 +6144,7 @@ except Exception:
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>   <span class="c1"># 生成/解析 XML 的标准库（自带，无需安装）</span>
 </code></pre></div>
 
-<p><strong>第 2 步</strong>：在 <code>archive_index()</code>（第 1189 行）后面加路由：</p>
+<p><strong>第 2 步</strong>：在 <code>archive_index()</code>（第1267行）后面加路由：</p>
 <div class="codehilite"><pre><span></span><code><span class="sx">@app.route('/feed/')</span>
 <span class="sx">def</span><span class="w"> </span><span class="nl">feed()</span><span class="p">:</span>
 <span class="w">    </span><span class="s2">"""RSS 2.0 订阅源：输出最近 20 篇已发布文章"""</span>
@@ -5622,7 +6195,7 @@ except Exception:
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td><code>index()</code>（第 941 行）搜索逻辑</td>
+<td><code>index()</code>（第1014行）搜索逻辑</td>
 <td>解析 tag: 前缀 + 关联过滤</td>
 </tr>
 <tr>
@@ -5651,7 +6224,7 @@ if m:
 if tag_name:
     # 有关联表 join 的过滤：只保留"带这个标签"的文章
     query = query.join(Post.tags).filter(Tag.slug == Tag.slugify(tag_name))
-    # Post.tags 是模型里的关系名（app.py 第 453 行），join 后可直接用 Tag 的列过滤
+    # Post.tags 是模型里的关系名（app.py 第456行），join 后可直接用 Tag 的列过滤
 if keyword:
     like = f'%{keyword}%'                    # 模糊匹配通配符
     query = query.filter(db.or_(
@@ -5684,22 +6257,22 @@ posts = query.order_by(Post.created_at.desc()).all()
 <tbody>
 <tr>
 <td><code>app.py</code></td>
-<td><code>FriendLink</code> 模型（第 578 行）</td>
+<td><code>FriendLink</code> 模型（第590行）</td>
 <td>加 <code>status</code> 字段</td>
 </tr>
 <tr>
 <td><code>app.py</code></td>
-<td><code>init_db()</code>（第 2131 行）</td>
+<td><code>init_db()</code>（第2248行）</td>
 <td>ALTER 补 status 列</td>
 </tr>
 <tr>
 <td><code>app.py</code></td>
-<td>第 1139 行 <code>friend_links()</code> 附近</td>
+<td>第1213行 <code>friend_links()</code> 附近</td>
 <td>前台：加申请表单路由</td>
 </tr>
 <tr>
 <td><code>app.py</code></td>
-<td>第 1390 行 <code>admin_links()</code> 附近</td>
+<td>第1479行 <code>admin_links()</code> 附近</td>
 <td>后台：加审核操作</td>
 </tr>
 <tr>
@@ -5710,9 +6283,9 @@ posts = query.order_by(Post.created_at.desc()).all()
 </tbody>
 </table>
 <h3 id="_59">分步实现</h3>
-<p><strong>第 1 步：模型加字段 + 迁移。</strong>照功能 5 的完整流程：FriendLink 模型（第 578 行）加 <code>status = db.Column(db.String(20), default='active')</code>；<code>init_db()</code> 里照抄 ALTER 模式补列。status 的三个值：<code>pending</code>（待审）/ <code>active</code>（已通过）/ <code>rejected</code>（拒绝）。</p>
+<p><strong>第 1 步：模型加字段 + 迁移。</strong>照功能 5 的完整流程：FriendLink 模型（第590行）加 <code>status = db.Column(db.String(20), default='active')</code>；<code>init_db()</code> 里照抄 ALTER 模式补列。status 的三个值：<code>pending</code>（待审）/ <code>active</code>（已通过）/ <code>rejected</code>（拒绝）。</p>
 <p><strong>为什么用字符串不用布尔：</strong>「通过/拒绝」是两种不同状态，布尔只有真假两个值，塞不下「拒绝」——状态多于 2 个时用字符串枚举（业界叫 enum），这是很常见的建模决策。</p>
-<p><strong>第 2 步：前台申请表单路由。</strong>在 <code>friend_links()</code>（第 1139 行）后面加：</p>
+<p><strong>第 2 步：前台申请表单路由。</strong>在 <code>friend_links()</code>（第1213行）后面加：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/links/apply/'</span><span class="p">,</span><span class="w"> </span><span class="n">methods</span><span class="o">=[</span><span class="n">'POST'</span><span class="o">]</span><span class="p">)</span>
 <span class="n">def</span><span class="w"> </span><span class="n">link_apply</span><span class="p">()</span><span class="err">:</span>
 <span class="w">    </span><span class="ss">"""访客提交友链申请：写入 pending 状态，等待审核"""</span>
@@ -5729,12 +6302,12 @@ posts = query.order_by(Post.created_at.desc()).all()
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">'friend_links'</span><span class="p">))</span>
 </code></pre></div>
 
-<p><strong>第 3 步：前台只显示 active。</strong>把 <code>friend_links()</code>（第 1139 行）里现有的查询改成：</p>
+<p><strong>第 3 步：前台只显示 active。</strong>把 <code>friend_links()</code>（第1213行）里现有的查询改成：</p>
 <div class="codehilite"><pre><span></span><code>links = FriendLink.query.filter_by(status='active', is_deleted=False).all()
 <span class="gh">#</span> 原来可能没有 status 条件 —— 加上后，"待审核"的不会显示在前台
 </code></pre></div>
 
-<p><strong>第 4 步：后台审核。</strong>在 <code>admin_links()</code>（第 1390 行）后台路由里，把列表查询改为显示全部（含 pending），并在模板加两个审核按钮。审核动作用一个新路由处理：</p>
+<p><strong>第 4 步：后台审核。</strong>在 <code>admin_links()</code>（第1479行）后台路由里，把列表查询改为显示全部（含 pending），并在模板加两个审核按钮。审核动作用一个新路由处理：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/admin/links/&amp;lt;int:link_id&amp;gt;/review/'</span><span class="p">,</span><span class="w"> </span><span class="n">methods</span><span class="o">=[</span><span class="n">'POST'</span><span class="o">]</span><span class="p">)</span>
 <span class="n">def</span><span class="w"> </span><span class="n">admin_link_review</span><span class="p">(</span><span class="n">link_id</span><span class="p">)</span><span class="err">:</span>
 <span class="w">    </span><span class="ss">"""后台审核：action=publish 通过 / action=reject 拒绝"""</span>
@@ -5836,7 +6409,7 @@ posts = query.order_by(Post.created_at.desc()).all()
 <p><strong>评论支持 Markdown 或表情</strong>（★★★★★）：注意 XSS 安全——配套文档讲过搜索高亮先转义，评论渲染同理，建议用「纯文本 + 换行」起步。</p>
 </li>
 <li>
-<p><strong>文章分类导航页</strong>（★★★）：Post 有现成的 <code>category</code> 字段（app.py 第 450 行）但前台没用起来——按「热门排行榜」的模板做一个 <code>/category/&lt;名字&gt;/</code> 页面即可，这是最容易的「挖掘存量字段」功能。</p>
+<p><strong>文章分类导航页</strong>（★★★）：Post 有现成的 <code>category</code> 字段（app.py 第453行）但前台没用起来——按「热门排行榜」的模板做一个 <code>/category/&lt;名字&gt;/</code> 页面即可，这是最容易的「挖掘存量字段」功能。</p>
 </li>
 <li>
 <p><strong>站点地图 sitemap.xml</strong>（★★★）：照 RSS 的 ElementTree 套路生成 XML，方便搜索引擎收录。</p>
@@ -5845,7 +6418,8 @@ posts = query.order_by(Post.created_at.desc()).all()
 <p><strong>给你的毕业检验：</strong>不看代码，能回答「加一个『浏览量 Top10 侧边栏』需要动哪几个文件、每处改什么」——能答上来，说明扩展点地图已经装进你脑子里，这篇文档的使命完成了。去动手吧，改坏了大不了从 <code>blog.db.bak</code> 恢复。</p>
 <blockquote>
 <p>（注：部分内容可能由 AI 生成）</p>
-</blockquote></section><section class="doc-panel" id="doc-05"><h1 id="_1">第三方库全面教程 · Flask</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-05"><h1 id="_1">第三方库全面教程 · Flask</h1>
 <blockquote>
 <p>面向初学者：不假设你已懂任何 Web 知识，每个概念第一次出现都用大白话解释。学完这份教程，你能全面掌控 Flask，而不只是会博客项目里那几招。
 适用版本：Flask 3.x ｜ 博客项目：<code>D:\blog_pkg\app.py</code></p>
@@ -6222,7 +6796,8 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <hr />
 <blockquote>
 <p>下一篇：Jinja2 —— 模板引擎全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-06"><h1 id="_1">第三方库全面教程 · Jinja2</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-06"><h1 id="_1">第三方库全面教程 · Jinja2</h1>
 <blockquote>
 <p>面向初学者：每个概念都从零解释。学完你能全面掌控 Jinja2 模板引擎，而不只是会博客里 <code>{{ }}</code> 那点皮毛。
 适用版本：Jinja2 3.x ｜ 博客项目：<code>templates/</code> 目录全部页面</p>
@@ -6551,7 +7126,8 @@ pip<span class="w"> </span>show<span class="w"> </span>jinja2<span class="w">   
 <hr />
 <blockquote>
 <p>下一篇：Werkzeug —— Flask 底层引擎全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-07"><h1 id="_1">第三方库全面教程 · Werkzeug</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-07"><h1 id="_1">第三方库全面教程 · Werkzeug</h1>
 <blockquote>
 <p>面向初学者：Werkzeug 是 Flask 的"隐形引擎"，你几乎不直接写它，但它一直在背后干活。学完这份教程，你不仅能明白 Flask 的底层原理，还能直接用它解决密码哈希、上传安全等实际问题。
 适用版本：Werkzeug 3.x ｜ 博客项目：<code>app.py</code> 里 <code>from werkzeug.utils import secure_filename</code></p>
@@ -6810,7 +7386,8 @@ pip<span class="w"> </span>show<span class="w"> </span>werkzeug<span class="w"> 
 <hr />
 <blockquote>
 <p>下一篇：Flask-SQLAlchemy —— 数据库 ORM 全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-08"><h1 id="_1">第三方库全面教程 · Flask-SQLAlchemy</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-08"><h1 id="_1">第三方库全面教程 · Flask-SQLAlchemy</h1>
 <blockquote>
 <p>面向初学者：这是博客项目里"数据层"的主角——6 张业务表的增删改查全靠它。学完这份教程，你能全面掌控 SQLAlchemy 的核心机制（ORM、Session、级联、迁移），而不只是会 <code>query.get_or_404</code>。
 适用版本：Flask-SQLAlchemy 3.x（底层 SQLAlchemy 2.x）｜ 博客项目：<code>app.py</code> 数据模型 + <code>init_db</code></p>
@@ -7170,7 +7747,8 @@ pip<span class="w"> </span>show<span class="w"> </span>flask-sqlalchemy<span cla
 <hr />
 <blockquote>
 <p>下一篇：SQLite —— 数据库本体全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-09"><h1 id="_1">第三方库全面教程 · SQLite（标准库）</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-09"><h1 id="_1">第三方库全面教程 · SQLite（标准库）</h1>
 <blockquote>
 <p>面向初学者：SQLite 不是第三方库，是 Python 自带的"零配置数据库"。博客的 blog.db 就是它。学完这份教程，你能掌握参数化查询、事务、WAL、全文搜索等 SQLite 高级能力——不只会"复制 blog.db 当备份"。
 适用版本：Python 内置 sqlite3 ｜ 博客项目：<code>blog.db</code>（通过 Flask-SQLAlchemy 间接使用）</p>
@@ -7413,7 +7991,8 @@ pip<span class="w"> </span>show<span class="w"> </span>flask-sqlalchemy<span cla
 <hr />
 <blockquote>
 <p>下一篇：python-markdown —— Markdown 转 HTML 全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-10"><h1 id="_1">第三方库全面教程 · python-markdown</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-10"><h1 id="_1">第三方库全面教程 · python-markdown</h1>
 <blockquote>
 <p>面向初学者：博客的文章正文从 Markdown 变成网页，就是它干的。学完这份教程，你能掌握 python-markdown 的全部常用扩展、插件机制和性能优化，而不只是会 <code>markdown.markdown(text)</code> 一句。
 适用版本：Markdown 3.x ｜ 博客项目：<code>app.py</code> 的 <code>render_markdown</code> 函数</p>
@@ -7709,7 +8288,8 @@ pip<span class="w"> </span>show<span class="w"> </span>markdown<span class="w"> 
 <hr />
 <blockquote>
 <p>下一篇：Pygments —— 代码高亮引擎全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-11"><h1 id="_1">第三方库全面教程 · Pygments</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-11"><h1 id="_1">第三方库全面教程 · Pygments</h1>
 <blockquote>
 <p>面向初学者：博客文章里的代码块五颜六色，就是 Pygments 的功劳。学完这份教程，你不仅能给代码上色，还能用命令行高亮文件、给代码加行号、换任意配色主题。
 适用版本：Pygments 2.x ｜ 博客项目：<code>app.py</code> 生成高亮 CSS + python-markdown 的 codehilite 扩展</p>
@@ -7939,7 +8519,8 @@ pygmentize<span class="w"> </span>-L<span class="w"> </span>styles
 <hr />
 <blockquote>
 <p>下一篇：PyYAML —— YAML 解析全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-12"><h1 id="_1">第三方库全面教程 · PyYAML</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-12"><h1 id="_1">第三方库全面教程 · PyYAML</h1>
 <blockquote>
 <p>面向初学者：博客文章的头部信息（front-matter）和批量导入文件都是 YAML 写的，PyYAML 负责解析。学完这份教程，你能全面掌握 YAML 的读写、安全加载、自定义类型——不只会 <code>yaml.safe_load</code>。
 适用版本：PyYAML 6.x ｜ 博客项目：<code>app.py</code> 的 <code>parse_front_matter</code> + <code>uploads/sample_batch.yaml</code></p>
@@ -8240,7 +8821,8 @@ pip<span class="w"> </span>show<span class="w"> </span>pyyaml<span class="w">   
 <hr />
 <blockquote>
 <p>下一篇：python-dateutil —— 智能日期处理全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-13"><h1 id="_1">第三方库全面教程 · python-dateutil</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-13"><h1 id="_1">第三方库全面教程 · python-dateutil</h1>
 <blockquote>
 <p>面向初学者：博客导入文章时，各种格式的日期字符串靠它识别。学完这份教程，你会掌握"解析任意日期写法"、"月份加减"（timedelta 干不了的活）、"重复规则"和时区处理——Python 标准库 datetime 的四大短板，它全补齐了。
 适用版本：python-dateutil 2.x ｜ 博客项目：<code>app.py</code> 导入文章的日期解析</p>
@@ -8486,7 +9068,8 @@ pip<span class="w"> </span>show<span class="w"> </span>python-dateutil<span clas
 <hr />
 <blockquote>
 <p>下一篇：waitress —— 生产级 WSGI 服务器全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-14"><h1 id="_1">第三方库全面教程 · waitress</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-14"><h1 id="_1">第三方库全面教程 · waitress</h1>
 <blockquote>
 <p>面向初学者：博客"生产模式"下真正接待访客的服务器就是 waitress。学完这份教程，你会理解 WSGI 服务器的原理、阻塞与非阻塞的区别，以及它和 Flask 内置服务器的本质差异。
 适用版本：waitress 3.x ｜ 博客项目：<code>app.py</code> 的 <code>run_server</code> + <code>main.py</code> 的桌面版后台线程</p>
@@ -8781,7 +9364,8 @@ pip<span class="w"> </span>show<span class="w"> </span>waitress<span class="w"> 
 <hr />
 <blockquote>
 <p>下一篇：pywebview —— 桌面窗口全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-15"><h1 id="_1">第三方库全面教程 · pywebview</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-15"><h1 id="_1">第三方库全面教程 · pywebview</h1>
 <blockquote>
 <p>面向初学者：博客桌面版的那个"像浏览器的窗口"，就是 pywebview 开的。学完这份教程，你会掌握桌面窗口的完整生命周期、JS 与 Python 双向通信，以及各种窗口参数——不只会 <code>create_window</code> + <code>start</code>。
 适用版本：pywebview 5.x ｜ 博客项目：<code>main.py</code>（窗口、居中、托盘配合）</p>
@@ -9008,6 +9592,29 @@ pip<span class="w"> </span>show<span class="w"> </span>pywebview<span class="w">
 <span class="n">webview</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">gui</span><span class="o">=</span><span class="s1">'edgechromium'</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">http_server</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="p">[])</span>
 </code></pre></div>
 
+<p><strong>v2.8.3 增强：窗口大小记忆（不再是固定 1280×820）</strong></p>
+<p>v2.1 是写死 <code>width=1280, height=820</code>，用户每次拖拽调整大小，重启后都回到默认——很烦。v2.8.3 改为「记住用户最后一次调整的尺寸」：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 1. 读取记忆：window_state.json 有记录用记录，没有才用默认</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_window_size</span><span class="p">():</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">_read_json</span><span class="p">(</span><span class="n">_window_state_path</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'width'</span><span class="p">,</span> <span class="mi">1280</span><span class="p">),</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'height'</span><span class="p">,</span> <span class="mi">820</span><span class="p">)</span>
+
+<span class="c1"># 2. 构造参数时用记忆尺寸（_build_create_window_kwargs 内部调用 _load_window_size）</span>
+<span class="n">cw_kwargs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_build_create_window_kwargs</span><span class="p">(</span><span class="s1">'个人博客'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">/'</span><span class="p">)</span>
+<span class="n">window</span> <span class="o">=</span> <span class="n">webview</span><span class="o">.</span><span class="n">create_window</span><span class="p">(</span><span class="o">**</span><span class="n">cw_kwargs</span><span class="p">)</span>
+
+<span class="c1"># 3. 监听 resized 事件：拖拽结束 0.8 秒后（防抖）写回文件</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bind_window_size_save</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+    <span class="n">_t</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'timer'</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_resized</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">_t</span><span class="p">[</span><span class="s1">'timer'</span><span class="p">]:</span> <span class="n">_t</span><span class="p">[</span><span class="s1">'timer'</span><span class="p">]</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="n">_t</span><span class="p">[</span><span class="s1">'timer'</span><span class="p">]</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">_flush_window_size_now</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+        <span class="n">_t</span><span class="p">[</span><span class="s1">'timer'</span><span class="p">]</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">_t</span><span class="p">[</span><span class="s1">'timer'</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">resized</span> <span class="o">+=</span> <span class="n">_on_resized</span>
+</code></pre></div>
+
+<p><strong>三个设计要点：</strong>① <strong>防抖（0.8 秒）</strong>——拖拽过程中会触发几十次 resized 事件，每次都写文件太浪费；等停止 0.8 秒再写一次，既省 IO 又不会漏；② <strong>原子写</strong>——先写临时文件再 <code>os.replace</code>，避免写到一半断电导致文件损坏；③ <strong>关闭时强制 flush</strong>——防止「刚调完就关窗口」时防抖定时器还没触发、记录丢失。记忆文件 <code>data/window_state.json</code> 是用户数据，打包纯净版时排除。</p>
 <h2 id="_17">5.2 独立示例：10 行做一个"打开本地文件"桌面工具</h2>
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">webview</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
 
@@ -9094,7 +9701,8 @@ pip<span class="w"> </span>show<span class="w"> </span>pywebview<span class="w">
 <hr />
 <blockquote>
 <p>下一篇：PyInstaller —— 打包全面教程</p>
-</blockquote></section><section class="doc-panel" id="doc-16"><h1 id="_1">第三方库全面教程 · PyInstaller</h1>
+</blockquote></section>
+<section class="doc-panel" id="doc-16"><h1 id="_1">第三方库全面教程 · PyInstaller</h1>
 <blockquote>
 <p>面向初学者：你手里的"个人博客绿色版.exe"就是 PyInstaller 打包出来的。学完这份教程，你会掌握打包的完整原理、spec 文件的每一个字段，以及"打包后神秘报错"的全部排查套路。
 适用版本：PyInstaller 6.x ｜ 博客项目：<code>blog_desktop.spec</code></p>
@@ -9291,7 +9899,22 @@ pyinstaller<span class="w"> </span>--exclude-module<span class="w"> </span>numpy
 - <code>sys.frozen</code>：打包后运行才有（源码运行没有这个属性）——判断"现在在 exe 里还是源码里"
 - <code>sys._MEIPASS</code>：PyInstaller 在运行时自动设置的资源解压目录；onedir 模式就是 <code>_internal</code>，onefile 模式是临时解压目录
 - 把"只读资源"（模板/静态）和"可写数据"（数据库/上传）<strong>分开目录</strong>，用户升级版本时直接覆盖 exe+_internal 也不会丢数据</p>
-<h2 id="_15">5.2 独立示例：给任意脚本打包的完整流程</h2>
+<h2 id="_15">5.2 打包纯净版：把个人数据挡在包外（v2.8.3 实战）</h2>
+<p>博客是发出去给其他人用的，打包前必须<strong>排除自己的个人数据</strong>，否则别人拿到的是你的博客内容。v2.8.3 的做法是「打包清单」式检查——只保留项目代码与示例资源，删掉全部运行时产生的数据文件：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 打包前检查 data 目录（个人数据全部在这里），逐个确认删除：</span>
+<span class="c1">#   blog.db               ← 数据库（文章/评论/点赞/友链/资料 全在这里）</span>
+<span class="c1">#   uploads/links/        ← 友链头像等上传文件</span>
+<span class="c1">#   .session_key          ← 会话密钥</span>
+<span class="c1">#   gitee_sync.json       ← 云同步配置（含 Gitee token，绝不能打包！）</span>
+<span class="c1">#   sync_state.json / sync_last_run.json  ← 同步状态</span>
+<span class="c1">#   .sync_node_id         ← 同步节点标记</span>
+<span class="c1">#   window_state.json     ← 窗口大小记忆</span>
+<span class="c1">#   avatars/ bg/          ← 头像、背景图</span>
+</code></pre></div>
+
+<p><strong>两个绝不能漏的重点：</strong>① <code>gitee_sync.json</code> 里有你的 <strong>Gitee 访问令牌</strong>，漏打包 = 把仓库写权限发给所有人；② <code>blog.db</code> 是全部个人数据，漏打包 = 别人看到你的全部文章和评论。<strong>删完再打包，打包后自检</strong>：解压产物搜一下有没有 <code>blog.db</code> 和 <code>gitee_sync.json</code>，没有才算纯净。</p>
+<p><strong>为什么数据文件不进 SHARED_DATAS？</strong>SHARED_DATAS 打进 <code>_internal</code>（只读区、随包分发），数据文件一旦进去就变成"初始快照"：用户第一次运行会用它初始化数据，之后每次改都写在外部 DATA_DIR，升级版本时旧数据仍在外部目录、不会被覆盖。<strong>资源进包、数据出包</strong>——这是桌面软件打包的铁律。</p>
+<h2 id="_16">5.3 独立示例：给任意脚本打包的完整流程</h2>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 1. 第一次打包（生成 spec）</span>
 pyinstaller<span class="w"> </span>-D<span class="w"> </span>-w<span class="w"> </span>--name<span class="w"> </span>MyTool<span class="w"> </span>tool.py
 
@@ -9309,7 +9932,7 @@ MyTool.exe<span class="w">        </span><span class="c1"># 双击或命令行�
 </code></pre></div>
 
 <hr />
-<h1 id="_16">第 6 章 高频坑与排查</h1>
+<h1 id="_17">第 6 章 高频坑与排查</h1>
 <table>
 <thead>
 <tr>
@@ -9362,7 +9985,7 @@ MyTool.exe<span class="w">        </span><span class="c1"># 双击或命令行�
 </tbody>
 </table>
 <hr />
-<h1 id="_17">第 7 章 学习路径与自测</h1>
+<h1 id="_18">第 7 章 学习路径与自测</h1>
 <p><strong>学习路径</strong>：先命令行打一个"Hello 窗口"（半天）→ 加资源文件（半天）→ 手改 spec 四个环节（1 天）→ 排查 hiddenimports（1 天，博客实战）→ 资源路径 sys.frozen 改造（半天）。</p>
 <p><strong>自测题</strong>：</p>
 <ol>
@@ -9379,16 +10002,14 @@ MyTool.exe<span class="w">        </span><span class="c1"># 双击或命令行�
 4. 打包后运行才有的标志，用它判断"现在是在 exe 里还是源码里"，决定资源路径。
 5. build/dist 有旧缓存，不删可能打的是旧代码，改了等于白改。</p>
 <hr />
-<h1 id="_18">全部 12 份教程完结</h1>
+<h1 id="_19">全部 12 份教程完结</h1>
 <p>到这里，博客项目用到的 <strong>12 个库</strong>（11 个第三方库 + SQLite 标准库）都各有了一份"从零到精通"全面教程。学习建议：</p>
 <ol>
 <li><strong>主线四件套必学</strong>：Flask → Flask-SQLAlchemy → Jinja2 → python-markdown（改博客功能的主战场）</li>
 <li><strong>桌面两件套</strong>：waitress + pywebview（桌面版的一切）</li>
 <li><strong>按需查</strong>：Werkzeug（上传/密码）、PyYAML（配置）、dateutil（日期）、Pygments（高亮）、PyInstaller（打包）</li>
 <li><strong>每份教程的自测题</strong>能独立答出来，才算真正掌控该库</li>
-</ol></section><div id="footer">个人博客项目 · 教程文档站（博客专版）v2.8.3 ｜ 16 份文档 ｜ 右上角可切换日间/夜间模式 ｜ 双击 index.html 即可离线浏览</div>
-  </div>
-<script>
+</ol></section><div id="footer">个人博客项目 · 教程文档站（博客专版）v2.8.3 ｜ 16 份文档 ｜ 右上角可切换日间/夜间模式 ｜ 双击 index.html 即可离线浏览</div></div><script>
 function switchTab(id){
   document.querySelectorAll('.tab-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.tab === id);

@@ -218,6 +218,33 @@ _start_tray(window)              # 托盘在 start() 之前！
 webview.start(gui='edgechromium', debug=False, http_server=False, func=[])
 ```
 
+**v2.8.3 增强：窗口大小记忆（不再是固定 1280×820）**
+
+v2.1 是写死 `width=1280, height=820`，用户每次拖拽调整大小，重启后都回到默认——很烦。v2.8.3 改为「记住用户最后一次调整的尺寸」：
+
+```python
+# 1. 读取记忆：window_state.json 有记录用记录，没有才用默认
+def _load_window_size():
+    state = _read_json(_window_state_path())
+    return state.get('width', 1280), state.get('height', 820)
+
+# 2. 构造参数时用记忆尺寸（_build_create_window_kwargs 内部调用 _load_window_size）
+cw_kwargs, _ = _build_create_window_kwargs('个人博客', f'http://127.0.0.1:{port}/')
+window = webview.create_window(**cw_kwargs)
+
+# 3. 监听 resized 事件：拖拽结束 0.8 秒后（防抖）写回文件
+def _bind_window_size_save(window):
+    _t = {'timer': None}
+    def _on_resized():
+        if _t['timer']: _t['timer'].cancel()
+        _t['timer'] = threading.Timer(0.8, lambda: _flush_window_size_now(window))
+        _t['timer'].daemon = True
+        _t['timer'].start()
+    window.events.resized += _on_resized
+```
+
+**三个设计要点：**① **防抖（0.8 秒）**——拖拽过程中会触发几十次 resized 事件，每次都写文件太浪费；等停止 0.8 秒再写一次，既省 IO 又不会漏；② **原子写**——先写临时文件再 `os.replace`，避免写到一半断电导致文件损坏；③ **关闭时强制 flush**——防止「刚调完就关窗口」时防抖定时器还没触发、记录丢失。记忆文件 `data/window_state.json` 是用户数据，打包纯净版时排除。
+
 ## 5.2 独立示例：10 行做一个"打开本地文件"桌面工具
 
 ```python
