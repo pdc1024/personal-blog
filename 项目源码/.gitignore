@@ -14,6 +14,14 @@ blog.pid
 logs/
 uploads/avatars/
 uploads/bg/
+uploads/links/
+
+# ---- 云同步 / 窗口状态（请勿提交）----
+gitee_sync.json
+sync_state.json
+sync_last_run.json
+.sync_node_id
+window_state.json
 
 # ---- 构建产物 ----
 build/

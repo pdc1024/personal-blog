@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import sys
 import os
+import json
 import ctypes
 import threading
 import time
@@ -140,6 +141,188 @@ def _compute_centered_position(width: int, height: int):
         return None
 
 
+# ---------- 窗口大小记忆（拖拽调整后自动记住，下次启动沿用）----------
+_SIZE_MIN_W, _SIZE_MIN_H = 960, 640          # 与 create_window 的 min_size 一致
+_SIZE_DEFAULT = (1280, 820)                  # 首次启动/无记忆时默认
+_SIZE_SAVE_DEBOUNCE = 0.8                    # 拖拽结束 0.8s 无变化才写盘
+_size_timer = None                            # debounce 定时器
+_size_timer_lock = threading.Lock()
+_size_flush_callback = None                   # 关闭窗口前立即刷新的回调
+
+
+def _window_state_path() -> str:
+    from config import Config as _Cfg
+    return os.path.join(_Cfg.DATA_DIR, 'window_state.json')
+
+
+def _screen_dip_size():
+    """主屏大小（DIP）。失败返回 None。"""
+    if sys.platform != 'win32':
+        return None
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        sw = user32.GetSystemMetrics(0)
+        sh = user32.GetSystemMetrics(1)
+        if sw <= 0 or sh <= 0:
+            return None
+        dpi = 96
+        try:
+            dpi = int(user32.GetDpiForSystem())
+        except Exception:
+            dpi = 96
+        scale = dpi / 96.0
+        return int(sw / scale), int(sh / scale)
+    except Exception:
+        return None
+
+
+def _load_window_size():
+    """读取上次保存的窗口大小（DIP）。缺失/非法/超屏一律回退默认。"""
+    try:
+        p = _window_state_path()
+        if not os.path.isfile(p):
+            return None
+        with open(p, 'r', encoding='utf-8') as f:
+            d = json.load(f)
+        w = int(d.get('width', 0))
+        h = int(d.get('height', 0))
+        if w < _SIZE_MIN_W or h < _SIZE_MIN_H:
+            return None
+        scr = _screen_dip_size()
+        if scr and (w > scr[0] or h > scr[1]):
+            return None
+        return w, h
+    except Exception:
+        return None
+
+
+def _save_window_size(width: int, height: int) -> None:
+    """原子写入窗口大小（失败静默，不影响主流程）。"""
+    try:
+        p = _window_state_path()
+        d = os.path.dirname(p)
+        if d and not os.path.isdir(d):
+            os.makedirs(d, exist_ok=True)
+        tmp = p + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump({'width': int(width), 'height': int(height)}, f, ensure_ascii=False)
+        os.replace(tmp, p)
+    except Exception:
+        pass
+
+
+def _native_window_handle(window):
+    """多路径获取 Windows 原生窗口句柄（pywebview 5.x/6.x 兼容）。"""
+    if sys.platform != 'win32':
+        return None
+    try:
+        n = window.native
+        for getter in (
+            lambda: n.Handle,
+            lambda: n.form.Handle,
+            lambda: n.Form.Handle,
+            lambda: n.GetNativeWindow().Handle,
+            lambda: n._window.Handle,
+            lambda: n.Browser.Handle,
+        ):
+            try:
+                h = getter()
+                if h:
+                    return int(h)
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return None
+
+
+def _restored_window_size_dip(window):
+    """取窗口“还原状态”的尺寸（DIP）：最大化/最小化时返回拖动前大小，避免把全屏尺寸误存。"""
+    hwnd = _native_window_handle(window)
+    if not hwnd:
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+        class _WINDOWPLACEMENT(ctypes.Structure):
+            _fields_ = [('length', wintypes.UINT), ('flags', wintypes.UINT),
+                        ('showCmd', wintypes.UINT),
+                        ('ptMinPosition', wintypes.POINT),
+                        ('ptMaxPosition', wintypes.POINT),
+                        ('rcNormalPosition', wintypes.RECT)]
+        wp = _WINDOWPLACEMENT()
+        wp.length = ctypes.sizeof(_WINDOWPLACEMENT)
+        ok = ctypes.windll.user32.GetWindowPlacement(
+            wintypes.HWND(hwnd), ctypes.byref(wp))
+        if not ok:
+            return None
+        w_phys = wp.rcNormalPosition.right - wp.rcNormalPosition.left
+        h_phys = wp.rcNormalPosition.bottom - wp.rcNormalPosition.top
+        if w_phys <= 0 or h_phys <= 0:
+            return None
+        scale = 1.0
+        try:
+            dpi = ctypes.windll.user32.GetDpiForWindow(wintypes.HWND(hwnd))
+            if dpi > 0:
+                scale = dpi / 96.0
+        except Exception:
+            pass
+        return max(1, int(round(w_phys / scale))), max(1, int(round(h_phys / scale)))
+    except Exception:
+        return None
+
+
+def _bind_window_size_save(window) -> None:
+    """监听窗口 resized 事件：拖拽结束后（防抖）把最新大小写入记忆文件。
+
+    多次调整始终以最后一次为准；最大化/最小化不覆盖记录。
+    """
+    global _size_timer, _size_flush_callback
+
+    def _flush():
+        global _size_timer
+        with _size_timer_lock:
+            if _size_timer is not None:
+                _size_timer.cancel()
+                _size_timer = None
+        rect = _restored_window_size_dip(window)
+        if rect:
+            w, h = rect
+        else:
+            w = getattr(window, 'width', None)
+            h = getattr(window, 'height', None)
+            if not w or not h:
+                return
+        if w < _SIZE_MIN_W or h < _SIZE_MIN_H:
+            return
+        _save_window_size(w, h)
+
+    def _on_resized(*_args):
+        global _size_timer
+        with _size_timer_lock:
+            if _size_timer is not None:
+                _size_timer.cancel()
+            _size_timer = threading.Timer(_SIZE_SAVE_DEBOUNCE, _flush)
+            _size_timer.daemon = True
+            _size_timer.start()
+
+    try:
+        window.events.resized += _on_resized
+    except Exception:
+        pass
+    _size_flush_callback = _flush
+
+
+def _flush_window_size_now() -> None:
+    """窗口关闭前调用：立即把当前大小写入记忆（不被防抖吞掉）。"""
+    if _size_flush_callback is not None:
+        try:
+            _size_flush_callback()
+        except Exception:
+            pass
+
+
 def _build_create_window_kwargs(title: str, url: str, _force_icon: bool = False):
     """把 webview.create_window 的参数抽成函数，便于做签名检查。
 
@@ -165,7 +348,7 @@ def _build_create_window_kwargs(title: str, url: str, _force_icon: bool = False)
                    'background_color','transparent','text_select','zoomable','draggable',
                    'vibrancy','menu','localization','server','http_port','server_args'}
 
-    win_w, win_h = 1280, 820
+    win_w, win_h = _load_window_size() or _SIZE_DEFAULT
     kwargs_all = dict(
         title=title,
         url=url,
@@ -990,6 +1173,7 @@ def main() -> int:
 
     def on_closing():
         """点窗口 X：托盘可用时最小化到托盘而不是退出；托盘"退出"命令则放行关闭"""
+        _flush_window_size_now()  # 关闭前保存当前窗口大小（防抖可能未触发）
         if _TRAY_ACTIVE and not _TRAY_QUITTING:
             _tray_hide_window()
             return False
@@ -1012,6 +1196,8 @@ def main() -> int:
     window = webview.create_window(**cw_kwargs)
     window.events.closed += on_closed
     window.events.closing += on_closing
+    # 拖拽调整窗口大小 → 自动记忆（每次以最后一次调整为准）
+    _bind_window_size_save(window)
 
     # 启动系统托盘（v1.3）：注册成功 → X=最小化到托盘；失败（非 Windows 等）→ 保持"关闭即退出"
     _start_tray(window)

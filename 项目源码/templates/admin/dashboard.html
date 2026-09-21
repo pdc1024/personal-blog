@@ -190,7 +190,7 @@
                                 {% endif %}
                             </td>
                             <td class="px-3 md:px-6 py-4 text-white/50 hidden sm:table-cell whitespace-nowrap">
-                                {{ post.created_at.strftime('%Y-%m-%d') }}
+                                {{ post.created_at|localtime|strftime('%Y-%m-%d') }}
                             </td>
                             <td class="px-3 md:px-6 py-4 text-white/60 hidden md:table-cell">{{ post.view_count or 0 }}</td>
                             <td class="px-5 md:px-6 py-4">
@@ -205,7 +205,7 @@
                                         </button>
                                     </form>
                                     <form method="POST" action="{{ url_for('post_delete', post_id=post.id) }}" class="inline"
-                                          onsubmit="return confirm('确定删除《{{ post.title }}》吗？');">
+                                          onsubmit="event.preventDefault(); BlogConfirm.confirmFetch(this, '确定删除《{{ post.title }}》吗？');">
                                         <button type="submit" class="px-2.5 py-1 rounded-lg text-red-300 hover:bg-red-500/10 text-xs" title="删除">🗑️</button>
                                     </form>
                                 </div>

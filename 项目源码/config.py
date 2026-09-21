@@ -129,6 +129,9 @@ _load_dotenv()
 
 
 class Config:
+    # 应用版本号（三位数语义版本，显示于后台页脚/托盘提示；打包 zip 命名同步）
+    APP_VERSION = '2.8.3'
+
     # PyInstaller 打包：资源目录（只读：templates/static）与数据目录（可写：db/uploads/logs）
     # 放在类属性上，保证 app.py / launcher.py 通过 Config.RESOURCE_DIR / Config.DATA_DIR 可读
     RESOURCE_DIR = RESOURCE_DIR

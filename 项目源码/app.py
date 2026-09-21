@@ -178,6 +178,9 @@ os.makedirs(AVATAR_FOLDER, exist_ok=True)
 # 背景图片上传目录
 BG_IMAGE_FOLDER = os.path.join(app.config['UPLOAD_FOLDER'], 'bg')
 os.makedirs(BG_IMAGE_FOLDER, exist_ok=True)
+# 友链头像/图标上传目录
+LINK_ICON_FOLDER = os.path.join(app.config['UPLOAD_FOLDER'], 'links')
+os.makedirs(LINK_ICON_FOLDER, exist_ok=True)
 # 允许的头像扩展名
 ALLOWED_AVATAR_EXT = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 ALLOWED_BG_EXT = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -464,6 +467,9 @@ class Tag(db.Model):
     slug = db.Column(db.String(50), unique=True, nullable=False)
     # 【同步】软删墓碑
     is_deleted = db.Column(db.Boolean, default=False)
+    # 【同步】LWW 时间戳：编辑/软删时自动更新，保证变更/墓碑能增量同步到其他机器
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.utcnow)
 
     @staticmethod
     def slugify(name):
@@ -534,6 +540,9 @@ class Comment(db.Model):
     # 【同步】软删墓碑
     is_deleted = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # 【同步】LWW 时间戳：软删等变更时自动更新，保证墓碑能增量同步到其他机器
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.utcnow)
 
     # 关联
     # cascade='all, delete-orphan'：删除文章时级联删除其全部评论，
@@ -566,6 +575,9 @@ class Like(db.Model):
     # 【同步】软删墓碑
     is_deleted = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # 【同步】LWW 时间戳：点赞/取消（软删墓碑）时自动更新，保证变更能增量同步
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.utcnow)
 
     __table_args__ = (db.UniqueConstraint('post_id', 'fingerprint', name='uq_post_fingerprint'),)
 
@@ -587,6 +599,9 @@ class FriendLink(db.Model):
     # 【同步】软删墓碑
     is_deleted = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # 【同步】LWW 时间戳：编辑（改权重/头像等）时自动更新，保证变更能同步到其他机器
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.utcnow)
 
     def __repr__(self):
         return f'<FriendLink {self.name}>'
@@ -745,7 +760,7 @@ def get_profile():
     return p
 
 
-def get_or_create_tag(tag_name):
+def get_or_create_tag(tag_name, ts=None):
     tag_name = tag_name.strip()
     if not tag_name:
         return None
@@ -755,6 +770,11 @@ def get_or_create_tag(tag_name):
     tag = Tag.query.filter_by(slug=slug).first()
     if not tag:
         tag = Tag(name=tag_name, slug=slug)
+        # 种子调用传 ts=_SAMPLE_TS：避免纯净版种子时间=本机当前时刻，
+        # 导致 LWW 判定"本地新种子更新"而跳过远端真实 tag 变更
+        if ts is not None:
+            tag.created_at = ts
+            tag.updated_at = ts
         db.session.add(tag)
         try:
             db.session.flush()
@@ -778,6 +798,47 @@ def login_required(view):
 # ============================================================
 # 上下文 & 错误处理
 # ============================================================
+@app.template_filter('localtime')
+def _tpl_localtime(dt):
+    """naive UTC datetime -> 本地时间（模板显示用，避免 8 小时时差/跨日偏移）"""
+    if dt is None:
+        return dt
+    try:
+        if getattr(dt, 'tzinfo', None) is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone()
+    except Exception:
+        return dt
+
+
+@app.template_filter('strftime')
+def _tpl_strftime(dt, fmt):
+    """Jinja 无内置 strftime 过滤器；本地化后的 datetime 按格式输出"""
+    if dt is None:
+        return ''
+    try:
+        return dt.strftime(fmt)
+    except Exception:
+        return ''
+
+
+@app.template_filter('localdt')
+def _tpl_localdt(value, fmt='%Y-%m-%d %H:%M:%S'):
+    """naive UTC ISO 字符串 -> 本地时间格式化字符串（同步页 finished_at 等）"""
+    if not value:
+        return ''
+    try:
+        if isinstance(value, datetime.datetime):
+            dt = value
+        else:
+            dt = datetime.datetime.fromisoformat(str(value))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone().strftime(fmt)
+    except Exception:
+        return str(value)
+
+
 @app.context_processor
 def inject_globals():
     """全局模板变量（PP2 性能版）。
@@ -847,13 +908,17 @@ def inject_globals():
         try:
             tag_counts = db.session.query(
                 Tag, db.func.count(post_tags.c.post_id).label('count')
-            ).outerjoin(post_tags).group_by(Tag.id).order_by(db.desc('count')).all()
+            ).join(post_tags, post_tags.c.tag_id == Tag.id).join(
+                Post, Post.id == post_tags.c.post_id
+            ).filter(Post.is_deleted == False, Tag.is_deleted == False
+                     ).group_by(Tag.id).order_by(db.desc('count')).all()
         except Exception:
             tag_counts = []
 
         try:
             categories = [c[0] for c in db.session.query(
-                Post.category.distinct()).filter(Post.category.isnot(None)).all()
+                Post.category.distinct()).filter(
+                    Post.category.isnot(None), Post.is_deleted == False).all()
                           if c[0]]
         except Exception:
             categories = []
@@ -862,24 +927,32 @@ def inject_globals():
             archives = db.session.query(
                 db.func.strftime('%Y-%m', Post.created_at).label('ym'),
                 db.func.count(Post.id).label('count')
-            ).filter(Post.published == True).group_by('ym').order_by(db.desc('ym')).all()
+            ).filter(Post.published == True, Post.is_deleted == False
+                     ).group_by('ym').order_by(db.desc('ym')).all()
         except Exception:
             archives = []
 
         try:
             stats = {
-                'total_posts': Post.query.filter_by(published=True).count(),
-                'total_tags': Tag.query.count(),
-                'total_views': db.session.query(db.func.sum(Post.view_count)).scalar() or 0,
+                'total_posts': Post.query.filter_by(published=True, is_deleted=False).count(),
+                # 使用中的标签数：有未删除文章关联且未删除的标签（删除文章后同步减少）
+                'total_tags': db.session.query(
+                    db.func.count(db.func.distinct(post_tags.c.tag_id))
+                ).join(Tag, Tag.id == post_tags.c.tag_id).join(
+                    Post, Post.id == post_tags.c.post_id
+                ).filter(Post.is_deleted == False, Tag.is_deleted == False).scalar() or 0,
+                'total_views': db.session.query(
+                    db.func.sum(Post.view_count)
+                ).filter(Post.is_deleted == False).scalar() or 0,
                 'total_categories': len(categories),
-                'total_comments': Comment.query.filter_by(is_visible=True).count(),
-                'total_likes': Like.query.count(),
+                'total_comments': Comment.query.filter_by(is_visible=True, is_deleted=False).count(),
+                'total_likes': Like.query.filter_by(is_deleted=False).count(),
             }
         except Exception:
             pass
 
         try:
-            friend_links = FriendLink.query.filter_by(is_visible=True).order_by(
+            friend_links = FriendLink.query.filter_by(is_visible=True, is_deleted=False).order_by(
                 FriendLink.sort_order.asc(), FriendLink.id.asc()).all()
         except Exception:
             friend_links = []
@@ -944,7 +1017,7 @@ def index():
     query = request.args.get('q', '').strip()
     category = request.args.get('category', '').strip()
 
-    q = Post.query.filter_by(published=True)
+    q = Post.query.filter_by(published=True, is_deleted=False)
     if query:
         q = q.filter(db.or_(
             Post.title.ilike(f'%{query}%'),
@@ -984,7 +1057,7 @@ def index():
 @app.route('/post/<int:post_id>/')
 def post_detail(post_id):
     """文章详情（PP4 · 性能三件套：VC 内存计数 + Markdown 缓存 + 评论批量查询 1 次）"""
-    post = Post.query.get_or_404(post_id)
+    post = Post.query.filter_by(id=post_id, is_deleted=False).first_or_404()
     # 登录功能已移除：未发布（草稿）文章一律不对外展示
     if not post.published:
         abort(404)
@@ -1009,10 +1082,10 @@ def post_detail(post_id):
 
     # 上下篇
     prev_post = Post.query.filter(
-        Post.id < post.id, Post.published == True
+        Post.id < post.id, Post.published == True, Post.is_deleted == False
     ).order_by(Post.id.desc()).first()
     next_post = Post.query.filter(
-        Post.id > post.id, Post.published == True
+        Post.id > post.id, Post.published == True, Post.is_deleted == False
     ).order_by(Post.id.asc()).first()
 
     # ---- 【PP4-2】评论批量查询（1 条 SQL 拿所有评论，Python 分组）----
@@ -1024,7 +1097,7 @@ def post_detail(post_id):
     #   1 条 SELECT * FROM comment WHERE post_id=? AND is_visible=1 ORDER BY created_at
     #   → Python dict 分组成 tree → comment_count = len(all_comments)（内存 O(1)）
     all_visible = (Comment.query
-                   .filter_by(post_id=post.id, is_visible=True)
+                   .filter_by(post_id=post.id, is_visible=True, is_deleted=False)
                    .order_by(Comment.created_at.asc())
                    .all())
     by_parent: dict = {}
@@ -1039,9 +1112,9 @@ def post_detail(post_id):
     comment_count = len(all_visible)
 
     # 点赞（仍 2 条查询，因为 one query count + one query me，数据量小）
-    like_count = Like.query.filter_by(post_id=post.id).count()
+    like_count = Like.query.filter_by(post_id=post.id, is_deleted=False).count()
     liked = Like.query.filter_by(
-        post_id=post.id, fingerprint=like_fingerprint()
+        post_id=post.id, fingerprint=like_fingerprint(), is_deleted=False
     ).first() is not None
 
     return render_template('post_detail.html',
@@ -1119,15 +1192,16 @@ def post_like(post_id):
     fp = like_fingerprint()
     existing = Like.query.filter_by(post_id=post_id, fingerprint=fp).first()
     if existing:
-        db.session.delete(existing)
+        # 软删切换（墓碑保留，保证云同步能把取消点赞同步到其他机器）
+        existing.is_deleted = not existing.is_deleted
         db.session.commit()
-        count = Like.query.filter_by(post_id=post_id).count()
-        return jsonify({'ok': True, 'liked': False, 'count': count})
+        count = Like.query.filter_by(post_id=post_id, is_deleted=False).count()
+        return jsonify({'ok': True, 'liked': not existing.is_deleted, 'count': count})
     else:
         like = Like(post_id=post_id, fingerprint=fp)
         db.session.add(like)
         db.session.commit()
-        count = Like.query.filter_by(post_id=post_id).count()
+        count = Like.query.filter_by(post_id=post_id, is_deleted=False).count()
         return jsonify({'ok': True, 'liked': True, 'count': count})
 
 
@@ -1138,7 +1212,7 @@ def post_like(post_id):
 @app.route('/friend_links/')
 def friend_links():
     """友情链接公开页"""
-    links = FriendLink.query.filter_by(is_visible=True).order_by(
+    links = FriendLink.query.filter_by(is_visible=True, is_deleted=False).order_by(
         FriendLink.sort_order.asc(), FriendLink.id.asc()).all()
     return render_template('friend_links.html', links=links)
 
@@ -1146,11 +1220,11 @@ def friend_links():
 @app.route('/tag/<slug>/')
 def tag_posts(slug):
     """按标签查看（支持在标签下进一步搜索）"""
-    tag = Tag.query.filter_by(slug=slug).first_or_404()
+    tag = Tag.query.filter_by(slug=slug, is_deleted=False).first_or_404()
     page = request.args.get('page', 1, type=int)
     query = request.args.get('q', '').strip()
 
-    q = tag.posts.filter_by(published=True)
+    q = tag.posts.filter_by(published=True, is_deleted=False)
     if query:
         q = q.filter(db.or_(
             Post.title.ilike(f'%{query}%'),
@@ -1182,7 +1256,10 @@ def all_tags():
     """所有标签页"""
     tag_counts = db.session.query(
         Tag, db.func.count(post_tags.c.post_id).label('count')
-    ).outerjoin(post_tags).group_by(Tag.id).order_by(db.desc('count')).all()
+    ).join(post_tags, post_tags.c.tag_id == Tag.id).join(
+        Post, Post.id == post_tags.c.post_id
+    ).filter(Post.is_deleted == False, Tag.is_deleted == False
+             ).group_by(Tag.id).order_by(db.desc('count')).all()
     return render_template('tags.html', tag_counts=tag_counts)
 
 
@@ -1192,7 +1269,8 @@ def archive_index():
     rows = db.session.query(
         Post.id, Post.title, Post.summary, Post.category, Post.created_at,
         Post.published, Post.view_count
-    ).filter(Post.published == True).order_by(Post.created_at.desc()).all()
+    ).filter(Post.published == True, Post.is_deleted == False
+             ).order_by(Post.created_at.desc()).all()
     # 按 ym 分组
     from collections import OrderedDict
     groups = OrderedDict()
@@ -1213,6 +1291,7 @@ def archive(ym):
     page = request.args.get('page', 1, type=int)
     pagination = Post.query.filter(
         Post.published == True,
+        Post.is_deleted == False,
         db.func.strftime('%Y-%m', Post.created_at) == ym
     ).order_by(Post.created_at.desc()).paginate(
         page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False
@@ -1243,13 +1322,13 @@ def profile_home():
     """个人中心主页"""
     profile = get_profile()
     # 博主最新文章
-    latest_posts = Post.query.filter_by(published=True).order_by(
+    latest_posts = Post.query.filter_by(published=True, is_deleted=False).order_by(
         Post.created_at.desc()).limit(6).all()
     for p in latest_posts:
         if not p.summary:
             p.summary = generate_summary(p.content)
     # 热门文章（根据阅读量）
-    hot_posts = Post.query.filter_by(published=True).order_by(
+    hot_posts = Post.query.filter_by(published=True, is_deleted=False).order_by(
         Post.view_count.desc()).limit(5).all()
     # about 正文渲染
     about_html = render_markdown(profile.about) if profile.about else ''
@@ -1267,14 +1346,22 @@ def profile_home():
 @login_required
 def admin_dashboard():
     """后台首页：统计 & 文章列表"""
-    total_posts = Post.query.count()
-    published = Post.query.filter_by(published=True).count()
-    total_tags = Tag.query.count()
-    total_views = db.session.query(db.func.sum(Post.view_count)).scalar() or 0
-    total_comments = Comment.query.count()
-    total_likes = Like.query.count()
+    total_posts = Post.query.filter_by(is_deleted=False).count()
+    published = Post.query.filter_by(published=True, is_deleted=False).count()
+    # 使用中的标签数：有未删除文章关联且未删除的标签（删除文章后同步减少）
+    total_tags = db.session.query(
+        db.func.count(db.func.distinct(post_tags.c.tag_id))
+    ).join(Tag, Tag.id == post_tags.c.tag_id).join(
+        Post, Post.id == post_tags.c.post_id
+    ).filter(Post.is_deleted == False, Tag.is_deleted == False).scalar() or 0
+    total_views = db.session.query(
+        db.func.sum(Post.view_count)
+    ).filter(Post.is_deleted == False).scalar() or 0
+    total_comments = Comment.query.filter_by(is_deleted=False).count()
+    total_likes = Like.query.filter_by(is_deleted=False).count()
 
-    posts = Post.query.order_by(Post.created_at.desc()).limit(20).all()
+    posts = Post.query.filter_by(is_deleted=False).order_by(
+        Post.created_at.desc()).limit(20).all()
     return render_template('admin/dashboard.html',
                            total_posts=total_posts,
                            published=published,
@@ -1391,7 +1478,7 @@ def admin_profile():
 @login_required
 def admin_links():
     """友链列表管理"""
-    links = FriendLink.query.order_by(
+    links = FriendLink.query.filter_by(is_deleted=False).order_by(
         FriendLink.sort_order.asc(), FriendLink.id.asc()).all()
     return render_template('admin/links.html', links=links)
 
@@ -1449,9 +1536,32 @@ def admin_link_update(link_id):
 @login_required
 def admin_link_delete(link_id):
     link = FriendLink.query.get_or_404(link_id)
-    db.session.delete(link)
+    # 软删（墓碑保留，保证云同步能把删除同步到其他机器）
+    link.is_deleted = True
     db.session.commit()
     flash(f'友链「{link.name}」已删除', 'info')
+
+
+@app.route('/links/<path:filename>')
+def serve_link_icon(filename):
+    """服务友链本地上传的头像/图标"""
+    return send_from_directory(LINK_ICON_FOLDER, filename)
+
+
+@app.route('/admin/links/upload_icon/', methods=['POST'])
+@login_required
+def admin_link_upload_icon():
+    """友链头像/图标本地上传：保存到 uploads/links/ 并返回可访问 URL"""
+    f = request.files.get('icon')
+    if not f or not f.filename:
+        return jsonify({'ok': False, 'error': '未选择文件'}), 400
+    if not allowed_avatar(f.filename):
+        return jsonify({'ok': False, 'error': '仅支持 png/jpg/jpeg/gif/webp 图片'}), 400
+    ext = f.filename.rsplit('.', 1)[1].lower()
+    save_name = f"link_icon_{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S')}.{ext}"
+    f.save(os.path.join(LINK_ICON_FOLDER, save_name))
+    # 返回绝对 URL，满足前端 type="url" 输入框的 HTML5 校验
+    return jsonify({'ok': True, 'url': url_for('serve_link_icon', filename=save_name, _external=True)})
     return redirect(url_for('admin_links'))
 
 
@@ -1526,10 +1636,11 @@ def post_edit(post_id):
 @login_required
 def post_delete(post_id):
     post = Post.query.get_or_404(post_id)
-    # 先清理该文章的点赞记录（Like 无 relationship 级联，不显式删除会残留孤儿行）
-    Like.query.filter_by(post_id=post.id).delete(synchronize_session=False)
-    # 评论由 Comment.post relationship 的 cascade='all, delete-orphan' 级联删除
-    db.session.delete(post)
+    # 软删（墓碑保留，保证云同步能把删除同步到其他机器）
+    post.is_deleted = True
+    # 该文章的点赞/评论一并软删（保留墓碑，同步后远端同样隐藏）
+    Like.query.filter_by(post_id=post.id).update({Like.is_deleted: True}, synchronize_session=False)
+    Comment.query.filter_by(post_id=post.id).update({Comment.is_deleted: True}, synchronize_session=False)
     db.session.commit()
     flash('文章已删除', 'info')
     return redirect(url_for('admin_dashboard'))
@@ -1803,16 +1914,22 @@ def admin_sync_test_connection():
     if not raw.get('token'):
         return jsonify({'ok': False, 'error': '请先填写或粘贴 Gitee 私人令牌。'}), 400
     ok, info = _gb.test_connection(raw)
-    # 如果返回了自动更正的 settings → 写回磁盘（保留用户旧 last_backup_* 等）
-    if 'corrected_settings' in info:
+    # 只在「测试通过」时把配置写回磁盘（含自动更正字段；保留旧 last_backup_* 等）。
+    # 测试失败不写盘：避免错误配置顶替原本可用的旧配置。
+    if ok:
         data_dir = Config.DATA_DIR
         current = _gb.load_settings(data_dir)
-        corrected = info['corrected_settings']
+        corrected = info.get('corrected_settings') or raw
         for k in ('token', 'owner', 'repo', 'branch', 'path_prefix'):
             if corrected.get(k) is not None:
                 current[k] = corrected[k]
+        # 与「只保存到配置文件（不测试）」按钮一致：token+owner+repo 齐全即视为已启用
+        if all(current.get(k) for k in ('token', 'owner', 'repo')):
+            current['enabled'] = True
         _gb.save_settings(data_dir, current)
         info['saved_settings'] = _gb.normalize_settings(current)
+    else:
+        info['saved_settings'] = None
     return jsonify({'ok': ok, 'result': info})
 
 # 双向同步（类 Chrome/Edge 云同步体验）
@@ -2163,15 +2280,19 @@ def init_db():
             ],
             'tag': [
                 "ALTER TABLE tag ADD COLUMN is_deleted BOOLEAN DEFAULT 0",
+                "ALTER TABLE tag ADD COLUMN updated_at DATETIME",
             ],
             'comment': [
                 "ALTER TABLE comment ADD COLUMN is_deleted BOOLEAN DEFAULT 0",
+                "ALTER TABLE comment ADD COLUMN updated_at DATETIME",
             ],
             'like': [
                 "ALTER TABLE like ADD COLUMN is_deleted BOOLEAN DEFAULT 0",
+                "ALTER TABLE like ADD COLUMN updated_at DATETIME",
             ],
             'friend_link': [
                 "ALTER TABLE friend_link ADD COLUMN is_deleted BOOLEAN DEFAULT 0",
+                "ALTER TABLE friend_link ADD COLUMN updated_at DATETIME",
             ],
         }
         for t, alters in _upgrade.items():
@@ -2218,9 +2339,9 @@ def init_db():
         # 无文章时，插入示例（updated_at 设为极早时间，确保云同步恢复时远端数据 LWW 优先）
         _SAMPLE_TS = datetime.datetime(2000, 1, 1)
         if Post.query.count() == 0:
-            tag1 = get_or_create_tag('Python')
-            tag2 = get_or_create_tag('编程笔记')
-            tag3 = get_or_create_tag('生活')
+            tag1 = get_or_create_tag('Python', ts=_SAMPLE_TS)
+            tag2 = get_or_create_tag('编程笔记', ts=_SAMPLE_TS)
+            tag3 = get_or_create_tag('生活', ts=_SAMPLE_TS)
 
             sample = Post(
                 title='欢迎来到我的博客！',
@@ -2312,22 +2433,22 @@ date: 2026-08-30
             demo_links = [
                 FriendLink(name='阮一峰的博客', url='https://www.ruanyifeng.com/blog/',
                             description='科技爱好者周刊 · ES6 教程作者',
-                            avatar='https://www.ruanyifeng.com/favicon.ico', sort_order=0),
+                            avatar='https://www.ruanyifeng.com/favicon.ico', sort_order=0, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
                 FriendLink(name='廖雪峰的官方网站', url='https://www.liaoxuefeng.com/',
                             description='Python / Git / JavaScript 教程',
-                            avatar='https://www.liaoxuefeng.com/favicon.ico', sort_order=1),
+                            avatar='https://www.liaoxuefeng.com/favicon.ico', sort_order=1, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
                 FriendLink(name='V2EX', url='https://www.v2ex.com/',
                             description='创意工作者们的社区',
-                            avatar='https://www.v2ex.com/static/favicon.ico', sort_order=2),
+                            avatar='https://www.v2ex.com/static/favicon.ico', sort_order=2, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
                 FriendLink(name='少数派', url='https://sspai.com/',
                             description='高质量数字消费指南',
-                            avatar='https://cdn.sspai.com/favicon.ico', sort_order=3),
+                            avatar='https://cdn.sspai.com/favicon.ico', sort_order=3, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
                 FriendLink(name='掘金', url='https://juejin.cn/',
                             description='一个帮助开发者成长的社区',
-                            avatar='https://juejin.cn/favicon.ico', sort_order=4),
+                            avatar='https://juejin.cn/favicon.ico', sort_order=4, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
                 FriendLink(name='GitHub', url='https://github.com/',
                             description='全球最大代码托管平台 · 开发者之家',
-                            avatar='https://github.githubassets.com/favicons/favicon.svg', sort_order=5),
+                            avatar='https://github.githubassets.com/favicons/favicon.svg', sort_order=5, created_at=_SAMPLE_TS, updated_at=_SAMPLE_TS),
             ]
             db.session.add_all(demo_links)
             db.session.commit()

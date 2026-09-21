@@ -200,9 +200,8 @@ def _export_post_tags(session, since_iso: str, provenance: str = '') -> List[Dic
         # 取 Post 的 updated_at 作为本条关系的 LWW 时间（没 Post 就算了）
         p = session.query(_app_module.Post).get(post_id)
         ts = _model_updated_at(p) if p is not None else ''
-        if since_iso and ts and _cmp_iso(ts, since_iso) <= 0:
-            # since_iso 那一刻及之前的都已同步，严格 > 才传
-            continue
+        # 不做 since 裁剪：关联对数量小，write_jsonl 端按 updated_at LWW 合并无损；
+        # 若按 Post 时间裁剪，旧文章新增标签（Post 时间未变）会被增量过滤而推不上去。
         rec = {
             'id': 'pt_%d_%d' % (post_id, tag_id),  # 伪主键，便于去重
             'data': {'post_id': post_id, 'tag_id': tag_id},
@@ -245,16 +244,47 @@ def import_records(session, entity_name: str,
     """
     把远端记录合并到本地 DB（LWW）。返回实际应用（更新/插入/墓碑）的记录数。
     冲突策略：比较 record.updated_at vs 本地对应行的 updated_at，谁更新谁赢。
-    only_since_iso: 可选，只处理 updated_at > only_since_iso 的记录（增量拉取）。
+    only_since_iso: 可选，增量拉取时的本地游标。
     """
     applied = 0
-    # 增量 since 预过滤（防止"全量远端 vs 本地已合并"时浪费大量 LWW 比较）
-    if only_since_iso:
+    # 增量 since 预过滤（防止"全量远端 vs 本地已合并"时浪费大量 LWW 比较）：
+    #   - post_tags 不做时间裁剪：其 updated_at 参考 Post（旧文章新增标签时时间戳不变），
+    #     本地缺失的关联必须交给 _import_post_tags 全量判断；
+    #   - profile 不做时间裁剪：单行记录，必须每次参与 LWW/字段级合并，否则
+    #     远端新资料（updated_at 与本地游标相等/更早）会被游标挡掉而拉不下来；
+    #   - 其余实体只跳过「本地已存在 且 远端时间戳 > since 不成立」的记录：
+    #       * 远端无时间戳（如 Tag 表没有时间戳列）→ 必须保留，否则新增标签永远拉不到；
+    #       * 本地缺失（记录被删除 / 新环境首次同步）→ 必须保留，否则"从 Gitee 恢复"
+    #         拉不回被删数据（pull_cursor 不会随本地删除而回退，旧记录会被游标挡掉）。
+    if only_since_iso and entity_name not in ('post_tags', 'profile'):
+        import app as _app_module
+        model = _get_syncable_models(_app_module).get(entity_name)
         kept = []
         for r in remote_records:
             ts = r.get('updated_at', '') or ''
-            if ts and _cmp_iso(ts, only_since_iso) > 0:
+            if not ts or _cmp_iso(ts, only_since_iso) > 0:
                 kept.append(r)
+                continue
+            # 远端时间戳 <= 本地游标：游标是"上次 pull 的时刻"而非内容状态，
+            # 变更可能编辑于游标之前、push 于游标之后（本地行旧于远端）——
+            # 此时若按游标丢弃，该变更将永远拉不到。正确判据：
+            #   - 本地缺失 → 必须保留（新环境/被删数据恢复）；
+            #   - 本地存在且本地 updated_at 已不旧于远端 → 可跳过（本地已含该变更）；
+            #   - 本地存在但旧于远端 → 保留，交给 _apply_one_record 的 LWW 裁决。
+            rid = r.get('id')
+            local = None
+            if rid is not None and model is not None:
+                try:
+                    local = session.query(model).get(rid)
+                except Exception:
+                    local = None
+            if local is None:
+                kept.append(r)
+                continue
+            local_ts = _model_updated_at(local)
+            if _cmp_iso(local_ts, ts) >= 0:
+                continue  # 本地不旧于远端 -> 跳过
+            kept.append(r)
         remote_records = kept
 
     if entity_name == 'post_tags':
@@ -281,20 +311,53 @@ def import_records(session, entity_name: str,
     return applied
 
 
+_PROFILE_TEMPLATE_VALUES = {
+    # get_profile() 初始化写入的模板默认值 —— 这些字段值表示"用户从未编辑过"
+    'nickname': ('博主', '默认博主', 'Cyber Coder', ''),
+    'title': ('全栈开发工程师 / AI 爱好者', ''),
+    'bio': ('热爱编程，热爱生活。用代码点亮世界 ✨', ''),
+    'location': ('中国 · 深圳', ''),
+    'email': ('hello@example.com', ''),
+    'github': ('https://github.com/your-username', ''),
+    'juejin': ('https://juejin.cn/', ''),
+    'tech_stack': ('Python, Flask, Vue, React, Docker, PostgreSQL, AI, FastAPI', ''),
+    'career_years': ('5', ''),
+}
+_PROFILE_FIELDS = ('nickname', 'title', 'bio', 'about', 'avatar', 'bg_image',
+                   'location', 'email', 'github', 'weibo', 'zhihu', 'juejin',
+                   'bilibili', 'website', 'tech_stack', 'career_years')
+
+
 def _profile_field_is_default(field_name: str, value) -> bool:
-    """判断 Profile 某字段是否处于"用户未编辑过"的默认态。
+    """判断 Profile 某字段是否处于"用户未编辑过"的默认态（空值或代码模板默认值）。
 
     用于"记录级 LWW 失败"时的字段级兜底合并：本地仍为默认态 ⇒ 允许远端非空值填入。
     注意：这只是"填空"，绝不会覆盖用户已编辑的非默认值，因此等价于字段级 LWW 的保守实现。
+
+    关键：删库重建/全新安装时，get_profile() 会把资料初始化成 Cyber Coder 模板
+    （title/bio/about/location 等全部非空）。这些模板值同样算"未编辑"，否则
+    LWW 会认为"本地有数据"而拒绝远端真实资料（模板库 updated_at 还是当前时间，
+    记录级 LWW 一定赢）——这正是"删库重同步后个人资料还是初始数据"的根因。
     """
     s = '' if value is None else str(value).strip()
+    if field_name == 'about':
+        # 模板 about 有固定开头；用户自己写的 about 不算默认
+        return s == '' or s.startswith('# 👋 你好，我是 Cyber Coder')
     if field_name == 'nickname':
-        DEFAULT_NICKS = ('博主', '默认博主', '', 'Cyber Coder')
-        return (s in DEFAULT_NICKS
+        return (s in ('博主', '默认博主', '', 'Cyber Coder')
                 or s.startswith('博主') or s.startswith('默认博主')
                 or s.startswith('Cyber Coder'))
-    # 其他展示字段：空串/空值 = 默认态
-    return s == ''
+    defaults = _PROFILE_TEMPLATE_VALUES.get(field_name, ('',))
+    return s in defaults or s == ''
+
+
+def _profile_row_is_template(row) -> bool:
+    """Profile 整行是否处于模板默认态（全新安装/删库重建的初始化状态）。"""
+    try:
+        return all(_profile_field_is_default(f, getattr(row, f, None))
+                   for f in _PROFILE_FIELDS)
+    except Exception:
+        return False
 
 
 def _apply_one_record(session, model, rec: Dict[str, Any]) -> int:
@@ -310,23 +373,13 @@ def _apply_one_record(session, model, rec: Dict[str, Any]) -> int:
     local = session.query(model).get(rid)
     if local is not None:
         local_updated = _model_updated_at(local)
-        # ========== 特殊：默认初始化 Profile 视为 "从未编辑过"，LWW 优先级最低 ==========
+        # ========== 特殊：模板默认态 Profile 视为 "从未编辑过"，LWW 优先级最低 ==========
         default_profile = False
         try:
             if model.__name__ == 'Profile' and rid == 1:
-                nick = str(getattr(local, 'nickname', None) or '').strip()
-                title = str(getattr(local, 'title', None) or '').strip()
-                bio = str(getattr(local, 'bio', None) or '').strip()
-                about = str(getattr(local, 'about', None) or '').strip()
-                avatar = str(getattr(local, 'avatar', None) or '').strip()
-                bg = str(getattr(local, 'bg_image', None) or '').strip()
-                DEFAULT_NICKS = ('博主', '默认博主', '', 'Cyber Coder')
-                is_default_name = (nick in DEFAULT_NICKS
-                                   or nick.startswith('博主')
-                                   or nick.startswith('默认博主')
-                                   or nick.startswith('Cyber Coder'))
-                is_empty_content = not (title or bio or about or avatar or bg)
-                default_profile = is_default_name and is_empty_content
+                # 空壳 OR Cyber Coder 模板（get_profile 初始化写入的非空模板值）
+                # 都算"未编辑" → 远端真实资料直接覆盖
+                default_profile = _profile_row_is_template(local)
         except Exception:
             default_profile = False
 
@@ -752,7 +805,7 @@ class LocalDirRemoteAdapter(RemoteAdapter):
 # ============================================================
 # 6. 同步引擎（拉 → 合并 → 推 → 保存状态 + 附件同步）
 # ============================================================
-_ATTACH_DIR_CANDIDATES = ('avatars', 'bg', 'post_images')  # 相对 DATA_DIR/uploads 的子目录
+_ATTACH_DIR_CANDIDATES = ('avatars', 'bg', 'post_images', 'links')  # 相对 DATA_DIR/uploads 的子目录（links=友链头像/图标）
 
 
 def _node_provenance_id(state_path: str) -> str:
@@ -1000,6 +1053,17 @@ class SyncEngine:
                 local_records = export_all_records(self.session, entity,
                                                    since_iso=since_iso,
                                                    provenance=self._node_id)
+                if entity == 'profile' and local_records:
+                    # 保护：本地 profile 若是模板默认态（全新安装/删库重建），
+                    # 绝不推送——模板值 updated_at 是当前时间，LWW 会赢过 Gitee 上
+                    # 用户真实资料，导致"换纯净版同步后云端资料被模板覆盖"。
+                    # 先 pull（both 顺序）会先把真实资料拉下来，届时再正常推送。
+                    import app as _app_module
+                    model = _get_syncable_models(_app_module).get('profile')
+                    if model is not None:
+                        local_row = self.session.query(model).get(1)
+                        if local_row is not None and _profile_row_is_template(local_row):
+                            local_records = []
                 if local_records:
                     self.adapter.write_jsonl(entity, local_records)
                 pushed[entity] = len(local_records)

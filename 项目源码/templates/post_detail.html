@@ -22,7 +22,7 @@
             <!-- 元信息 -->
             <div class="flex flex-wrap gap-2 text-xs mb-5">
                 <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60">
-                    📅 {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    📅 {{ post.created_at|localtime|strftime('%Y-%m-%d %H:%M') }}
                 </span>
                 {% if post.category %}
                     <a href="{{ url_for('index', category=post.category) }}"
@@ -41,7 +41,7 @@
                 </span>
                 {% if post.updated_at and post.updated_at != post.created_at %}
                     <span class="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-200">
-                        ✏️ 更新于 {{ post.updated_at.strftime('%m-%d') }}
+                        ✏️ 更新于 {{ post.updated_at|localtime|strftime('%m-%d') }}
                     </span>
                 {% endif %}
             </div>
@@ -82,7 +82,7 @@
                 </button>
             </form>
             <form method="POST" action="{{ url_for('post_delete', post_id=post.id) }}" class="inline"
-                  onsubmit="return confirm('确定要删除这篇文章吗？此操作不可恢复。');">
+                  onsubmit="event.preventDefault(); BlogConfirm.confirmForm(this, '确定要删除这篇文章吗？此操作不可恢复。');">
                 <button type="submit"
                         class="px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-red-200 hover:bg-red-500/25 text-sm transition">
                     🗑️ 删除
@@ -199,8 +199,8 @@
                                         {% if c.website %}
                                             <a href="{{ c.website }}" target="_blank" rel="noopener" class="text-xs text-cyan-300/60 hover:text-cyan-300 truncate max-w-[160px]">🌐 {{ c.website }}</a>
                                         {% endif %}
-                                        <span class="text-xs text-white/40 ml-auto" title="{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}">
-                                            {{ c.created_at.strftime('%m-%d %H:%M') }}
+                                        <span class="text-xs text-white/40 ml-auto" title="{{ c.created_at|localtime|strftime('%Y-%m-%d %H:%M') }}">
+                                            {{ c.created_at|localtime|strftime('%m-%d %H:%M') }}
                                         </span>
                                     </div>
                                     <div class="text-sm text-white/85 leading-relaxed whitespace-pre-wrap break-words">{{ c.content }}</div>
@@ -225,7 +225,7 @@
                                                     {% if r.is_admin %}
                                                         <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-cyber-gradient text-white font-semibold">博主</span>
                                                     {% endif %}
-                                                    <span class="text-xs text-white/40 ml-auto">{{ r.created_at.strftime('%m-%d %H:%M') }}</span>
+                                                    <span class="text-xs text-white/40 ml-auto">{{ r.created_at|localtime|strftime('%m-%d %H:%M') }}</span>
                                                 </div>
                                                 <div class="text-xs text-white/80 leading-relaxed whitespace-pre-wrap break-words">{{ r.content }}</div>
                                             </div>
@@ -266,7 +266,7 @@
 
             <div class="grid grid-cols-3 gap-2 text-center border-t border-cyber-500/15 pt-4">
                 <div>
-                    <div class="font-bold text-cyan-300 text-lg">{{ post.created_at.strftime('%Y') }}</div>
+                    <div class="font-bold text-cyan-300 text-lg">{{ post.created_at|localtime|strftime('%Y') }}</div>
                     <div class="text-[10px] text-white/50 mt-1">年份</div>
                 </div>
                 <div>

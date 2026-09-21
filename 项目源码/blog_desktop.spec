@@ -14,12 +14,20 @@ PROJECT_DIR = os.path.abspath(SPECPATH)
 block_cipher = None
 
 # 与传统服务版共享的只读资源
+# uploads/：只打包项目自带样例（sample_batch.yaml / sample_post.md），
+# 绝不打包任何图片附件 —— 保证分发物纯净（不含用户的头像/背景等个人数据）。
+# 新用户首次运行后上传的附件落在数据目录 uploads/，与安装包互不干扰。
+_UPLOADS_SAMPLE = [
+    os.path.join(PROJECT_DIR, 'uploads', f)
+    for f in ('sample_batch.yaml', 'sample_post.md')
+    if os.path.exists(os.path.join(PROJECT_DIR, 'uploads', f))
+]
 SHARED_DATAS = [
     (os.path.join(PROJECT_DIR, 'templates'), 'templates'),
     (os.path.join(PROJECT_DIR, 'static'), 'static'),
-    # uploads/ 目录：头像/背景图上传落点 + sample 示例文件
-    # 若用户 install 到新机器没运行过一次博客，uploads/ 为空没关系，至少目录建好 + sample 到位
-    (os.path.join(PROJECT_DIR, 'uploads'), 'uploads'),
+]
+SHARED_DATAS += [(p, 'uploads') for p in _UPLOADS_SAMPLE]
+SHARED_DATAS += [
     (os.path.join(PROJECT_DIR, '.env.example'), '.'),
     (os.path.join(PROJECT_DIR, 'logo.png'), '.'),
     (os.path.join(PROJECT_DIR, 'logo.ico'), '.'),

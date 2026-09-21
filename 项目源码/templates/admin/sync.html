@@ -422,7 +422,7 @@
                 </details>
 
                 <form method="post" action="{{ url_for('admin_sync_reset_cursors') }}"
-                      onsubmit="return confirm('确认清空同步游标？\n下次运行会重新做一次全量 LWW 比对（更慢但更准确）。');">
+                      onsubmit="event.preventDefault(); BlogConfirm.confirmForm(this, '确认清空同步游标？\n下次运行会重新做一次全量 LWW 比对（更慢但更准确）。');">
                     <button type="submit" class="px-3 py-2 text-xs rounded-xl
                                                  bg-white/5 border border-white/10 text-white/75
                                                  hover:bg-rose-500/10 hover:border-rose-400/30 hover:text-rose-200 transition">
@@ -469,7 +469,7 @@
                                          bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                                 成功 · {{ {'both':'立即同步','push_only':'只备份','pull_only':'只恢复'}[lr.mode|default('both')] }}
                             </span>
-                            <span class="text-xs text-white/55">{{ lr.finished_at or '' }}</span>
+                            <span class="text-xs text-white/55">{{ lr.finished_at|localdt }}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3 text-sm">
                             {% set pushed = lr.pushed or {} %}
@@ -513,7 +513,7 @@
                                          bg-rose-500/15 text-rose-300 border border-rose-500/30">
                                 失败
                             </span>
-                            <span class="text-xs text-white/55">{{ lr.finished_at or '' }}</span>
+                            <span class="text-xs text-white/55">{{ lr.finished_at|localdt }}</span>
                         </div>
                         <div class="text-sm text-rose-200/80 rounded-xl bg-rose-500/10
                                     border border-rose-500/20 p-3 whitespace-pre-wrap break-all">
@@ -732,6 +732,15 @@
                 fPrefix.value= sv.path_prefix!==undefined ? sv.path_prefix : fPrefix.value;
                 fToken.value = sv.token || fToken.value; s2.value = fToken.value;
             }
+            // ✅ 配置已自动保存：立即解锁下方三按钮 + 自动同步开关（无需刷新页面）
+            document.querySelectorAll('.sync-run-form button[type=submit]').forEach(function(b){ b.disabled = false; });
+            var sw4 = document.getElementById('sync-toggle-switch');
+            if (sw4) sw4.disabled = false;
+            lines.push('');
+            lines.push('✅ 配置已自动保存，下方「立即备份 / 立即同步 / 立即恢复」已可用。');
+        } else {
+            lines.push('');
+            lines.push('❌ 连通性未通过，未保存配置；请按上面提示修正后重试。');
         }
         setStatus(s4Status, lines.join('\n'), (data.ok && ok));
     });

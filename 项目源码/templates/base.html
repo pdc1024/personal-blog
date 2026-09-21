@@ -421,6 +421,18 @@
             transition: opacity .4s ease;
         }
 
+        /* 环境氛围光层（固定全屏，铺在内容之下；宽屏时用主题渐变填充两侧空区） */
+        #ambientGlow {
+            position: fixed; inset: 0; z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 55vw 45vh at 0% 32%, var(--bg-grad-2), transparent 70%),
+                radial-gradient(ellipse 55vw 45vh at 100% 68%, var(--bg-grad-1), transparent 70%),
+                radial-gradient(ellipse 42vw 38vh at 50% 112%, var(--bg-grad-3), transparent 76%);
+            opacity: .6;
+            transition: opacity .4s ease;
+        }
+
         /* 玻璃拟态卡片 */
         .glass {
             background: var(--glass-bg);
@@ -680,6 +692,17 @@
 
         ::selection { background: var(--selection-bg); color: var(--selection-text); }
 
+        /* 下拉框主题兼容：原生 option 弹出列表默认白底，深色主题下会白字白底看不见。
+           统一用主题变量着色，任何主题下选项都清晰可读 */
+        select, select option {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+        }
+        select:focus option:hover {
+            background-color: var(--selection-bg);
+            color: var(--selection-text);
+        }
+
         /* 导航栏毛玻璃 */
         .nav-blur {
             background: var(--nav-bg);
@@ -722,10 +745,98 @@
         #themeDropdownMobile.open {
             display: block; opacity: 1; pointer-events: auto; transform: none;
         }
+
+        /* ========== 全局确认弹窗（居中·跟随主题，替代浏览器原生 confirm） ========== */
+        .confirm-modal {
+            position: fixed; inset: 0; z-index: 90;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.25rem;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s ease;
+        }
+        .confirm-modal.open { opacity: 1; pointer-events: auto; }
+        .confirm-modal-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(2,6,23,.62);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        }
+        .confirm-modal-card {
+            position: relative;
+            width: 100%; max-width: 420px;
+            background: var(--glass-strong-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-strong-border);
+            border-radius: 1.25rem;
+            box-shadow: var(--glass-strong-shadow),
+                        0 0 0 1px color-mix(in srgb, var(--accent-1) 10%, transparent),
+                        0 0 44px var(--accent-glow);
+            padding: 1.75rem 1.5rem 1.5rem;
+            text-align: center;
+            transform: translateY(14px) scale(.95);
+            transition: transform .25s ease;
+        }
+        .confirm-modal.open .confirm-modal-card { transform: translateY(0) scale(1); }
+        .confirm-modal-icon {
+            width: 58px; height: 58px; margin: 0 auto 1rem;
+            border-radius: 9999px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; line-height: 1;
+            background: color-mix(in srgb, #ef4444 16%, transparent);
+            border: 1px solid color-mix(in srgb, #ef4444 45%, transparent);
+            box-shadow: 0 0 22px rgba(239,68,68,.28);
+        }
+        .confirm-modal-icon.warn {
+            background: color-mix(in srgb, #f59e0b 16%, transparent);
+            border-color: color-mix(in srgb, #f59e0b 45%, transparent);
+            box-shadow: 0 0 22px rgba(245,158,11,.25);
+        }
+        .confirm-modal-title {
+            font-size: 1.125rem; font-weight: 700;
+            color: var(--text-heading); margin-bottom: .55rem;
+        }
+        .confirm-modal-message {
+            font-size: .9rem; line-height: 1.7;
+            color: var(--text-secondary); margin-bottom: 1.5rem;
+            white-space: pre-line; word-break: break-word;
+        }
+        .confirm-modal-actions { display: flex; gap: .75rem; justify-content: center; }
+        .confirm-modal-btn {
+            flex: 1; max-width: 150px;
+            padding: .62rem 1rem; border-radius: .75rem;
+            font-size: .9rem; font-weight: 600; cursor: pointer;
+            border: 1px solid transparent;
+            transition: all .2s ease;
+        }
+        .confirm-modal-cancel {
+            background: color-mix(in srgb, var(--text-heading) 6%, transparent);
+            border-color: var(--glass-border);
+            color: var(--text-primary);
+        }
+        .confirm-modal-cancel:hover { background: color-mix(in srgb, var(--text-heading) 12%, transparent); }
+        .confirm-modal-ok {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(239,68,68,.35);
+        }
+        .confirm-modal-ok:hover { box-shadow: 0 4px 24px rgba(239,68,68,.55); filter: brightness(1.08); }
+        .confirm-modal-ok:focus-visible, .confirm-modal-cancel:focus-visible {
+            outline: 2px solid var(--accent-light); outline-offset: 2px;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen flex flex-col font-sans">
+
+{# 后台页判断提前，供顶栏/主容器按页面类型取宽度 #}
+{% set admin_nav = [
+    ('admin_dashboard', '📊 仪表盘'),
+    ('post_new',        '✏️ 写文章'),
+    ('admin_sync',      '☁️ 云同步'),
+    ('upload_file',     '📤 上传'),
+    ('admin_links',     '🤝 友链'),
+    ('admin_profile',   '🧑‍💻 资料'),
+] %}
+{% set is_admin_page = request.endpoint in (admin_nav | map(attribute=0) | list) %}
 
 {% if profile and profile.bg_image %}
 <style>
@@ -733,12 +844,15 @@
 </style>
 {% endif %}
 
+<!-- 环境氛围光层（在内容之下、背景图之下） -->
+<div id="ambientGlow"></div>
+
 <!-- 背景图片层（固定全屏，在所有内容之下） -->
 <div id="bgImageLayer"></div>
 
 <!-- ============== 顶部导航 ============== -->
 <header class="nav-blur sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="{% if is_admin_page %}max-w-[1600px]{% else %}max-w-7xl{% endif %} mx-auto px-4 sm:px-6">
         <div class="flex items-center justify-between h-16 md:h-[72px]">
             <!-- Logo -->
             <a href="{{ url_for('index') }}" class="flex items-center gap-3 shrink-0 group">
@@ -1051,18 +1165,23 @@
     </div>
 </div>
 
+<!-- ============== 全局确认弹窗（居中·跟随主题，替代浏览器原生 confirm） ============== -->
+<div id="confirm-modal" class="confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="confirm-modal-backdrop" data-confirm-close></div>
+    <div class="confirm-modal-card">
+        <div class="confirm-modal-icon" id="confirm-icon">⚠️</div>
+        <h3 class="confirm-modal-title" id="confirm-title">删除确认</h3>
+        <p class="confirm-modal-message" id="confirm-message"></p>
+        <div class="confirm-modal-actions">
+            <button type="button" class="confirm-modal-btn confirm-modal-cancel" data-confirm-close>取消</button>
+            <button type="button" class="confirm-modal-btn confirm-modal-ok" id="confirm-ok">确认删除</button>
+        </div>
+    </div>
+</div>
+
 <!-- 后台快捷导航条（仅后台页面显示，v2.1 UI 优化：后台任意页一键跳转） -->
-{% set admin_nav = [
-    ('admin_dashboard', '📊 仪表盘'),
-    ('post_new',        '✏️ 写文章'),
-    ('admin_sync',      '☁️ 云同步'),
-    ('upload_file',     '📤 上传'),
-    ('admin_links',     '🤝 友链'),
-    ('admin_profile',   '🧑‍💻 资料'),
-] %}
-{% set is_admin_page = request.endpoint in (admin_nav | map(attribute=0) | list) %}
 {% if is_admin_page %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-5">
+<div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 pt-5">
     <nav class="glass-strong rounded-2xl px-3 py-2.5 flex items-center gap-1.5 overflow-x-auto
                 border border-cyber-500/15 shadow-cyber-sm">
         <span class="text-[11px] font-bold tracking-widest text-white/40 uppercase shrink-0 px-1.5 hidden sm:inline">
@@ -1090,7 +1209,7 @@
 {% endif %}
 
 <!-- 主内容 -->
-<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-10">
+<main class="flex-1 {% if is_admin_page %}max-w-[1600px]{% else %}max-w-7xl{% endif %} w-full mx-auto px-4 sm:px-6 py-6 md:py-10">
     {% block content %}{% endblock %}
 </main>
 
@@ -1098,7 +1217,7 @@
 <footer class="mt-12 relative overflow-hidden border-t border-cyber-500/15">
     <div class="absolute inset-0 pointer-events-none"
          style="background: radial-gradient(ellipse 800px 200px at 50% -20%, var(--bg-grad-1), transparent 70%);"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 relative">
+    <div class="{% if is_admin_page %}max-w-[1600px]{% else %}max-w-7xl{% endif %} mx-auto px-4 sm:px-6 py-10 relative">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
                 <div class="flex items-center gap-2.5 mb-3">
@@ -1159,6 +1278,8 @@
         </div>
         <div class="mt-10 pt-6 border-t border-cyber-500/15 text-center text-xs text-white/40 flex flex-wrap justify-center gap-x-4 gap-y-1">
             <span>© {{ site_year }} {{ site_name }}</span>
+            <span>·</span>
+            <span>v{{ config.APP_VERSION }}</span>
             <span>·</span>
             <span>Built with <span class="text-cyan-300">Flask</span> + <span class="text-blue-300">SQLite</span></span>
             <span>·</span>
@@ -1284,6 +1405,133 @@
             el.querySelector('.flash-close').addEventListener('click', function () { dismissFlash(el); });
         }
         return { show: show };
+    })();
+
+    // ---------- 4. 全局确认弹窗 BlogConfirm（替代原生 confirm：居中显示、跟随主题） ----------
+    // 页面加载后恢复删除操作前的滚动位置（配合 confirmFetch 的刷新中转）。
+    // 先禁用浏览器原生滚动恢复（auto 会在 load 后异步覆盖我们的恢复值），
+    // 只允许下面基于 sessionStorage 的显式恢复生效。
+    (function () {
+        try {
+            if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+        } catch (e) {}
+        var sp = null;
+        try { sp = sessionStorage.getItem('blog_admin_scroll'); } catch (e) { sp = null; }
+        if (sp !== null && sp !== '') {
+            try { sessionStorage.removeItem('blog_admin_scroll'); } catch (e) {}
+            var y = parseInt(sp, 10) || 0;
+            if (y > 0) {
+                var restore = function () {
+                    var maxY = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+                    window.scrollTo(0, Math.max(0, Math.min(y, maxY)));
+                };
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () {
+                        requestAnimationFrame(restore);
+                    });
+                } else {
+                    requestAnimationFrame(restore);
+                }
+            }
+        }
+    })();
+
+    window.BlogConfirm = (function () {
+        var modal = document.getElementById('confirm-modal');
+        var iconEl = document.getElementById('confirm-icon');
+        var titleEl = document.getElementById('confirm-title');
+        var msgEl = document.getElementById('confirm-message');
+        var okBtn = document.getElementById('confirm-ok');
+        var current = null;
+        var lastScrollY = 0;
+
+        function open() {
+            if (!modal) return;
+            lastScrollY = window.scrollY;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            // overflow:hidden 会让滚动条消失、视口变宽，浏览器会自行调整 scrollY，
+            // 这里立即恢复，保证弹窗关闭后（及删除等回调里读取的）位置与打开前一致。
+            window.scrollTo(0, lastScrollY);
+            // 打开后聚焦"确认"按钮，方便直接回车确认
+            setTimeout(function () { if (okBtn) okBtn.focus(); }, 60);
+        }
+        function close(result) {
+            if (!modal || !modal.classList.contains('open')) return;
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            // 恢复打开前的滚动位置（滚动条回来、视口变窄后再恢复，顺序不能反）
+            window.scrollTo(0, lastScrollY);
+            var cb = current ? (result ? current.onConfirm : current.onCancel) : null;
+            current = null;
+            if (cb) { try { cb(); } catch (e) { console.error('[BlogConfirm]', e); } }
+        }
+        function show(opts) {
+            opts = opts || {};
+            var danger = opts.danger !== false;
+            if (titleEl) titleEl.textContent = opts.title || (danger ? '删除确认' : '确认操作');
+            if (msgEl) msgEl.textContent = opts.message || '确定要执行此操作吗？';
+            if (okBtn) okBtn.textContent = opts.confirmText || (danger ? '确认删除' : '确认');
+            if (iconEl) {
+                iconEl.textContent = opts.icon || '⚠️';
+                iconEl.classList.toggle('warn', !danger);
+            }
+            current = { onConfirm: opts.onConfirm, onCancel: opts.onCancel };
+            open();
+        }
+        // 表单确认快捷方式：确认后提交该表单（替代原生 confirm 的 return 语义）
+        function confirmForm(form, message, opts) {
+            opts = opts || {};
+            opts.message = message || opts.message;
+            opts.danger = opts.danger !== false;
+            opts.onConfirm = function () { if (form && form.submit) form.submit(); };
+            show(opts);
+        }
+        // 表单确认 + fetch 提交：确认后原地发送请求，成功后整页刷新并恢复原滚动位置，
+        // 不回到顶部 —— 长列表中删除后停留在原滚动条位置，方便连续删除。
+        function confirmFetch(form, message, opts) {
+            opts = opts || {};
+            opts.message = message || opts.message;
+            opts.danger = opts.danger !== false;
+            opts.onConfirm = function () {
+                if (!form) { return; }
+                // 点击"确认"的瞬间记录滚动位置（在异步 fetch 之前，避免网络往返
+                // 期间任何滚动干扰），reload 后由页面级恢复逻辑还原。
+                var pos = window.scrollY;
+                try { sessionStorage.setItem('blog_admin_scroll', String(pos)); } catch (e) {}
+                var fd = new FormData(form);
+                var act = form.getAttribute('action') || form.action || location.href;
+                var mtd = (form.getAttribute('method') || 'POST').toUpperCase();
+                fetch(act, { method: mtd, body: fd, credentials: 'same-origin' })
+                    .then(function (resp) {
+                        if (!resp.ok) {
+                            try { sessionStorage.removeItem('blog_admin_scroll'); } catch (e) {}
+                            alert('操作失败（HTTP ' + resp.status + '），请重试');
+                            return;
+                        }
+                        location.reload();
+                    })
+                    .catch(function (err) {
+                        try { sessionStorage.removeItem('blog_admin_scroll'); } catch (e) {}
+                        alert('网络错误：' + (err && err.message ? err.message : err));
+                    });
+            };
+            show(opts);
+        }
+
+        // 关闭交互：取消按钮 / 点击遮罩 / Esc 键
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target && e.target.getAttribute('data-confirm-close') !== null) close(false);
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('open')) close(false);
+            });
+            if (okBtn) okBtn.addEventListener('click', function () { close(true); });
+        }
+        return { show: show, confirmForm: confirmForm, confirmFetch: confirmFetch, close: close };
     })();
 })();
 </script>

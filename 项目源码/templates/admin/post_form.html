@@ -371,30 +371,76 @@ document.addEventListener('DOMContentLoaded', function() {
             if (vditorInitialValue) {
                 vditor.setValue(vditorInitialValue);
             }
+            // 初始内容就位后固化离开确认基线
+            if (window.__setBlogLeaveBaseline) window.__setBlogLeaveBaseline();
         }
     });
 });
 
-/* ============ 离开确认（适配 Vditor） ============ */
+/* ============ 离开确认（自定义主题化弹窗 + beforeunload 兜底） ============ */
 (function(){
     const form = document.getElementById('postForm');
     const hiddenInput = document.getElementById('mdEditor');
     let submitting = false;
-    // 提交时标记，避免 beforeunload 误拦正常保存
+    let leaveConfirmed = false;
+    let baseline = null;  // 基线：vditor 初始化完成后由 after 回调设置（空文章初始值可能带 \n）
+
+    function getCurrent() {
+        if (typeof vditor !== 'undefined' && vditor && typeof vditor.getValue === 'function') {
+            return vditor.getValue();
+        }
+        return hiddenInput.value;
+    }
+    function isDirty() {
+        // 基线未就绪（vditor 尚未初始化完成）时保守视为有未保存内容
+        if (baseline === null) return true;
+        return getCurrent() !== baseline;
+    }
+    // 供 vditor after 回调在初始内容就位后固化基线
+    window.__setBlogLeaveBaseline = function () { baseline = getCurrent(); };
+
+    // 提交时标记，避免误拦正常保存
     form.addEventListener('submit', function(){
         submitting = true;
         // 确保 Vditor 最新值已同步到隐藏字段
-        if (vditor && typeof vditor.getValue === 'function') {
-            hiddenInput.value = vditor.getValue();
-        }
+        hiddenInput.value = getCurrent();
     });
+
+    // 页内离开动作（点击链接 / 提交其它表单）→ 自定义居中弹窗确认
+    function guardLeave(action) {
+        if (submitting || leaveConfirmed || !isDirty()) { action(); return; }
+        BlogConfirm.show({
+            title: '未保存的更改',
+            message: '你还没有保存这篇内容，确定要离开吗？离开后未保存的修改将丢失。',
+            confirmText: '仍要离开',
+            danger: true,
+            icon: '📝',
+            onConfirm: function () { leaveConfirmed = true; action(); },
+            onCancel: function () { /* 留在当前页面 */ }
+        });
+    }
+
+    // 捕获阶段拦截链接点击（排除新窗口/下载/锚点）
+    document.addEventListener('click', function (e) {
+        const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+        if (!a) return;
+        const href = a.getAttribute('href') || '';
+        if (a.target === '_blank' || a.hasAttribute('download') || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
+        e.preventDefault();
+        guardLeave(function () { window.location.href = a.href; });
+    }, true);
+
+    // 拦截非 postForm 的表单提交（兜底）
+    document.addEventListener('submit', function (e) {
+        if (e.target === form) return;  // 主表单走正常保存流程
+        e.preventDefault();
+        guardLeave(function () { e.target.submit(); });
+    }, true);
+
+    // 浏览器原生兜底（仅窗口关闭 / 刷新时触发；原生对话框样式不可自定义）
     window.addEventListener('beforeunload', function(e){
-        if (submitting) return;  // 正在提交，放行
-        let current = hiddenInput.value;
-        if (vditor && typeof vditor.getValue === 'function') {
-            current = vditor.getValue();
-        }
-        if (current !== vditorInitialValue) {
+        if (submitting || leaveConfirmed) return;  // 正在提交或已确认离开，放行
+        if (isDirty()) {
             e.preventDefault();
             e.returnValue = '';
         }
